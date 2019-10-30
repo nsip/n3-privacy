@@ -13,6 +13,9 @@ func prepareJQ(jqDirs ...string) (jqWD, oriWD string, err error) {
 	FailOnErr("Getwd() 1 fatal @ %v: %w", fn, err)
 	jqDirs = append(jqDirs, "./")
 	for _, jqWD = range jqDirs {
+		if !strings.HasSuffix(jqWD, "/") {
+			jqWD += "/"
+		}
 		if _, err = os.Stat(jqWD + jq); err == nil {
 			FailOnErr("Chdir() fatal @ %v: %w", fn, os.Chdir(jqWD))
 			jqWD, err = os.Getwd()

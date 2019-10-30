@@ -16,7 +16,14 @@
               {
                 "TestItemRefId": "----------",
                 "TestItemContent": {
-                  "NAPTestItemLocalId": "----------"
+                  "NAPTestItemLocalId": "----------",
+                  "ItemSubstitutedForList": {
+                    "SubstituteItem": [
+                      {                        
+                        "SubstituteItemLocalId": "----------"
+                      }
+                    ]
+                  }
                 }
               }
             ]

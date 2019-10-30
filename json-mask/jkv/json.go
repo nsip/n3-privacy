@@ -8,15 +8,21 @@ import (
 	"math"
 )
 
+// IsJSON :
 func IsJSON(str string) bool {
 	var js json.RawMessage
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
+// IsJSONArr :
+func IsJSONArr(str string) bool {
+	return str[0] == '['
+}
+
 // NewJKV :
-func NewJKV(jsonstr string) *JKV {
+func NewJKV(jsonstr, dfltroot string) *JKV {
 	jkv := &JKV{
-		json: jsonstr,
+		JSON: jsonstr,
 		lsLvlIPaths: [][]string{
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
@@ -34,18 +40,57 @@ func NewJKV(jsonstr string) *JKV {
 		mOIDType:      make(map[string]JTYPE),  // oid's type is OBJ or ARR|OBJ
 	}
 	jkv.init()
-	return jkv
+	if dfltroot == "" {
+		return jkv
+	}
+	return jkv.wrapDefault(dfltroot)
 }
+
+// SplitJSONArr :
+func SplitJSONArr(json string) []string {
+	if json[0] != '[' {
+		return nil
+	}
+	arr := sSpl(json, "},\n  {")
+	for i := 0; i < len(arr); i++ {
+		if i == 0 {
+			arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
+		} else if i == len(arr)-1 {
+			arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
+		} else {
+			arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
+		}
+		if !sHasSuffix(arr[i], "\n") {
+			arr[i] += "\n"
+		}
+	}
+	return arr
+}
+
+// MergeJSONs :
+func MergeJSONs(jsons ...string) (arrstr string) {
+	if len(jsons) == 1 {
+		arrstr, _ = Indent("[\n"+jsons[0], 2, true)
+	} else {
+		tmp := sJoin(jsons, ",")
+		tmp = sReplaceAll(tmp, "}\n,{", "},\n{")
+		arrstr, _ = Indent("[\n"+tmp, 2, true)
+	}
+	arrstr += "]\n"
+	return
+}
+
+// **************************************************************** //
 
 // isJSON :
 func (jkv *JKV) isJSON() bool {
-	return IsJSON(jkv.json)
+	return IsJSON(jkv.JSON)
 }
 
 // scan :                        L   posarr     pos L
 func (jkv *JKV) scan() (int, map[int][]int, map[int]int, error) {
 	Lm, offset := -1, 0
-	if s := jkv.json; jkv.isJSON() {
+	if s := jkv.JSON; jkv.isJSON() {
 		mLvlFParr := make(map[int][]int)
 		for i := 0; i <= LvlMax; i++ {
 			mLvlFParr[i] = []int{}
@@ -105,7 +150,7 @@ func (jkv *JKV) scan() (int, map[int][]int, map[int]int, error) {
 
 // fields :
 func (jkv *JKV) fields(mLvlFPos map[int][]int) []map[int]string {
-	s, keys := jkv.json, MapKeys(mLvlFPos).([]int)
+	s, keys := jkv.JSON, MapKeys(mLvlFPos).([]int)
 	nLVL := keys[len(keys)-1]
 	mFPosFNameList := []map[int]string{map[int]string{}} // L0 is empty
 	for L := 1; L <= nLVL; L++ {                         // from L1 to Ln
@@ -227,7 +272,7 @@ func (jkv *JKV) fValueType(p int) (v string, t JTYPE) {
 		panic("Shouldn't be here @ getAV")
 	}
 
-	s := jkv.json
+	s := jkv.JSON
 	v1c, pv := byte(0), 0
 	for i := p; i < len(s); i++ {
 		if S(s[i:]).HP(TraitFV) {
@@ -401,6 +446,8 @@ func AOIDStrToOIDs(aoidstr string) (oids []string) {
 	return
 }
 
+// ******************************************** //
+
 // QueryPV : value ("*.*") for no path checking
 func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]string, maxLvl int) {
 	mLvlOIDs = make(map[int][]string)
@@ -444,13 +491,73 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 	return mLvlOIDs, maxLvl
 }
 
+// wrapDefault :
+func (jkv *JKV) wrapDefault(root string) *JKV {
+	if len(jkv.lsLvlIPaths[1]) == 1 {
+		return jkv
+	}
+	json := jkv.JSON
+
+	jsonInd, _ := Indent(json, 2, true)
+	rooted1 := fSf("{\n  \"%s\": %s}\n", root, jsonInd)
+	// rooted2 := fSf("{\n  \"%s\": %s}", root, json)
+	// rooted2 = pp.FmtJSONStr(rooted2, "/mnt/ramdisk/")
+	// if rooted1 != rooted2 {
+	// 	FailOnErr("%v @ wrapDefault", errors.New("error rooted"))
+	// }
+
+	// fPln(" ----------------------------------------------- ")
+	jkvR := NewJKV(rooted1, "")
+	jkvR.Wrapped = true
+	return jkvR
+}
+
+// UnwrapDefault :
+func (jkv *JKV) UnwrapDefault() *JKV {
+	if !jkv.Wrapped {
+		return jkv
+	}
+	json := jkv.JSON
+	i, j, n1, n2 := 0, len(json)-1, 0, 0
+	for i, j = 0, len(json)-1; i < len(json) && j >= 0; {
+		if n1 < 2 {
+			if json[i] == '{' {
+				n1++
+			}
+			i++
+		}
+		if n2 < 2 {
+			if json[j] == '}' {
+				n2++
+			}
+			j--
+		}
+		if n1 == 2 && n2 == 2 {
+			break
+		}
+	}
+
+	unrooted1, _ := Indent(json[i-1:j+2], -2, true)
+	unrooted1 += "\n"
+	// fPln(unrooted1)
+	// unrooted2 := pp.FmtJSONStr(json[i-1:j+2], "/mnt/ramdisk/")
+	// fPln(unrooted2)
+	// if unrooted1 != unrooted2 {
+	// 	FailOnErr("%v @ UnwrapDefault", errors.New("error unrooted"))
+	// }
+
+	jkvUnR := NewJKV(unrooted1, "")
+	jkvUnR.Wrapped = false
+	return jkvUnR
+}
+
 // Unfold :
 func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 	frame := ""
 	if len(jkv.lsLvlIPaths[1]) == 0 {
 		frame = ""
 	} else if len(jkv.lsLvlIPaths[1]) != 0 && len(jkv.lsLvlIPaths[2]) == 0 {
-		frame = jkv.json
+		frame = jkv.JSON
 	} else {
 		firstField := jkv.lsLvlIPaths[1][0]
 		lvl1path := S(firstField).RmTailFromLast("@").V()

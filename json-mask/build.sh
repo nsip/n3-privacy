@@ -6,29 +6,32 @@ set -e
 GOPATH=`go env GOPATH`
 ORIGINALPATH=`pwd`
 
+UPATH="./preprocess/utils"
+
 rm -rf ./build
+rm -rf $UPATH
 
 mkdir -p ./build/Linux64 ./build/Win64 ./build/Mac
-mkdir -p ./preprocess/util
+mkdir -p $UPATH
 
 JQURL="https://github.com/stedolan/jq/releases/download/jq-1.6"
 JQ="jq-linux64"
-if [ ! -f ./preprocess/util/$JQ ]; then    
-    curl -o $JQ -L $JQURL/$JQ && mv $JQ ./preprocess/util/ && chmod 777 ./preprocess/util/$JQ
+if [ ! -f $UPATH/$JQ ]; then    
+    curl -o $UPATH/$JQ -L $JQURL/$JQ && chmod 777 $UPATH/$JQ
 fi
-cp ./preprocess/util/$JQ ./build/Linux64/jq
+cp $UPATH/$JQ ./build/Linux64/jq
 
 JQ="jq-win64.exe"
-if [ ! -f ./preprocess/util/$JQ ]; then    
-    curl -o $JQ -L $JQURL/$JQ && mv $JQ ./preprocess/util/
+if [ ! -f $UPATH/$JQ ]; then    
+    curl -o $UPATH/$JQ -L $JQURL/$JQ
 fi
-cp ./preprocess/util/$JQ ./build/Win64/jq.exe
+cp $UPATH/$JQ ./build/Win64/jq.exe
 
 JQ="jq-osx-amd64"
-if [ ! -f ./preprocess/util/$JQ ]; then    
-    curl -o $JQ -L $JQURL/$JQ && mv $JQ ./preprocess/util/ && chmod 777 ./preprocess/util/$JQ
+if [ ! -f $UPATH/$JQ ]; then    
+    curl -o $UPATH/$JQ -L $JQURL/$JQ && chmod 777 $UPATH/$JQ
 fi
-cp ./preprocess/util/$JQ ./build/Mac/jq
+cp $UPATH/$JQ ./build/Mac/jq
 
 ###
 

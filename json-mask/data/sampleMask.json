@@ -5,6 +5,7 @@
                 "GlossEntry": {
                     "ID": "-----",
                     "SortAs": "-----",
+                    "Acronym": "-----",
                     "GlossDef": {
                         "para": "-----",
                         "GlossSeeAlso": "*****"

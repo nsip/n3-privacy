@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -44,6 +45,11 @@ var (
 	sReplace    = strings.Replace
 	sReplaceAll = strings.ReplaceAll
 	sIndex      = strings.Index
+	sLastIndex  = strings.LastIndex
+	sTrim       = strings.Trim
+	sTrimLeft   = strings.TrimLeft
+	sHasPrefix  = strings.HasPrefix
+	sHasSuffix  = strings.HasSuffix
 	IF          = u.IF
 	MapKeys     = u.MapKeys
 	MapKVs      = u.MapKVs
@@ -106,28 +112,9 @@ var (
 	rSHA256, _ = regexp.Compile("[a-f0-9]{64}")
 )
 
-// var (
-// 	// lsLvlIPaths is 2D slice for each Level's each ipath
-// 	lsLvlIPaths = [][]string{
-// 		{}, {}, {}, {}, {},
-// 		{}, {}, {}, {}, {},
-// 		{}, {}, {}, {}, {},
-// 		{}, {}, {}, {}, {},
-// 		{}, {}, {}, {}, {},
-// 	}
-// 	mPathMIdx   = make(map[string]int)    //
-// 	mIPathPos   = make(map[string]int)    //
-// 	mIPathValue = make(map[string]string) //
-// 	mIPathOID   = make(map[string]string) //
-// 	mOIDIPath   = make(map[string]string) //
-// 	mOIDObj     = make(map[string]string) //
-// 	mOIDLvl     = make(map[string]int)    // from 1 ...
-// 	mOIDType    = make(map[string]JTYPE)  // oid's type is OBJ or ARR|OBJ
-// )
-
 // JKV :
 type JKV struct {
-	json          string
+	JSON          string
 	lsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
 	mPathMIdx     map[string]int    //
 	mIPathPos     map[string]int    //
@@ -137,6 +124,7 @@ type JKV struct {
 	mOIDObj       map[string]string //
 	mOIDLvl       map[string]int    // from 1 ...
 	mOIDType      map[string]JTYPE  // oid's type is OBJ or ARR|OBJ
+	Wrapped       bool              //
 }
 
 // ********************************************************** //
@@ -180,4 +168,50 @@ func TL(nChar int) (string, int) {
 func tmTrack(start time.Time) {
 	elapsed := time.Since(start)
 	fPf("took %s\n", elapsed)
+}
+
+// FailOnErr :
+func FailOnErr(format string, v ...interface{}) {
+	for _, p := range v {
+		switch p.(type) {
+		case error:
+			{
+				if p != nil {
+					log.Fatalf(format, v...)
+				}
+			}
+		}
+	}
+}
+
+// Indent :
+func Indent(str string, n int, ignoreFirstLine bool) (string, bool) {
+	if n == 0 {
+		return str, false
+	}
+	S := 0
+	if ignoreFirstLine {
+		S = 1
+	}
+	lines := sSpl(str, "\n")
+	if n > 0 {
+		space := ""
+		for i := 0; i < n; i++ {
+			space += " "
+		}
+		for i := S; i < len(lines); i++ {
+			lines[i] = space + lines[i]
+		}
+	} else {
+		for i := S; i < len(lines); i++ {
+			if len(lines[i]) == 0 { //                                         ignore empty string line
+				continue
+			}
+			if len(lines[i]) <= -n || sTrimLeft(lines[i][:-n], " ") != "" { // cannot be indented as <n>, give up indent
+				return str, false
+			}
+			lines[i] = lines[i][-n:]
+		}
+	}
+	return sTrim(sJoin(lines, "\n"), " "), true
 }

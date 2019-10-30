@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"./jkv"
 	pp "./preprocess"
@@ -31,9 +32,34 @@ func main() {
 		output = output + ".json"
 	}
 
-	jsonData := strings.ReplaceAll(pp.FmtJSONFile(inputfp), "\r\n", "\n")
-	jsonMask := strings.ReplaceAll(pp.FmtJSONFile(maskfp), "\r\n", "\n")
-	jkvD, jkvM := jkv.NewJKV(jsonData), jkv.NewJKV(jsonMask)
-	masked, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
-	ioutil.WriteFile(output, []byte(masked), 0666)
+	data := strings.ReplaceAll(pp.FmtJSONFile(inputfp), "\r\n", "\n")
+	mask := strings.ReplaceAll(pp.FmtJSONFile(maskfp), "\r\n", "\n")
+	jkvM := jkv.NewJKV(mask, "root")
+
+	if jkv.IsJSONArr(data) {
+		jsonarr := jkv.SplitJSONArr(data)
+		wg := sync.WaitGroup{}
+		wg.Add(len(jsonarr))
+		jsons := make([]string, len(jsonarr))
+		for i, json := range jsonarr {
+			go func(i int, json string) {
+				defer wg.Done()
+				jkvD := jkv.NewJKV(json, "root")
+				maskroot, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
+				jkvMR := jkv.NewJKV(maskroot, "")
+				jkvMR.Wrapped = jkvD.Wrapped
+				jsons[i] = jkvMR.UnwrapDefault().JSON
+			}(i, json)
+		}
+		wg.Wait()
+		ioutil.WriteFile(output, []byte(jkv.MergeJSONs(jsons...)), 0666)
+
+	} else {
+		jkvD := jkv.NewJKV(data, "root")
+		maskroot, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
+		jkvMR := jkv.NewJKV(maskroot, "")
+		jkvMR.Wrapped = jkvD.Wrapped
+		json := jkvMR.UnwrapDefault().JSON
+		ioutil.WriteFile(output, []byte(json), 0666)
+	}
 }
