@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math"
+	"sync"
 )
 
 // IsJSON :
@@ -51,19 +52,39 @@ func SplitJSONArr(json string) []string {
 	if json[0] != '[' {
 		return nil
 	}
+
 	arr := sSpl(json, "},\n  {")
-	for i := 0; i < len(arr); i++ {
-		if i == 0 {
-			arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
-		} else if i == len(arr)-1 {
-			arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
-		} else {
-			arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
-		}
-		if !sHasSuffix(arr[i], "\n") {
-			arr[i] += "\n"
-		}
+	larr := len(arr)
+	wg := sync.WaitGroup{}
+	wg.Add(larr)
+	for i := 0; i < larr; i++ {
+		// if i == 0 {
+		// 	arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
+		// } else if i == larr-1 {
+		// 	arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
+		// } else {
+		// 	arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
+		// }
+		// if !sHasSuffix(arr[i], "\n") {
+		// 	arr[i] += "\n"
+		// }
+
+		go func(i int) {
+			defer wg.Done()
+			switch i {
+			case 0:
+				arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
+			case larr - 1:
+				arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
+			default:
+				arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
+			}
+			if !sHasSuffix(arr[i], "\n") {
+				arr[i] += "\n"
+			}
+		}(i)
 	}
+	wg.Wait()
 	return arr
 }
 
