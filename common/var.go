@@ -1,7 +1,8 @@
-package main
+package common
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -20,19 +21,8 @@ var (
 	sTrimLeft   = strings.TrimLeft
 	sHasPrefix  = strings.HasPrefix
 	sHasSuffix  = strings.HasSuffix
-)
 
-const (
-	linker = "#"
+	RExpMD5, _    = regexp.Compile("[a-f0-9]{32}")
+	RExpSHA1, _   = regexp.Compile("[a-f0-9]{40}")
+	RExpSHA256, _ = regexp.Compile("[a-f0-9]{64}")
 )
-
-var (
-	mCtxUNum  = make(map[string]int)    // contextID       - User Count
-	mCIdxUID  = make(map[string]string) // contextID#Index - UUID
-	mUOrwMask = make(map[string]string) // UUID#Object#RW  - mask.json
-)
-
-// SILink :
-func SILink(s string, i int) string {
-	return fSf("%s%s%d", s, linker, i)
-}

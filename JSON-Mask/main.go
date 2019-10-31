@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"./jkv"
-	pp "./preprocess"
+	"../jkv"
+	pp "../preprocess"
 )
 
 func main() {

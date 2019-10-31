@@ -1,0 +1,14 @@
+{
+  "xapi": {
+    "fields": [
+      "a",
+      "b"
+    ]
+  },
+  "SchoolInfo": {
+    "fields": [
+      "c",
+      "d"
+    ]
+  }
+}

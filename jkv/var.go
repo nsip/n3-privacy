@@ -3,14 +3,8 @@
 package jkv
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
 	"fmt"
-	"log"
-	"regexp"
 	"strings"
-	"time"
 
 	u "github.com/cdutwhu/go-util"
 	w "github.com/cdutwhu/go-wrappers"
@@ -104,12 +98,9 @@ const (
 
 // readonly var
 var (
-	sTAOS      = []string{AOS0, AOS1, AOS2, AOS3, AOS4, AOS5, AOS6, AOS7, AOS8, AOS9, AOS10, AOS11, AOS12}
-	sTAOE      = []string{AOE0, AOE1, AOE2, AOE3, AOE4, AOE5, AOE6, AOE7, AOE8, AOE9, AOE10, AOE11, AOE12}
-	pLinker    = pathLinker
-	rMD5, _    = regexp.Compile("[a-f0-9]{32}")
-	rSHA1, _   = regexp.Compile("[a-f0-9]{40}")
-	rSHA256, _ = regexp.Compile("[a-f0-9]{64}")
+	sTAOS   = []string{AOS0, AOS1, AOS2, AOS3, AOS4, AOS5, AOS6, AOS7, AOS8, AOS9, AOS10, AOS11, AOS12}
+	sTAOE   = []string{AOE0, AOE1, AOE2, AOE3, AOE4, AOE5, AOE6, AOE7, AOE8, AOE9, AOE10, AOE11, AOE12}
+	pLinker = pathLinker
 )
 
 // JKV :
@@ -128,21 +119,6 @@ type JKV struct {
 }
 
 // ********************************************************** //
-
-// SHA1Str :
-func SHA1Str(s string) string {
-	return fSf("%x", sha1.Sum([]byte(s)))
-}
-
-// SHA256Str :
-func SHA256Str(s string) string {
-	return fSf("%x", sha256.Sum256([]byte(s)))
-}
-
-// MD5Str :
-func MD5Str(s string) string {
-	return fSf("%x", md5.Sum([]byte(s)))
-}
 
 // T : JSON line Search Feature.
 func T(lvl int) string {
@@ -163,25 +139,6 @@ func NT(T string) string {
 func TL(nChar int) (string, int) {
 	lvl := (nChar - 1) / 2
 	return T(lvl), lvl
-}
-
-func tmTrack(start time.Time) {
-	elapsed := time.Since(start)
-	fPf("took %s\n", elapsed)
-}
-
-// FailOnErr :
-func FailOnErr(format string, v ...interface{}) {
-	for _, p := range v {
-		switch p.(type) {
-		case error:
-			{
-				if p != nil {
-					log.Fatalf(format, v...)
-				}
-			}
-		}
-	}
 }
 
 // Indent :

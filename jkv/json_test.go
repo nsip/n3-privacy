@@ -6,36 +6,27 @@ import (
 	"testing"
 	"time"
 
+	cmn "../common"
 	pp "../preprocess"
 )
 
 func TestSplitJSONArr(t *testing.T) {
-	defer tmTrack(time.Now())
-
-	jarr := pp.FmtJSONFile("../../data/xapi.json", "../build/Linux64/")
+	defer cmn.TmTrack(time.Now())
+	jarr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
 	if arr := SplitJSONArr(jarr); arr != nil {
-		// fPln(arr[0])
-		// fPln("---------------------------")
-		// fPln(arr[1])
-		// fPln("---------------------------")
-		// fPln(arr[len(arr)-1])
-		// fPln("---------------------------")
-
-		// --------------------------------------------------- //
-
 		jarr1 := MergeJSONs(arr...)
 		if jarr != jarr1 {
 			panic("abc")
 		}
 
 	} else {
-		FailOnErr("%v", errors.New("non-formatted json array"))
+		cmn.FailOnErr("%v", errors.New("non-formatted json array"))
 	}
 }
 
 func TestScan(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/NAPCodeFrame.json"); e == nil {
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		jkv := NewJKV(string(jsonbytes), "")
 		LVL, mLvlFParr, mFPosLvl, _ := jkv.scan()
 		fPln("levels:", LVL)
@@ -49,8 +40,8 @@ func TestScan(t *testing.T) {
 }
 
 func TestFieldByPos(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/NAPCodeFrame.json"); e == nil {
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		jkv := NewJKV(string(jsonbytes), "")
 		LVL, mLvlFParr, _, _ := jkv.scan()
 		// for k, v := range mLvlFParr {
@@ -74,32 +65,30 @@ func TestFieldByPos(t *testing.T) {
 }
 
 func TestFType(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/NAPCodeFrame.json"); e == nil {
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		jkv := NewJKV(string(jsonbytes), "")
 		value, typ := jkv.fValueType(1617)
 		fPln(typ.Str())
-
 		if typ == ARR|OBJ {
 			objs := fValuesOnObjs(value)
 			fPln(objs[1])
 		}
-
 	}
 }
 
 func TestInit(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/NAPCodeFrame.json"); e == nil {
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		NewJKV(string(jsonbytes), "")
 	}
 	fPln("break")
 }
 
 func TestWrap(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/xapi1.json"); e == nil {
-		json := pp.FmtJSONStr(string(jsonbytes), "../build/Linux64")
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/xapi1.json"); e == nil {
+		json := pp.FmtJSONStr(string(jsonbytes), "../preprocess/utils/")
 		jkv := NewJKV(sReplaceAll(json, "\r\n", "\n"), "root")
 		fPln("--- Init ---")
 		fPln(jkv.JSON)
@@ -108,11 +97,11 @@ func TestWrap(t *testing.T) {
 }
 
 func TestUnfold(t *testing.T) {
-	defer tmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../data/xapi1.json"); e == nil {
+	defer cmn.TmTrack(time.Now())
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/xapi1.json"); e == nil {
 		// fPln(string(jsonbytes))
 
-		json := pp.FmtJSONStr(string(jsonbytes), "../build/Linux64/")
+		json := pp.FmtJSONStr(string(jsonbytes), "../preprocess/utils/")
 		jkv := NewJKV(sReplaceAll(json, "\r\n", "\n"), "root")
 		fPln("--- Init ---")
 		fPln(jkv.Wrapped)
@@ -130,10 +119,10 @@ func TestUnfold(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	defer tmTrack(time.Now())
+	defer cmn.TmTrack(time.Now())
 	param := "NAPTestItemLocalId"
 	value := "x00101935"
-	if jsonbytes, e := ioutil.ReadFile("../data/NAPCodeFrame.json"); e == nil {
+	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		// jstr := jStr(string(jsonbytes))
 		jkv := NewJKV(string(jsonbytes), "")
 		fPln("--- Init ---")

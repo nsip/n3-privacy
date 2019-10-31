@@ -6,7 +6,7 @@ set -e
 GOPATH=`go env GOPATH`
 ORIGINALPATH=`pwd`
 
-UPATH="./preprocess/utils"
+UPATH="../preprocess/utils"
 
 rm -rf ./build
 rm -rf $UPATH
@@ -20,6 +20,7 @@ if [ ! -f $UPATH/$JQ ]; then
     curl -o $UPATH/$JQ -L $JQURL/$JQ && chmod 777 $UPATH/$JQ
 fi
 cp $UPATH/$JQ ./build/Linux64/jq
+cp $UPATH/$JQ $UPATH/jq                   # For Unit Test 
 
 JQ="jq-win64.exe"
 if [ ! -f $UPATH/$JQ ]; then    
@@ -39,10 +40,11 @@ cp $UPATH/$JQ ./build/Mac/jq
 
 GOARCH=amd64
 LDFLAGS="-s -w"
+OUT=jm
 
-GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o json-mask
-mv json-mask ./build/Linux64/
-GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o json-mask.exe
-mv json-mask.exe ./build/Win64/
-GOOS="darwin" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o json-mask
-mv json-mask ./build/Mac/
+GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
+mv $OUT ./build/Linux64/
+GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT.exe
+mv $OUT.exe ./build/Win64/
+GOOS="darwin" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
+mv $OUT ./build/Mac/

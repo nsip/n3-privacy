@@ -7,6 +7,8 @@ import (
 	"errors"
 	"math"
 	"sync"
+
+	cmn "../common"
 )
 
 // IsJSON :
@@ -380,7 +382,7 @@ func (jkv *JKV) init() error {
 				if !IsJSON(v) {
 					panic("fetching value error")
 				}
-				oid = SHA1Str(v)
+				oid = cmn.SHA1Str(v)
 				jkv.mOIDObj[oid] = v
 				v = oid
 				if t.IsObj() || t.IsObjArr() {
@@ -448,7 +450,7 @@ func (jkv *JKV) expAOID(aoid string) string {
 		strobjs := jkv.mOIDObj[aoid]
 		objs := fValuesOnObjs(strobjs)
 		for _, obj := range objs {
-			oid := SHA1Str(obj)
+			oid := cmn.SHA1Str(obj)
 			jkv.mOIDObj[oid] = obj
 			strobjs = sReplace(strobjs, obj, oid, 1)
 		}
@@ -460,7 +462,7 @@ func (jkv *JKV) expAOID(aoid string) string {
 // AOIDStrToOIDs :
 func AOIDStrToOIDs(aoidstr string) (oids []string) {
 	nComma := sCount(aoidstr, ",")
-	oids = rSHA1.FindAllString(aoidstr, -1)
+	oids = cmn.RExpSHA1.FindAllString(aoidstr, -1)
 	if aoidstr[0] != '[' || aoidstr[len(aoidstr)-1] != ']' || (oids != nil && len(oids) != nComma+1) {
 		panic("error format @ AOIDStr")
 	}
@@ -592,7 +594,7 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 		iExp++
 
 		// [object array whole oid] => [ oid, oid, oid ... ]
-		for _, oid := range rSHA1.FindAllString(frame, -1) {
+		for _, oid := range cmn.RExpSHA1.FindAllString(frame, -1) {
 			if jkv.mOIDType[oid].IsObjArr() {
 				frame = sReplaceAll(frame, oid, jkv.mOIDObj[oid])
 			}
@@ -601,13 +603,13 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 			return frame, iExp // DEBUG testing, NOT REAL JSON
 		}
 
-		if oids := rSHA1.FindAllString(frame, -1); oids != nil {
+		if oids := cmn.RExpSHA1.FindAllString(frame, -1); oids != nil {
 			for _, oid := range oids {
 				obj := jkv.mOIDObj[oid]
 				frame = sReplaceAll(frame, oid, Mask(obj, iExp, mask))
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
-				for _, oid := range rSHA1.FindAllString(obj, -1) {
+				for _, oid := range cmn.RExpSHA1.FindAllString(obj, -1) {
 					if jkv.mOIDType[oid].IsObjArr() {
 						frame = sReplaceAll(frame, oid, jkv.mOIDObj[oid])
 					}
@@ -671,7 +673,7 @@ func Mask(obj string, lvl int, maskPathValue map[string]string) string {
 				// val := obj[pvStart : pvStart+pvEnd]
 				// fPln(val)
 
-				if rSHA1.FindStringIndex(value) == nil {
+				if cmn.RExpSHA1.FindStringIndex(value) == nil {
 					obj = obj[:pvStart] + value + obj[pvStart+pvEnd:]
 				}
 			}
