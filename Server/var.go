@@ -37,6 +37,12 @@ var (
 	mMIDRWMask = make(map[string]string)   // MaskID#[R/W] - Mask
 )
 
+// MetaData :
+type MetaData struct {
+	Object string   `json:"object"`
+	Fields []string `json:"fields"`
+}
+
 // siLink :
 func siLink(s string, i int) string {
 	return fSf("%s%s%d", s, linker, i)

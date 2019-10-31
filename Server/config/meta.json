@@ -1,14 +1,16 @@
-{
-  "xapi": {
+[
+  {
+    "object": "xapi",
     "fields": [
       "a",
       "b"
     ]
   },
-  "SchoolInfo": {
+  {
+    "object": "SchoolInfo",
     "fields": [
       "c",
       "d"
     ]
   }
-}
+]

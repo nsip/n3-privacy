@@ -1,11 +1,17 @@
 package main
 
 import (
+	"encoding/json"
+
 	cmn "../common"
 )
 
-// ObjFromPolicy :
-func ObjFromPolicy(mask string) string {
+func parsePolicy(mask string) string {
+	return "xapi"
+}
+
+// PolicyObject :
+func PolicyObject(mask string) string {
 	return "xapi"
 }
 
@@ -32,7 +38,7 @@ func GetPolicy(uid, ctx, object, rw string) (string, bool) {
 		}
 		for _, mid := range lsMIDuc {
 			mask := mMIDRWMask[ssLink(mid, rw)]
-			if object == ObjFromPolicy(mask) {
+			if object == PolicyObject(mask) {
 				return mask, true
 			}
 		}
@@ -44,4 +50,9 @@ func main() {
 	UpdatePolicy("qm", "ctx1", "r", "policy.json")
 	policy, ok := GetPolicy("qm", "ctx1", "xapi", "r")
 	fPln(policy, ok)
+
+	md := &MetaData{Object: "A", Fields: []string{"B", "C"}}
+	if b, e := json.Marshal(md); e == nil {
+		fPln(string(b))
+	}
 }

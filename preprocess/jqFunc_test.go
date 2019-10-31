@@ -31,8 +31,8 @@ func TestJQ(t *testing.T) {
 	// formatted := FmtJSONFile("../../data/xapi.json", "../", "./", "../build/Linux64/")
 	// ioutil.WriteFile("fmt.json", []byte(formatted), 0666)
 
-	formatted := FmtJSONFile("../../Server/config/objfeat.json", "./utils/")
-	ioutil.WriteFile("../Server/config/objfeat.json", []byte(formatted), 0666)
+	formatted := FmtJSONFile("../../Server/config/meta.json", "./utils/")
+	ioutil.WriteFile("../Server/config/meta.json", []byte(formatted), 0666)
 
 	fmt.Println()
 	// FmtJSONFile("../data/xapi1.json", "../", "./", "./utils/")
