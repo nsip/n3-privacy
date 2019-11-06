@@ -2,14 +2,65 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"os"
 
 	cmn "github.com/nsip/n3-privacy/common"
+	"github.com/nsip/n3-privacy/jkv"
+	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 // when a mask is coming, parse and record it to meta.json
-func parsePolicy(mask string) string {
+func recPolicy(mask string) (updated bool) {
 
-	return "xapi"
+	jkvM := jkv.NewJKV(mask, "ToBeNamed")
+	if jkvM.Wrapped {
+		fPln("wrapped")
+	} else {
+		fPln("Not Wrapped")
+	}
+
+	object := jkvM.LsLvlFields[1][0]
+	// object = sSpl(object, "@")[0]
+
+	fields := []string{}
+	for _, field := range jkvM.LsLvlFields[2] {
+		//ifield := sSpl(ipath, jkv.PathLinker)[1]
+		// field := sSpl(ifield, "@")[0]
+		fields = append(fields, field)
+	}
+
+	md := &MetaData{Object: object, Fields: fields}
+	if b, e := json.Marshal(md); e == nil {
+		newPolicy := pp.FmtJSONStr(string(b), "../preprocess/utils")
+
+		// first meta.
+		if _, err := os.Stat("./config/meta.json"); err != nil && os.IsNotExist(err) {
+			newPolicy, _ = jkv.Indent(newPolicy, 2, false)
+			newPolicy = fSf("[\n%s]", newPolicy)
+			ioutil.WriteFile("./config/meta.json", []byte(newPolicy), 0666) // make sure meta.json is filled with formated json
+			return
+		}
+
+		b, _ = ioutil.ReadFile("./config/meta.json")
+		policies := jkv.SplitJSONArr(string(b))
+
+		// update
+		for i, policy := range policies {
+			md := MetaData{}
+			json.Unmarshal([]byte(policy), &md)
+			if md.Object == object {
+				policies[i] = newPolicy
+				updated = true
+			}
+		}
+		if !updated {
+			policies = append(policies, newPolicy)
+		}
+		ioutil.WriteFile("./config/meta.json", []byte(jkv.MergeJSONs(policies...)), 0666)
+	}
+
+	return
 }
 
 // policyObject :

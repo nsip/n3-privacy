@@ -1,16 +1,31 @@
 [
   {
-    "object": "xapi",
+    "object": "glossary",
     "fields": [
-      "a",
-      "b"
+      "GlossDiv",
+      "GlossDiv1"
     ]
   },
   {
-    "object": "SchoolInfo",
+    "object": "glossary1",
     "fields": [
-      "c",
-      "d"
+      "GlossDiv1",
+      "GlossDiv3"
+    ]
+  },
+  {
+    "object": "GlossDef",
+    "fields": []
+  },
+  {
+    "object": "ToBeNamed",
+    "fields": [
+      "Acronym",
+      "GlossDef1",
+      "GlossDef2",
+      "test1",
+      "ID",
+      "SortAs"
     ]
   }
 ]

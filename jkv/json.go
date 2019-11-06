@@ -26,14 +26,21 @@ func IsJSONArr(str string) bool {
 func NewJKV(jsonstr, dfltroot string) *JKV {
 	jkv := &JKV{
 		JSON: jsonstr,
-		LsLvlIPaths: [][]string{
+		LsLvlFields: [][]string{
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 		},
-		mPathMIdx:     make(map[string]int),    //
+		lsLvlIPaths: [][]string{
+			{}, {}, {}, {}, {},
+			{}, {}, {}, {}, {},
+			{}, {}, {}, {}, {},
+			{}, {}, {}, {}, {},
+			{}, {}, {}, {}, {},
+		},
+		mPathMAXIdx:   make(map[string]int),    //
 		mIPathPos:     make(map[string]int),    //
 		MapIPathValue: make(map[string]string), //
 		mIPathOID:     make(map[string]string), //
@@ -56,27 +63,40 @@ func SplitJSONArr(json string) []string {
 	}
 
 	arr := sSpl(json, "},\n  {")
-	larr := len(arr)
-	wg := sync.WaitGroup{}
-	wg.Add(larr)
-	for i := 0; i < larr; i++ {
-		// if i == 0 {
-		// 	arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
-		// } else if i == larr-1 {
-		// 	arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
-		// } else {
-		// 	arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
-		// }
-		// if !sHasSuffix(arr[i], "\n") {
-		// 	arr[i] += "\n"
-		// }
+	L := len(arr)
 
+	// one element array
+	if L == 1 {
+		start, end := 0, 0
+		for i, c := range json {
+			if c == '{' {
+				start = i
+				break
+			}
+		}
+		for j := len(json) - 1; j >= 0; j-- {
+			if json[j] == '}' {
+				end = j
+				break
+			}
+		}
+		json, _ = Indent(json[start:end+1], -2, true)
+		if !sHasSuffix(json, "\n") {
+			json += "\n"
+		}
+		return []string{json}
+	}
+
+	// multi-elements array
+	wg := sync.WaitGroup{}
+	wg.Add(L)
+	for i := 0; i < L; i++ {
 		go func(i int) {
 			defer wg.Done()
 			switch i {
 			case 0:
 				arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
-			case larr - 1:
+			case L - 1:
 				arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
 			default:
 				arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
@@ -360,20 +380,25 @@ func (jkv *JKV) pathType(fpath string, psSort []int, mFPosFPath map[int]string) 
 // init : prepare <>
 func (jkv *JKV) init() error {
 	if _, mLvlFParr, _, err := jkv.scan(); err == nil {
-		mFPosFNameList := jkv.fields(mLvlFParr)
-		// for iL, mPN := range mFPosFNameList {
-		// 	fPln("------Level------:", iL)
-		// 	for p, name := range mPN {
-		// 		v, t := jkv.fValueType(p)
-		// 		if !t.IsLeafValue() {
-		// 			oid := uuid.New().String()
-		// 			v = oid
-		// 		}
-		// 		fPln(t.Str(), name, v)
-		// 	}
-		// }
+		lsMapFPosFName := jkv.fields(mLvlFParr)
 
-		fpaths := fPaths(mFPosFNameList...)
+		for iL, mPN := range lsMapFPosFName {
+			// fPln("<------Level------>", iL)
+			for _, name := range mPN {
+				// ----- //
+				// v, t := jkv.fValueType(p)
+				// if !t.IsLeafValue() {
+				// 	oid := uuid.New().String()
+				// 	v = oid
+				// }
+				// fPln(t.Str(), name, v)
+				// ----- //
+
+				jkv.LsLvlFields[iL] = append(jkv.LsLvlFields[iL], name)
+			}
+		}
+
+		fpaths := fPaths(lsMapFPosFName...)
 		for _, p := range MapKeys(fpaths).([]int) {
 			v, t := jkv.fValueType(p)
 
@@ -391,8 +416,8 @@ func (jkv *JKV) init() error {
 			}
 
 			fp := fpaths[p]
-			fip := fSf("%s@%d", fp, jkv.mPathMIdx[fp])
-			jkv.mPathMIdx[fp]++
+			fip := fSf("%s@%d", fp, jkv.mPathMAXIdx[fp])
+			jkv.mPathMAXIdx[fp]++
 			jkv.MapIPathValue[fip] = v
 			jkv.mIPathPos[fip] = p
 			// fPf("DEBUG: %-5d%-5d[%-7s]  [%-60s]  %s\n", i, p, t.Str(), fip, v)
@@ -406,12 +431,12 @@ func (jkv *JKV) init() error {
 		//
 		for ipath := range jkv.mIPathOID {
 			n := sCount(ipath, pLinker) + 1
-			jkv.LsLvlIPaths[n] = append(jkv.LsLvlIPaths[n], ipath)
+			jkv.lsLvlIPaths[n] = append(jkv.lsLvlIPaths[n], ipath)
 			// fPf("%s [%d] %s\n", oid, n, ipath)
 		}
 
-		for i := 1; i < len(jkv.LsLvlIPaths); i++ {
-			if Ls, LsPrev := jkv.LsLvlIPaths[i], jkv.LsLvlIPaths[i-1]; len(Ls) > 0 && len(LsPrev) > 0 {
+		for i := 1; i < len(jkv.lsLvlIPaths); i++ {
+			if Ls, LsPrev := jkv.lsLvlIPaths[i], jkv.lsLvlIPaths[i-1]; len(Ls) > 0 && len(LsPrev) > 0 {
 				for _, ipathP := range LsPrev {
 					pathP := S(ipathP).RmTailFromLast("@").V()
 					chk := pathP + pLinker
@@ -482,13 +507,13 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 		valstr = fSf("%v", value)
 	}
 
-	for i := 0; i < jkv.mPathMIdx[path]; i++ {
+	for i := 0; i < jkv.mPathMAXIdx[path]; i++ {
 		ipath := fSf("%s@%d", path, i)
 		if v, ok := jkv.MapIPathValue[ipath]; ok && v == valstr {
 			pos, PIPath := jkv.mIPathPos[ipath], ""
 			for upgen := 1; upgen <= nGen; upgen++ {
 				ppath := S(ipath).RmTailFromLastN(pLinker, upgen).V()
-				for j := 0; j < jkv.mPathMIdx[ppath]; j++ {
+				for j := 0; j < jkv.mPathMAXIdx[ppath]; j++ {
 					pipath := fSf("%s@%d", ppath, j)
 					ppos := jkv.mIPathPos[pipath]
 					if ppos > pos {
@@ -516,7 +541,7 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 
 // wrapDefault :
 func (jkv *JKV) wrapDefault(root string) *JKV {
-	if len(jkv.LsLvlIPaths[1]) == 1 {
+	if len(jkv.LsLvlFields[1]) == 1 {
 		return jkv
 	}
 	json := jkv.JSON
@@ -577,12 +602,12 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 // Unfold :
 func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 	frame := ""
-	if len(jkv.LsLvlIPaths[1]) == 0 {
+	if len(jkv.lsLvlIPaths[1]) == 0 {
 		frame = ""
-	} else if len(jkv.LsLvlIPaths[1]) != 0 && len(jkv.LsLvlIPaths[2]) == 0 {
+	} else if len(jkv.lsLvlIPaths[1]) != 0 && len(jkv.lsLvlIPaths[2]) == 0 {
 		frame = jkv.JSON
 	} else {
-		firstField := jkv.LsLvlIPaths[1][0]
+		firstField := jkv.lsLvlIPaths[1][0]
 		lvl1path := S(firstField).RmTailFromLast("@").V()
 		oid := jkv.MapIPathValue[firstField]
 		frame = fSf("{\n  \"%s\": %s\n}", lvl1path, oid)

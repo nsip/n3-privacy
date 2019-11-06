@@ -25,12 +25,6 @@ func TestJSONPolicy(t *testing.T) {
 		wg.Add(len(jsonarr))
 		jsons := make([]string, len(jsonarr))
 		for i, json := range jsonarr {
-			// jkvD := NewJKV(json, "root")
-			// maskroot, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
-			// jkvMR := NewJKV(maskroot, "")
-			// jkvMR.Wrapped = jkvD.Wrapped
-			// jsons[i] = jkvMR.UnwrapDefault().JSON
-
 			go func(i int, json string) {
 				defer wg.Done()
 				jkvD := NewJKV(json, "root")

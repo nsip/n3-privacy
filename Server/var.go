@@ -52,3 +52,4 @@ func siLink(s string, i int) string {
 func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
+ 

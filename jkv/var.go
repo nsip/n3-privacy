@@ -41,6 +41,7 @@ var (
 	sLastIndex  = strings.LastIndex
 	sTrim       = strings.Trim
 	sTrimLeft   = strings.TrimLeft
+	sTrimRight  = strings.TrimRight
 	sHasPrefix  = strings.HasPrefix
 	sHasSuffix  = strings.HasSuffix
 	IF          = u.IF
@@ -105,8 +106,9 @@ var (
 // JKV :
 type JKV struct {
 	JSON          string
-	LsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
-	mPathMIdx     map[string]int    //
+	LsLvlFields   [][]string        // 2D slice for each Level's each ifield
+	lsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
+	mPathMAXIdx   map[string]int    //
 	mIPathPos     map[string]int    //
 	MapIPathValue map[string]string //
 	mIPathOID     map[string]string //
@@ -156,7 +158,9 @@ func Indent(str string, n int, ignoreFirstLine bool) (string, bool) {
 			space += " "
 		}
 		for i := S; i < len(lines); i++ {
-			lines[i] = space + lines[i]
+			if sTrim(lines[i], " \n\t") != "" {
+				lines[i] = space + lines[i]
+			}
 		}
 	} else {
 		for i := S; i < len(lines); i++ {
@@ -169,5 +173,5 @@ func Indent(str string, n int, ignoreFirstLine bool) (string, bool) {
 			lines[i] = lines[i][-n:]
 		}
 	}
-	return sTrim(sJoin(lines, "\n"), " "), true
+	return sJoin(lines, "\n"), true
 }

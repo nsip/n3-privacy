@@ -1,32 +1,14 @@
 {
-    "glossary": {        
-        "GlossDiv": {            
-            "GlossList": {
-                "GlossEntry": {
-                    "ID": "-----",
-                    "SortAs": "-----",
-                    "Acronym": "-----",
-                    "GlossDef": {
-                        "para": "-----",
-                        "GlossSeeAlso": "*****"
-                    },
-                    "GlossSee": "*****"
-                }
-            }
-        },
-        "GlossDiv1": {            
-            "GlossList": {
-                "GlossEntry": {
-                    "ID": "-----",
-                    "SortAs": "-----",
-                    "Acronym": "-----",
-                    "GlossDef": {
-                        "para": "-----",
-                        "GlossSeeAlso": "*****"
-                    },
-                    "GlossSee": "*****"
-                }
-            }
-        }
-    }
-} 
+  "ID": "-----",
+  "SortAs": "-----",
+  "Acronym": "-----",
+  "GlossDef1": {
+    "para": "-----",
+    "GlossSeeAlso": "*****"
+  },
+  "GlossDef2": {
+    "para": "-----",
+    "GlossSeeAlso": "*****"
+  },
+  "test1": "--000--"
+}

@@ -12,13 +12,19 @@ import (
 
 func TestSplitJSONArr(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	jarr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
-	if arr := SplitJSONArr(jarr); arr != nil {
-		jarr1 := MergeJSONs(arr...)
-		if jarr != jarr1 {
+	// jarrstr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
+	jarrstr := pp.FmtJSONFile("../../Server/config/meta.json", "../preprocess/utils/")
+	if jarrstr == "" {
+		fPln("Read JSON file error")
+		return
+	}
+	jarrstr = sReplaceAll(jarrstr, "\r\n", "\n")
+	if arr := SplitJSONArr(jarrstr); arr != nil {
+		jarrmstr := MergeJSONs(arr...)
+		fPln(jarrmstr)
+		if jarrstr != jarrmstr {
 			panic("abc")
 		}
-
 	} else {
 		cmn.FailOnErr("%v", errors.New("non-formatted json array"))
 	}
