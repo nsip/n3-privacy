@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"../jkv"
-	pp "../preprocess"
+	"github.com/nsip/n3-privacy/jkv"
+	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 func main() {

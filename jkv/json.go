@@ -8,7 +8,7 @@ import (
 	"math"
 	"sync"
 
-	cmn "../common"
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
 // IsJSON :
@@ -26,7 +26,7 @@ func IsJSONArr(str string) bool {
 func NewJKV(jsonstr, dfltroot string) *JKV {
 	jkv := &JKV{
 		JSON: jsonstr,
-		lsLvlIPaths: [][]string{
+		LsLvlIPaths: [][]string{
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
@@ -406,12 +406,12 @@ func (jkv *JKV) init() error {
 		//
 		for ipath := range jkv.mIPathOID {
 			n := sCount(ipath, pLinker) + 1
-			jkv.lsLvlIPaths[n] = append(jkv.lsLvlIPaths[n], ipath)
+			jkv.LsLvlIPaths[n] = append(jkv.LsLvlIPaths[n], ipath)
 			// fPf("%s [%d] %s\n", oid, n, ipath)
 		}
 
-		for i := 1; i < len(jkv.lsLvlIPaths); i++ {
-			if Ls, LsPrev := jkv.lsLvlIPaths[i], jkv.lsLvlIPaths[i-1]; len(Ls) > 0 && len(LsPrev) > 0 {
+		for i := 1; i < len(jkv.LsLvlIPaths); i++ {
+			if Ls, LsPrev := jkv.LsLvlIPaths[i], jkv.LsLvlIPaths[i-1]; len(Ls) > 0 && len(LsPrev) > 0 {
 				for _, ipathP := range LsPrev {
 					pathP := S(ipathP).RmTailFromLast("@").V()
 					chk := pathP + pLinker
@@ -516,7 +516,7 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 
 // wrapDefault :
 func (jkv *JKV) wrapDefault(root string) *JKV {
-	if len(jkv.lsLvlIPaths[1]) == 1 {
+	if len(jkv.LsLvlIPaths[1]) == 1 {
 		return jkv
 	}
 	json := jkv.JSON
@@ -577,12 +577,12 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 // Unfold :
 func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 	frame := ""
-	if len(jkv.lsLvlIPaths[1]) == 0 {
+	if len(jkv.LsLvlIPaths[1]) == 0 {
 		frame = ""
-	} else if len(jkv.lsLvlIPaths[1]) != 0 && len(jkv.lsLvlIPaths[2]) == 0 {
+	} else if len(jkv.LsLvlIPaths[1]) != 0 && len(jkv.LsLvlIPaths[2]) == 0 {
 		frame = jkv.JSON
 	} else {
-		firstField := jkv.lsLvlIPaths[1][0]
+		firstField := jkv.LsLvlIPaths[1][0]
 		lvl1path := S(firstField).RmTailFromLast("@").V()
 		oid := jkv.MapIPathValue[firstField]
 		frame = fSf("{\n  \"%s\": %s\n}", lvl1path, oid)

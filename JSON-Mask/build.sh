@@ -20,19 +20,21 @@ if [ ! -f $UPATH/$JQ ]; then
     curl -o $UPATH/$JQ -L $JQURL/$JQ && chmod 777 $UPATH/$JQ
 fi
 cp $UPATH/$JQ ./build/Linux64/jq
-cp $UPATH/$JQ $UPATH/jq                   # For Unit Test 
+cp $UPATH/$JQ $UPATH/jq                   # For Linux Unit Test 
 
 JQ="jq-win64.exe"
 if [ ! -f $UPATH/$JQ ]; then    
     curl -o $UPATH/$JQ -L $JQURL/$JQ
 fi
 cp $UPATH/$JQ ./build/Win64/jq.exe
+# cp $UPATH/$JQ $UPATH/jq.exe             # For Windows Unit Test 
 
 JQ="jq-osx-amd64"
 if [ ! -f $UPATH/$JQ ]; then    
     curl -o $UPATH/$JQ -L $JQURL/$JQ && chmod 777 $UPATH/$JQ
 fi
 cp $UPATH/$JQ ./build/Mac/jq
+# cp $UPATH/$JQ $UPATH/jq                 # For Mac Unit Test
 
 ###
 

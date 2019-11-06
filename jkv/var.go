@@ -13,7 +13,6 @@ import (
 type (
 	b     = byte
 	S     = w.Str
-	I32   = w.I32
 	JTYPE int
 )
 
@@ -92,7 +91,7 @@ const (
 	Trait3EndV = "],\n"
 	Trait4EndV = "]\n"
 
-	pathLinker = "~~"
+	PathLinker = "~~"
 	LvlMax     = 20 // init 20 max level in advances
 )
 
@@ -100,13 +99,13 @@ const (
 var (
 	sTAOS   = []string{AOS0, AOS1, AOS2, AOS3, AOS4, AOS5, AOS6, AOS7, AOS8, AOS9, AOS10, AOS11, AOS12}
 	sTAOE   = []string{AOE0, AOE1, AOE2, AOE3, AOE4, AOE5, AOE6, AOE7, AOE8, AOE9, AOE10, AOE11, AOE12}
-	pLinker = pathLinker
+	pLinker = PathLinker
 )
 
 // JKV :
 type JKV struct {
 	JSON          string
-	lsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
+	LsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
 	mPathMIdx     map[string]int    //
 	mIPathPos     map[string]int    //
 	MapIPathValue map[string]string //

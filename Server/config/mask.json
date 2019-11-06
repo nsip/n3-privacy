@@ -1,0 +1,32 @@
+{
+    "glossary": {        
+        "GlossDiv": {            
+            "GlossList": {
+                "GlossEntry": {
+                    "ID": "-----",
+                    "SortAs": "-----",
+                    "Acronym": "-----",
+                    "GlossDef": {
+                        "para": "-----",
+                        "GlossSeeAlso": "*****"
+                    },
+                    "GlossSee": "*****"
+                }
+            }
+        },
+        "GlossDiv1": {            
+            "GlossList": {
+                "GlossEntry": {
+                    "ID": "-----",
+                    "SortAs": "-----",
+                    "Acronym": "-----",
+                    "GlossDef": {
+                        "para": "-----",
+                        "GlossSeeAlso": "*****"
+                    },
+                    "GlossSee": "*****"
+                }
+            }
+        }
+    }
+} 

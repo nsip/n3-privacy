@@ -3,15 +3,17 @@ package main
 import (
 	"encoding/json"
 
-	cmn "../common"
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
+// when a mask is coming, parse and record it to meta.json
 func parsePolicy(mask string) string {
+
 	return "xapi"
 }
 
-// PolicyObject :
-func PolicyObject(mask string) string {
+// policyObject :
+func policyObject(mask string) string {
 	return "xapi"
 }
 
@@ -38,7 +40,7 @@ func GetPolicy(uid, ctx, object, rw string) (string, bool) {
 		}
 		for _, mid := range lsMIDuc {
 			mask := mMIDRWMask[ssLink(mid, rw)]
-			if object == PolicyObject(mask) {
+			if object == policyObject(mask) {
 				return mask, true
 			}
 		}

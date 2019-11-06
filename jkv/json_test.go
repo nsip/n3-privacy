@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	cmn "../common"
-	pp "../preprocess"
+	cmn "github.com/nsip/n3-privacy/common"
+	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 func TestSplitJSONArr(t *testing.T) {
