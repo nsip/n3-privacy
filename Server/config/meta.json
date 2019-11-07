@@ -27,5 +27,71 @@
       "ID",
       "SortAs"
     ]
+  },
+  {
+    "object": "***ToBeNamed***",
+    "fields": [
+      "SortAs",
+      "Acronym",
+      "GlossDef1",
+      "GlossDef2",
+      "test1",
+      "ID"
+    ]
+  },
+  {
+    "object": "f8f2de4410ed962afada3cd6e8c9e03d3e3dc445",
+    "fields": [
+      "ID",
+      "SortAs",
+      "Acronym",
+      "GlossDef1",
+      "GlossDef2",
+      "test1"
+    ]
+  },
+  {
+    "object": "ede7e59bd917d22c3cf2a488d7e91a5c8d5e3628",
+    "fields": [
+      "SortAs",
+      "Acronym",
+      "GlossDef1",
+      "GlossDef2",
+      "test1",
+      "test2",
+      "ID"
+    ]
+  },
+  {
+    "object": "inquiry_skills",
+    "fields": [
+      "name",
+      "skills",
+      "skill1"
+    ]
+  },
+  {
+    "object": "inquiry_skillS",
+    "fields": [
+      "name",
+      "skills",
+      "skill1"
+    ]
+  },
+  {
+    "object": "inquiry_skill111S",
+    "fields": [
+      "name",
+      "skills",
+      "skill1"
+    ]
+  },
+  {
+    "object": "inquiry",
+    "fields": [
+      "name",
+      "skills",
+      "skill1"
+    ]
   }
 ]

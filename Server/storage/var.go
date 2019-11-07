@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"fmt"
@@ -22,6 +22,8 @@ var (
 	sTrimLeft   = strings.TrimLeft
 	sHasPrefix  = strings.HasPrefix
 	sHasSuffix  = strings.HasSuffix
+	sToLower    = strings.ToLower
+	sToUpper    = strings.ToUpper
 
 	xin = u.XIn
 )
@@ -52,4 +54,3 @@ func siLink(s string, i int) string {
 func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
- 

@@ -26,12 +26,8 @@ func IsJSONArr(str string) bool {
 func NewJKV(jsonstr, dfltroot string) *JKV {
 	jkv := &JKV{
 		JSON: jsonstr,
-		LsLvlFields: [][]string{
-			{}, {}, {}, {}, {},
-			{}, {}, {}, {}, {},
-			{}, {}, {}, {}, {},
-			{}, {}, {}, {}, {},
-			{}, {}, {}, {}, {},
+		LsL12Fields: [][]string{
+			{}, {}, {},
 		},
 		lsLvlIPaths: [][]string{
 			{}, {}, {}, {}, {},
@@ -394,7 +390,9 @@ func (jkv *JKV) init() error {
 				// fPln(t.Str(), name, v)
 				// ----- //
 
-				jkv.LsLvlFields[iL] = append(jkv.LsLvlFields[iL], name)
+				if iL < len(jkv.LsL12Fields) {
+					jkv.LsL12Fields[iL] = append(jkv.LsL12Fields[iL], name)
+				}
 			}
 		}
 
@@ -541,7 +539,7 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 
 // wrapDefault :
 func (jkv *JKV) wrapDefault(root string) *JKV {
-	if len(jkv.LsLvlFields[1]) == 1 {
+	if len(jkv.LsL12Fields[1]) == 1 {
 		return jkv
 	}
 	json := jkv.JSON

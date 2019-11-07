@@ -106,7 +106,7 @@ var (
 // JKV :
 type JKV struct {
 	JSON          string
-	LsLvlFields   [][]string        // 2D slice for each Level's each ifield
+	LsL12Fields   [][]string        // 2D slice for each Level's each ifield
 	lsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
 	mPathMAXIdx   map[string]int    //
 	mIPathPos     map[string]int    //

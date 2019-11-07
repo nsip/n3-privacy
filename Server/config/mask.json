@@ -1,14 +1,13 @@
 {
-  "ID": "-----",
-  "SortAs": "-----",
-  "Acronym": "-----",
-  "GlossDef1": {
-    "para": "-----",
-    "GlossSeeAlso": "*****"
-  },
-  "GlossDef2": {
-    "para": "-----",
-    "GlossSeeAlso": "*****"
-  },
-  "test1": "--000--"
+  "inquiry": [
+    {
+      "name": "~~~~~",
+      "skills": [
+        {
+          "skill": "*****"
+        }
+      ],
+      "skill1": "------"
+    }
+  ]
 }
