@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-
-	db "github.com/nsip/n3-privacy/Server/storage"
-	pp "github.com/nsip/n3-privacy/preprocess"
+	g "github.com/nsip/n3-privacy/Server/global"
+	"github.com/nsip/n3-privacy/Server/webapi"
 )
 
 func main() {
-	policy := pp.FmtJSONFile("../../Server/config/mask.json", "../preprocess/utils")
-	db.UpdatePolicy("qm", "ctx1", "r", policy)
-	policy, ok := db.GetPolicy("qm", "ctx1", "inquiry_skills", "r")
-	fmt.Println(policy, ok)
+	if !g.Init() {
+		panic("global Init Error")
+	}
+	done := make(chan string)
+	go webapi.HostHTTPAsync()
+	<-done
 }

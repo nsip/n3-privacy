@@ -12,8 +12,8 @@ import (
 
 func TestSplitJSONArr(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	// jarrstr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
-	jarrstr := pp.FmtJSONFile("../../Server/config/meta.json", "../preprocess/utils/")
+	jarrstr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
+	// jarrstr := pp.FmtJSONFile("../../Server/config/meta.json", "../preprocess/utils/")
 	if jarrstr == "" {
 		fPln("Read JSON file error")
 		return
@@ -32,23 +32,22 @@ func TestSplitJSONArr(t *testing.T) {
 
 func TestScan(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		jkv := NewJKV(string(jsonbytes), "")
-		LVL, mLvlFParr, mFPosLvl, _ := jkv.scan()
-		fPln("levels:", LVL)
-		for k, v := range mLvlFParr {
-			fPln(k, v)
-		}
-		for k, v := range mFPosLvl {
-			fPln(k, v)
-		}
+	json := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
+	jkv := NewJKV(json, "")
+	LVL, mLvlFParr, mFPosLvl, _ := jkv.scan()
+	fPln("levels:", LVL)
+	for k, v := range mLvlFParr {
+		fPln(k, v)
+	}
+	for k, v := range mFPosLvl {
+		fPln(k, v)
 	}
 }
 
 func TestFieldByPos(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
 	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		jkv := NewJKV(string(jsonbytes), "")
+		jkv := NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
 		LVL, mLvlFParr, _, _ := jkv.scan()
 		// for k, v := range mLvlFParr {
 		// 	fPln(k, v)
@@ -73,7 +72,7 @@ func TestFieldByPos(t *testing.T) {
 func TestFType(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
 	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		jkv := NewJKV(string(jsonbytes), "")
+		jkv := NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
 		value, typ := jkv.fValueType(1617)
 		fPln(typ.Str())
 		if typ == ARR|OBJ {
@@ -86,7 +85,7 @@ func TestFType(t *testing.T) {
 func TestInit(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
 	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		NewJKV(string(jsonbytes), "")
+		NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
 	}
 	fPln("break")
 }
@@ -130,7 +129,7 @@ func TestQuery(t *testing.T) {
 	value := "x00101935"
 	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
 		// jstr := jStr(string(jsonbytes))
-		jkv := NewJKV(string(jsonbytes), "")
+		jkv := NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
 		fPln("--- Init ---")
 
 		path := func(string) string {

@@ -1,7 +1,7 @@
 package storage
 
-// GetPolicy :
-func GetPolicy(uid, ctx, object, rw string) (string, bool) {
+// GetPolicyCode :
+func GetPolicyCode(uid, ctx, object, rw string) (code string, ok bool) {
 	if xin(ctx, mUIDlsCtx[uid]) {
 		lsMIDuc := []string{}
 		for _, midu := range mUIDlsMID[uid] {
@@ -12,11 +12,20 @@ func GetPolicy(uid, ctx, object, rw string) (string, bool) {
 			}
 		}
 		for _, mid := range lsMIDuc {
-			mask := mMIDRWMask[ssLink(mid, rw)]
+			code := ssLink(mid, rw)
+			mask := mMIDRWMask[code]
 			if sToLower(object) == sToLower(policyObject(mask)) {
-				return mask, true
+				return code, true
 			}
 		}
+	}
+	return "", false
+}
+
+// GetPolicy :
+func GetPolicy(code string) (string, bool) {
+	if mask, ok := mMIDRWMask[code]; ok {
+		return mask, ok
 	}
 	return "", false
 }
