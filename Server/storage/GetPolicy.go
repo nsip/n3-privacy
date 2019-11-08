@@ -1,30 +1,28 @@
 package storage
 
-// GetPolicyCode :
-func GetPolicyCode(uid, ctx, object, rw string) (code string, ok bool) {
-	if xin(ctx, mUIDlsCtx[uid]) {
-		lsMIDuc := []string{}
-		for _, midu := range mUIDlsMID[uid] {
-			for _, midc := range mCtxlsMID[ctx] {
-				if midu == midc {
-					lsMIDuc = append(lsMIDuc, midu)
-				}
-			}
+// GetPolicyID :
+func GetPolicyID(uid, ctx, object, rw string) (lsID []string) {
+	oid := hash(object)[:lenOfOID]
+	sid := hash(uid + ctx + rw)[:lenOfSID]
+	for _, id := range lsMID {
+		if sHasPrefix(id, oid) && sHasSuffix(id, sid) {
+			lsID = append(lsID, id)
 		}
-		for _, mid := range lsMIDuc {
-			code := ssLink(mid, rw)
-			mask := mMIDRWMask[code]
-			if sToLower(object) == sToLower(policyObject(mask)) {
-				return code, true
-			}
-		}
+	}
+	return lsID
+}
+
+// GetPolicyHash :
+func GetPolicyHash(code string) (string, bool) {
+	if hashcode, ok := mMIDHash[code]; ok {
+		return hashcode, ok
 	}
 	return "", false
 }
 
 // GetPolicy :
 func GetPolicy(code string) (string, bool) {
-	if mask, ok := mMIDRWMask[code]; ok {
+	if mask, ok := mMIDMask[code]; ok {
 		return mask, ok
 	}
 	return "", false

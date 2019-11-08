@@ -1,12 +1,41 @@
 package storage
 
-import cmn "github.com/nsip/n3-privacy/common"
+import (
+	"sort"
+
+	u "github.com/cdutwhu/go-util"
+	"github.com/nsip/n3-privacy/jkv"
+)
+
+func genPolicyCode(mask string) string {
+	jkvM := jkv.NewJKV(mask, hash(mask))
+	object := jkvM.LsL12Fields[1][0]
+	fields := jkvM.LsL12Fields[2]
+	sort.Strings(fields)
+	oCode := hash(object)[:lenOfOID]
+	fCode := hash(sJoin(fields, ""))[:lenOfFID]
+	return oCode + fCode
+}
+
+func genPolicyID(mask, uid, ctx, rw string) string {
+	code := genPolicyCode(mask)
+	suffix := hash(uid + ctx + rw)[:lenOfSID]
+	return code + suffix
+}
 
 // UpdatePolicy :
 func UpdatePolicy(uid, ctx, rw, mask string) {
-	mid := cmn.SHA1Str(mask)
-	mMIDRWMask[ssLink(mid, rw)] = mask
-	mUIDlsCtx[uid] = append(mUIDlsCtx[uid], ctx)
-	mUIDlsMID[uid] = append(mUIDlsMID[uid], mid)
-	mCtxlsMID[ctx] = append(mCtxlsMID[ctx], mid)
+	id := genPolicyID(mask, uid, ctx, rw)
+	mMIDMask[id] = mask
+	mMIDHash[id] = hash(mask)
+	lsMID = u.MapKeys(mMIDMask).([]string)
+	//
+	lsCTX := mUIDlsCTX[uid]
+	if !xin(ctx, lsCTX) {
+		mUIDlsCTX[uid] = append(lsCTX, ctx)
+	}
+	lsUID := mCTXlsUID[ctx]
+	if !xin(uid, lsUID) {
+		mCTXlsUID[ctx] = append(lsUID, uid)
+	}
 }

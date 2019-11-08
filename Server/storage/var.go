@@ -5,9 +5,11 @@ import (
 	"strings"
 
 	u "github.com/cdutwhu/go-util"
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
 var (
+	fP          = fmt.Print
 	fPf         = fmt.Printf
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
@@ -33,10 +35,17 @@ const (
 )
 
 var (
-	mUIDlsCtx  = make(map[string][]string) // UUID         - ContextID array
-	mUIDlsMID  = make(map[string][]string) // UUID         - MaskID array
-	mCtxlsMID  = make(map[string][]string) // ContextID    - MaskID array
-	mMIDRWMask = make(map[string]string)   // MaskID#[R/W] - Mask
+	mMIDMask  = make(map[string]string)
+	mMIDHash  = make(map[string]string)
+	lsMID     []string // = u.MapKeys(mMIDMask).([]string)
+	hash      = cmn.SHA256Str
+	lenOfHash = len(hash("1"))
+	lenOfOID  = lenOfHash / 4 // length of Object-Hash-ID Occupied
+	lenOfFID  = lenOfHash / 4 // length of Fields-Hash-ID Occupied
+	lenOfSID  = lenOfHash / 2 // length of Suffix-Hash-ID Occupied ( Suffix: UserID+ContextID+RW )
+
+	mUIDlsCTX = make(map[string][]string)
+	mCTXlsUID = make(map[string][]string)
 )
 
 // MetaData :

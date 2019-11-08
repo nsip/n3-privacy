@@ -8,9 +8,9 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   Version = "0.1.0"
 
 [Route]
-  PeekPolicy = "/policy-server/#/peek"
-  GetPolicy = "/policy-server/#/get"
-  UpdatePolicy = "/policy-server/#/update"
+  Peek = "/policy-server/#/peek"
+  Get = "/policy-server/#/get"
+  Update = "/policy-server/#/update"
   GetJM = "/policy-server/#/jm"
   GetJQ = "/policy-server/#/jq"
   

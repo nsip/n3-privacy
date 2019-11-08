@@ -18,11 +18,11 @@ type Config struct {
 		Version string
 	}
 	Route struct {
-		PeekPolicy   string
-		GetPolicy    string
-		UpdatePolicy string
-		GetJM        string
-		GetJQ        string
+		Peek   string
+		Get    string
+		Update string
+		GetJM  string
+		GetJQ  string
 	}
 }
 
