@@ -79,7 +79,7 @@ func HostHTTPAsync() {
 			}
 			return c.JSON(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.JSON(http.StatusBadRequest, "policy <ID> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
 	e.GET(route.Get, func(c echo.Context) error {
@@ -93,7 +93,7 @@ func HostHTTPAsync() {
 			}
 			return c.JSON(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.JSON(http.StatusBadRequest, "policy <ID> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
 	e.POST(route.Update, func(c echo.Context) error {
