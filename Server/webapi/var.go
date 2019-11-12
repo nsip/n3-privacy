@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	g "github.com/nsip/n3-privacy/Server/global"
+	"github.com/nsip/n3-privacy/Server/storage"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 
 var (
 	mMtx = map[string]*sync.Mutex{}
+	db   = storage.NewDB()
 )
 
 func initMutex() {

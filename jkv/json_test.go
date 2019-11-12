@@ -20,7 +20,7 @@ func TestSplitJSONArr(t *testing.T) {
 	}
 	jarrstr = sReplaceAll(jarrstr, "\r\n", "\n")
 	if arr := SplitJSONArr(jarrstr); arr != nil {
-		jarrmstr := MergeJSONs(arr...)
+		jarrmstr := MergeJSON(arr...)
 		fPln(jarrmstr)
 		if jarrstr != jarrmstr {
 			panic("abc")

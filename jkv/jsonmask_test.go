@@ -33,7 +33,7 @@ func TestJSONPolicy(t *testing.T) {
 			}(i, json)
 		}
 		wg.Wait()
-		ioutil.WriteFile("array.json", []byte(MergeJSONs(jsons...)), 0666)
+		ioutil.WriteFile("array.json", []byte(MergeJSON(jsons...)), 0666)
 
 	} else {
 		jkvD := NewJKV(data, "root")

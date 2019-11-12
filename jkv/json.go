@@ -106,8 +106,8 @@ func SplitJSONArr(json string) []string {
 	return arr
 }
 
-// MergeJSONs :
-func MergeJSONs(jsons ...string) (arrstr string) {
+// MergeJSON :
+func MergeJSON(jsons ...string) (arrstr string) {
 	if len(jsons) == 1 {
 		arrstr, _ = Indent("[\n"+jsons[0], 2, true)
 	} else {
@@ -405,7 +405,7 @@ func (jkv *JKV) init() error {
 				if !IsJSON(v) {
 					panic("fetching value error")
 				}
-				oid = cmn.SHA1Str(v)
+				oid = hash(v)
 				jkv.mOIDObj[oid] = v
 				v = oid
 				if t.IsObj() || t.IsObjArr() {
@@ -473,7 +473,7 @@ func (jkv *JKV) expAOID(aoid string) string {
 		strobjs := jkv.mOIDObj[aoid]
 		objs := fValuesOnObjs(strobjs)
 		for _, obj := range objs {
-			oid := cmn.SHA1Str(obj)
+			oid := hash(obj)
 			jkv.mOIDObj[oid] = obj
 			strobjs = sReplace(strobjs, obj, oid, 1)
 		}

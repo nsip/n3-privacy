@@ -4,14 +4,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/nsip/n3-privacy/jkv"
-
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-
 	g "github.com/nsip/n3-privacy/Server/global"
-	db "github.com/nsip/n3-privacy/Server/storage"
 	cmn "github.com/nsip/n3-privacy/common"
+	"github.com/nsip/n3-privacy/jkv"
 )
 
 // HostHTTPAsync : Host a HTTP Server for providing policy json
@@ -105,7 +102,7 @@ func HostHTTPAsync() {
 			if ctx, ok := params["ctx"]; ok {
 				if rw, ok := params["rw"]; ok {
 					if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
-						db.UpdatePolicy(uid[0], ctx[0], rw[0], string(bPolicy))
+						db.UpdatePolicy(string(bPolicy), uid[0], ctx[0], rw[0])
 						return c.JSON(http.StatusOK, "OK")
 					}
 					return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")

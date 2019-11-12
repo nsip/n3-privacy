@@ -8,6 +8,7 @@ import (
 
 	u "github.com/cdutwhu/go-util"
 	w "github.com/cdutwhu/go-wrappers"
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
 type (
@@ -54,6 +55,7 @@ var (
 	MatchAssign = u.MatchAssign
 	XIn         = u.XIn
 	BLANK       = " \t\n\r"
+	hash        = cmn.SHA256Str
 )
 
 const (

@@ -1,0 +1,18 @@
+[
+  {
+    "object": "inquiry",
+    "fields": [
+      "skills",
+      "skill1",
+      "name1"
+    ]
+  },
+  {
+    "object": "inquiry1",
+    "fields": [
+      "name1",
+      "skills",
+      "skill1"
+    ]
+  }
+]

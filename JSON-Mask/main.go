@@ -52,7 +52,7 @@ func main() {
 			}(i, json)
 		}
 		wg.Wait()
-		ioutil.WriteFile(output, []byte(jkv.MergeJSONs(jsons...)), 0666)
+		ioutil.WriteFile(output, []byte(jkv.MergeJSON(jsons...)), 0666)
 
 	} else {
 		jkvD := jkv.NewJKV(data, "root")
