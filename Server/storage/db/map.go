@@ -2,10 +2,8 @@ package db
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
-	"sort"
 
 	u "github.com/cdutwhu/go-util"
 	"github.com/nsip/n3-privacy/jkv"
@@ -35,36 +33,13 @@ func (db *memMap) init() *memMap {
 	return db
 }
 
-// GenPolicyCode :
-func (db *memMap) GenPolicyCode(policy string) string {
-	jkvM := jkv.NewJKV(policy, hash(policy))
-	object := jkvM.LsL12Fields[1][0]
-	fields := jkvM.LsL12Fields[2]
-	sort.Strings(fields)
-	oCode := hash(object)[:lenOfOID]
-	fCode := hash(sJoin(fields, ""))[:lenOfFID]
-	return oCode + fCode
-}
-
-// GenPolicyID :
-func (db *memMap) GenPolicyID(policy, uid, ctx, rw string) string {
-	code := db.GenPolicyCode(policy)
-	suffix := hash(uid + ctx + rw)[:lenOfSID]
-	return code + suffix
-}
-
 // UpdatePolicy :
-func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) error {
-
-	// check & format policy
-	if !jkv.IsJSON(policy) {
-		return errors.New("Not a valid JSON")
+func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
+	if policy, err = valfmtPolicy(policy); err != nil {
+		return err
 	}
 
-	policy = pp.FmtJSONStr(policy)
-	//
-
-	id := db.GenPolicyID(policy, uid, ctx, rw)
+	id := genPolicyID(policy, uid, ctx, rw)
 	db.mMIDMask[id] = policy
 	db.mMIDHash[id] = hash(policy)
 	db.lsMID = u.MapKeys(db.mMIDMask).([]string)

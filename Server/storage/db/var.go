@@ -1,11 +1,15 @@
 package db
 
 import (
+	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
 	u "github.com/cdutwhu/go-util"
 	cmn "github.com/nsip/n3-privacy/common"
+	"github.com/nsip/n3-privacy/jkv"
+	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 var (
@@ -48,12 +52,33 @@ type MetaData struct {
 	Fields []string `json:"fields"`
 }
 
-// siLink :
 func siLink(s string, i int) string {
 	return fSf("%s%s%d", s, linker, i)
 }
 
-// ssLink :
 func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
+}
+
+func genPolicyCode(policy string) string {
+	jkvM := jkv.NewJKV(policy, hash(policy))
+	object := jkvM.LsL12Fields[1][0]
+	fields := jkvM.LsL12Fields[2]
+	sort.Strings(fields)
+	oCode := hash(object)[:lenOfOID]
+	fCode := hash(sJoin(fields, ""))[:lenOfFID]
+	return oCode + fCode
+}
+
+func genPolicyID(policy, uid, ctx, rw string) string {
+	code := genPolicyCode(policy)
+	suffix := hash(uid + ctx + rw)[:lenOfSID]
+	return code + suffix
+}
+
+func valfmtPolicy(policy string) (string, error) {
+	if !jkv.IsJSON(policy) {
+		return "", errors.New("Not a valid JSON")
+	}
+	return pp.FmtJSONStr(policy), nil
 }

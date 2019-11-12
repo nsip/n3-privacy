@@ -6,8 +6,8 @@ import (
 
 // DB :
 type DB interface {
-	GenPolicyCode(policy string) string
-	GenPolicyID(policy, uid, ctx, rw string) string
+	// GetPolicyCode(policy string) string
+	// GetPolicyID(policy, uid, ctx, rw string) string
 	UpdatePolicy(policy, uid, ctx, rw string) error
 	GetPolicyID(uid, ctx, object, rw string) []string
 	GetPolicyHash(id string) (string, bool)
