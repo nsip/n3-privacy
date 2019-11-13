@@ -34,7 +34,7 @@ var (
 )
 
 var (
-	hash      = cmn.SHA256Str
+	hash      = cmn.SHA1Str
 	lenOfHash = len(hash("1"))
 	lenOfOID  = lenOfHash / 4 // length of Object-Hash-ID Occupied
 	lenOfFID  = lenOfHash / 4 // length of Fields-Hash-ID Occupied
@@ -58,16 +58,6 @@ func siLink(s string, i int) string {
 func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
-
-// func genPolicyCode(policy string) string {
-// 	jkvM := jkv.NewJKV(policy, hash(policy))
-// 	object := jkvM.LsL12Fields[1][0]
-// 	fields := jkvM.LsL12Fields[2]
-// 	sort.Strings(fields)
-// 	oCode := hash(object)[:lenOfOID]
-// 	fCode := hash(sJoin(fields, ""))[:lenOfFID]
-// 	return oCode + fCode
-// }
 
 func genPolicyID(policy, uid, ctx, rw string) string {
 	genPolicyCode := func(policy string) string {

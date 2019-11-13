@@ -24,18 +24,9 @@ func TestUpdatePolicy(t *testing.T) {
 	ctx := "c123fff"
 
 	policy := `{
-		"testobj": {
+		"test": {
 			"t1": "-----",
 			"f12":    "*333*333***"
-		}
-	}`
-	policy = pp.FmtJSONStr(policy)
-	db.UpdatePolicy(policy, uid, ctx, "r")
-
-	policy = `{
-		"testobj": {
-			"f12T": "*444*444***",
-			"t1": "-----"
 		}
 	}`
 	policy = pp.FmtJSONStr(policy)

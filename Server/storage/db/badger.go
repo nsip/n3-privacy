@@ -65,8 +65,7 @@ func (db *badgerDB) init() *badgerDB {
 			for itr.Rewind(); itr.Valid(); itr.Next() {
 				item := itr.Item()
 				item.Value(func(v []byte) error {
-					fPln(string(v))
-					db.lsID = append(db.lsID, string(v))
+					db.lsID = append(db.lsID, string(item.Key()))
 					return nil
 				})
 			}
@@ -108,37 +107,35 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 		return err
 	}
 
+	// commit
+	if err = commitAllTxn(txIDPolicy, txIDHash); err == nil {
+		db.lsID = append(db.lsID, id)
+	}
+
 	// for extention query
 	txUIDlkCTX := db.mUIDlkCTX.NewTransaction(true)
 	defer txUIDlkCTX.Discard()
-	item, e := txUIDlkCTX.Get([]byte(uid))
-	if e != nil {
-		return e
+	if item, e := txUIDlkCTX.Get([]byte(uid)); e == nil {
+		lkCTX := ""
+		err = item.Value(func(v []byte) error {
+			lkCTX = string(v) + linker + ctx
+			return nil
+		})
+		txUIDlkCTX.Set([]byte(uid), []byte(lkCTX))
+		err = commitAllTxn(txUIDlkCTX)
 	}
-	lkCTX := ""
-	err = item.Value(func(v []byte) error {
-		lkCTX = string(v) + linker + ctx
-		return nil
-	})
-	txUIDlkCTX.Set([]byte(uid), []byte(lkCTX))
 
 	// for extention query
 	txCTXlkUID := db.mCTXlkUID.NewTransaction(true)
 	defer txCTXlkUID.Discard()
-	item, e = txCTXlkUID.Get([]byte(ctx))
-	if e != nil {
-		return e
-	}
-	lkUID := ""
-	err = item.Value(func(v []byte) error {
-		lkUID = string(v) + linker + uid
-		return nil
-	})
-	txCTXlkUID.Set([]byte(ctx), []byte(lkUID))
-
-	// commit
-	if err = commitAllTxn(txIDPolicy, txIDHash, txUIDlkCTX, txCTXlkUID); err == nil {
-		db.lsID = append(db.lsID, id)
+	if item, e := txCTXlkUID.Get([]byte(ctx)); e == nil {
+		lkUID := ""
+		err = item.Value(func(v []byte) error {
+			lkUID = string(v) + linker + uid
+			return nil
+		})
+		txCTXlkUID.Set([]byte(ctx), []byte(lkUID))
+		err = commitAllTxn(txCTXlkUID)
 	}
 
 	return err
