@@ -30,7 +30,7 @@ func TmTrack(start time.Time) {
 	fPf("took %s\n", elapsed)
 }
 
-// FailOnErr :
+// FailOnErr : error holder use "%v"
 func FailOnErr(format string, v ...interface{}) {
 	for _, p := range v {
 		switch p.(type) {

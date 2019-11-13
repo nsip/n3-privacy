@@ -16,7 +16,7 @@ var (
 
 var (
 	mMtx = map[string]*sync.Mutex{}
-	db   = storage.NewDB()
+	db   = storage.NewDB("map")
 )
 
 func initMutex() {

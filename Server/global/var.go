@@ -16,7 +16,7 @@ var (
 
 // Init : initialize the global variables
 func Init() bool {
-	Cfg = cfg.NewCfg("./config.toml", "../config.toml")
+	Cfg = cfg.NewCfg("./config.toml", "../config.toml", "../../config.toml")
 	return Cfg != nil
 }
 

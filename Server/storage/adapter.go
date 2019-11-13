@@ -1,13 +1,13 @@
 package storage
 
 import (
+	"log"
+
 	"github.com/nsip/n3-privacy/Server/storage/db"
 )
 
 // DB :
 type DB interface {
-	// GetPolicyCode(policy string) string
-	// GetPolicyID(policy, uid, ctx, rw string) string
 	UpdatePolicy(policy, uid, ctx, rw string) error
 	GetPolicyID(uid, ctx, object, rw string) []string
 	GetPolicyHash(id string) (string, bool)
@@ -16,6 +16,14 @@ type DB interface {
 }
 
 // NewDB :
-func NewDB() DB {
-	return db.NewDBByMap().(DB)
+func NewDB(dbType string) DB {
+	switch dbType {
+	case "badger":
+		return db.NewDBByBadger().(DB)
+	case "map":
+		return db.NewDBByMap().(DB)
+	default:
+		log.Fatalf("%s is not supported", dbType)
+		return nil
+	}
 }

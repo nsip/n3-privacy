@@ -8,4 +8,5 @@ func TestLoad(t *testing.T) {
 	fPln(cfg.ErrLog)
 	fPln(cfg.WebService)
 	fPln(cfg.Route)
+	fPln(cfg.Storage)
 }

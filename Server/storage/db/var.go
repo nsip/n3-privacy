@@ -30,8 +30,7 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
-
-	xin = u.XIn
+	xin         = u.XIn
 )
 
 var (
@@ -60,23 +59,31 @@ func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
 
-func genPolicyCode(policy string) string {
-	jkvM := jkv.NewJKV(policy, hash(policy))
-	object := jkvM.LsL12Fields[1][0]
-	fields := jkvM.LsL12Fields[2]
-	sort.Strings(fields)
-	oCode := hash(object)[:lenOfOID]
-	fCode := hash(sJoin(fields, ""))[:lenOfFID]
-	return oCode + fCode
-}
+// func genPolicyCode(policy string) string {
+// 	jkvM := jkv.NewJKV(policy, hash(policy))
+// 	object := jkvM.LsL12Fields[1][0]
+// 	fields := jkvM.LsL12Fields[2]
+// 	sort.Strings(fields)
+// 	oCode := hash(object)[:lenOfOID]
+// 	fCode := hash(sJoin(fields, ""))[:lenOfFID]
+// 	return oCode + fCode
+// }
 
 func genPolicyID(policy, uid, ctx, rw string) string {
-	code := genPolicyCode(policy)
+	genPolicyCode := func(policy string) string {
+		jkvM := jkv.NewJKV(policy, hash(policy))
+		object := jkvM.LsL12Fields[1][0]
+		fields := jkvM.LsL12Fields[2]
+		sort.Strings(fields)
+		oCode := hash(object)[:lenOfOID]
+		fCode := hash(sJoin(fields, ""))[:lenOfFID]
+		return oCode + fCode
+	}
 	suffix := hash(uid + ctx + rw)[:lenOfSID]
-	return code + suffix
+	return genPolicyCode(policy) + suffix
 }
 
-func valfmtPolicy(policy string) (string, error) {
+func validate(policy string) (string, error) {
 	if !jkv.IsJSON(policy) {
 		return "", errors.New("Not a valid JSON")
 	}

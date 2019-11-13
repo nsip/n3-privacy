@@ -25,6 +25,9 @@ type Config struct {
 		GetJM   string
 		GetJQ   string
 	}
+	Storage struct {
+		BadgerDBPath string
+	}
 }
 
 // NewCfg :

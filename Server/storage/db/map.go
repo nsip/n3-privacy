@@ -5,18 +5,17 @@ import (
 	"io/ioutil"
 	"os"
 
-	u "github.com/cdutwhu/go-util"
 	"github.com/nsip/n3-privacy/jkv"
 	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 // memMap :
 type memMap struct {
-	mMIDMask  map[string]string   //
-	mMIDHash  map[string]string   //
-	lsMID     []string            //
-	mUIDlsCTX map[string][]string //
-	mCTXlsUID map[string][]string //
+	mIDMask   map[string]string
+	mIDHash   map[string]string
+	lsID      []string
+	mUIDlkCTX map[string]string
+	mCTXlkUID map[string]string
 }
 
 // NewDBByMap :
@@ -26,32 +25,34 @@ func NewDBByMap() interface{} {
 }
 
 func (db *memMap) init() *memMap {
-	db.mMIDMask = make(map[string]string)
-	db.mMIDHash = make(map[string]string)
-	db.mUIDlsCTX = make(map[string][]string)
-	db.mCTXlsUID = make(map[string][]string)
+	db.mIDMask = make(map[string]string)
+	db.mIDHash = make(map[string]string)
+	// load db.lsID from database
+	db.lsID = []string{}
+	//
+	db.mUIDlkCTX = make(map[string]string)
+	db.mCTXlkUID = make(map[string]string)
 	return db
 }
 
 // UpdatePolicy :
 func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
-	if policy, err = valfmtPolicy(policy); err != nil {
+	if policy, err = validate(policy); err != nil {
 		return err
 	}
 
 	id := genPolicyID(policy, uid, ctx, rw)
-	db.mMIDMask[id] = policy
-	db.mMIDHash[id] = hash(policy)
-	db.lsMID = u.MapKeys(db.mMIDMask).([]string)
+	db.mIDMask[id] = policy
+	db.mIDHash[id] = hash(policy)
 
-	// for further query
-	lsCTX := db.mUIDlsCTX[uid]
-	if !xin(ctx, lsCTX) {
-		db.mUIDlsCTX[uid] = append(lsCTX, ctx)
+	db.lsID = append(db.lsID, id)
+
+	// for extention query
+	if sIndex(db.mUIDlkCTX[uid], ctx) < 0 {
+		db.mUIDlkCTX[uid] += (linker + ctx)
 	}
-	lsUID := db.mCTXlsUID[ctx]
-	if !xin(uid, lsUID) {
-		db.mCTXlsUID[ctx] = append(lsUID, uid)
+	if sIndex(db.mCTXlkUID[ctx], uid) < 0 {
+		db.mCTXlkUID[ctx] += (linker + uid)
 	}
 
 	return nil
@@ -60,7 +61,7 @@ func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 func (db *memMap) GetPolicyID(uid, ctx, object, rw string) (lsID []string) {
 	oid := hash(object)[:lenOfOID]
 	sid := hash(uid + ctx + rw)[:lenOfSID]
-	for _, id := range db.lsMID {
+	for _, id := range db.lsID {
 		if sHasPrefix(id, oid) && sHasSuffix(id, sid) {
 			lsID = append(lsID, id)
 		}
@@ -69,14 +70,14 @@ func (db *memMap) GetPolicyID(uid, ctx, object, rw string) (lsID []string) {
 }
 
 func (db *memMap) GetPolicyHash(id string) (string, bool) {
-	if hashcode, ok := db.mMIDHash[id]; ok {
+	if hashcode, ok := db.mIDHash[id]; ok {
 		return hashcode, ok
 	}
 	return "", false
 }
 
 func (db *memMap) GetPolicy(id string) (string, bool) {
-	if mask, ok := db.mMIDMask[id]; ok {
+	if mask, ok := db.mIDMask[id]; ok {
 		return mask, ok
 	}
 	return "", false

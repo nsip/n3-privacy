@@ -15,3 +15,5 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   GetJM = "/policy-server/#/jm"
   GetJQ = "/policy-server/#/jq"
   
+[Storage]
+  BadgerDBPath = "./data/badger/"
