@@ -9,10 +9,8 @@ import (
 // DB :
 type DB interface {
 	UpdatePolicy(policy, uid, ctx, rw string) error
-	GetPolicyID(uid, ctx, object, rw string) []string
 	GetPolicyHash(id string) (string, bool)
 	GetPolicy(id string) (string, bool)
-	RecordMeta(policy, metafile string) bool
 }
 
 // NewDB :

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	glb "github.com/nsip/n3-privacy/Server/global"
+	dbfn "github.com/nsip/n3-privacy/Server/storage/db"
 	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
@@ -18,36 +19,29 @@ func TestAdapter(t *testing.T) {
 
 func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
-	db := NewDB("badger")
+	db := NewDB("map")
 
 	uid := "u123456"
 	ctx := "c123fff"
 
 	policy := `{
 		"test": {
-			"t1": "-----",
-			"f12":    "*333*333***"
+			"T1": "-----",
+			"f1":    "*333*333***"
 		}
 	}`
 	policy = pp.FmtJSONStr(policy)
 	db.UpdatePolicy(policy, uid, ctx, "r")
 
-	return
-
-	lsIDs := db.GetPolicyID(uid, ctx, "testobj", "r")
-	for _, id := range lsIDs {
+	lsID := dbfn.GetPolicyID(uid, ctx, "test", "r")
+	for _, id := range lsID {
 		fPln(id)
 		policy, _ := db.GetPolicy(id)
 		fPln(policy)
 	}
-
-	// fPln(mCTXlsUID)
-	// fPln(mUIDlsCTX)
 }
 
 func TestRecPolicyMeta(t *testing.T) {
 	policy := pp.FmtJSONFile("../meta/mask.json")
-
-	db := NewDB("badger")
-	db.RecordMeta(policy, "../meta/meta1.json")
+	dbfn.RecordMeta(policy, "../meta/meta1.json")
 }

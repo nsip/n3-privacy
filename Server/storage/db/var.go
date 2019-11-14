@@ -39,17 +39,12 @@ var (
 	lenOfOID  = lenOfHash / 4 // length of Object-Hash-ID Occupied
 	lenOfFID  = lenOfHash / 4 // length of Fields-Hash-ID Occupied
 	lenOfSID  = lenOfHash / 2 // length of Suffix-Hash-ID Occupied ( Suffix: UserID+ContextID+RW )
+	listID    = []string{}    // Policy ID List in running time
 )
 
 const (
 	linker = "#"
 )
-
-// MetaData :
-type MetaData struct {
-	Object string   `json:"object"`
-	Fields []string `json:"fields"`
-}
 
 func siLink(s string, i int) string {
 	return fSf("%s%s%d", s, linker, i)
@@ -78,4 +73,16 @@ func validate(policy string) (string, error) {
 		return "", errors.New("Not a valid JSON")
 	}
 	return pp.FmtJSONStr(policy), nil
+}
+
+// GetPolicyID :
+func GetPolicyID(uid, ctx, object, rw string) (lsID []string) {
+	oid := hash(object)[:lenOfOID]
+	sid := hash(uid + ctx + rw)[:lenOfSID]
+	for _, id := range listID {
+		if sHasPrefix(id, oid) && sHasSuffix(id, sid) {
+			lsID = append(lsID, id)
+		}
+	}
+	return lsID
 }

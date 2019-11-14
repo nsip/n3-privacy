@@ -11,7 +11,6 @@ import (
 type badgerDB struct {
 	mIDPolicy *badger.DB
 	mIDHash   *badger.DB
-	lsID      []string
 	mUIDlkCTX *badger.DB
 	mCTXlkUID *badger.DB
 	err       error
@@ -41,7 +40,7 @@ func commitAllTxn(lsTxn ...*badger.Txn) error {
 
 // NewDBByBadger :
 func NewDBByBadger() interface{} {
-	db := badgerDB{}
+	db := &badgerDB{}
 	return db.init()
 }
 
@@ -56,7 +55,7 @@ func (db *badgerDB) init() *badgerDB {
 	db.mIDHash, db.err = badger.Open(badger.DefaultOptions(path + "IDHash"))
 	cmn.FailOnErr("%v", db.err)
 
-	// *** load lsID *** //
+	// *** load listID *** //
 	countID := func() int {
 		opt := badger.DefaultIteratorOptions
 		db.mIDPolicy.View(func(txn *badger.Txn) error {
@@ -65,15 +64,15 @@ func (db *badgerDB) init() *badgerDB {
 			for itr.Rewind(); itr.Valid(); itr.Next() {
 				item := itr.Item()
 				item.Value(func(v []byte) error {
-					db.lsID = append(db.lsID, string(item.Key()))
+					listID = append(listID, string(item.Key()))
 					return nil
 				})
 			}
 			return nil
 		})
-		return len(db.lsID)
+		return len(listID)
 	}
-	fPln(countID())
+	countID()
 
 	//
 	db.mUIDlkCTX, db.err = badger.Open(badger.DefaultOptions(path + "UIDlkCTX"))
@@ -109,7 +108,9 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 
 	// commit
 	if err = commitAllTxn(txIDPolicy, txIDHash); err == nil {
-		db.lsID = append(db.lsID, id)
+		if !xin(id, listID) {
+			listID = append(listID, id)
+		}
 	}
 
 	// for extention query
@@ -141,9 +142,9 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 	return err
 }
 
-func (db *badgerDB) GetPolicyID(uid, ctx, object, rw string) []string {
-	return nil
-}
+// func (db *badgerDB) GetPolicyID(uid, ctx, object, rw string) []string {
+// 	return nil
+// }
 
 func (db *badgerDB) GetPolicyHash(id string) (string, bool) {
 	return "", false
@@ -151,8 +152,4 @@ func (db *badgerDB) GetPolicyHash(id string) (string, bool) {
 
 func (db *badgerDB) GetPolicy(id string) (string, bool) {
 	return "", false
-}
-
-func (db *badgerDB) RecordMeta(policy, metafile string) bool {
-	return false
 }
