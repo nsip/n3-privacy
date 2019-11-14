@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
-	dbfn "github.com/nsip/n3-privacy/Server/storage/db"
 	cmn "github.com/nsip/n3-privacy/common"
 	"github.com/nsip/n3-privacy/jkv"
 )
@@ -30,9 +29,9 @@ func HostHTTPAsync() {
 
 	port := glb.Cfg.WebService.Port
 	fullIP := cmn.LocalIP() + fSf(":%d", port)
-
 	route := glb.Cfg.Route
 	initMutex()
+	initDB()
 
 	// *************************************** List all APP, API *************************************** //
 	e.GET("/", func(c echo.Context) error {
@@ -55,7 +54,7 @@ func HostHTTPAsync() {
 			if ctx, ok := params["ctx"]; ok {
 				if object, ok := params["object"]; ok {
 					if rw, ok := params["rw"]; ok {
-						if mCodes := dbfn.GetPolicyID(uid[0], ctx[0], object[0], rw[0]); len(mCodes) > 0 {
+						if mCodes := db.PolicyID(uid[0], ctx[0], object[0], rw[0]); len(mCodes) > 0 {
 							return c.JSON(http.StatusOK, mCodes)
 						}
 						return c.JSON(http.StatusNotFound, "No Policy as your request")
@@ -72,7 +71,7 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		params := c.QueryParams()
 		if id, ok := params["id"]; ok {
-			if hashstr, ok := db.GetPolicyHash(id[0]); ok {
+			if hashstr, ok := db.PolicyHash(id[0]); ok {
 				return c.JSON(http.StatusOK, hashstr)
 			}
 			return c.JSON(http.StatusNotFound, "No Policy as your request")
@@ -86,7 +85,7 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		params := c.QueryParams()
 		if id, ok := params["id"]; ok {
-			if policy, ok := db.GetPolicy(id[0]); ok {
+			if policy, ok := db.Policy(id[0]); ok {
 				return c.String(http.StatusOK, policy)
 			}
 			return c.JSON(http.StatusNotFound, "No Policy as your request")

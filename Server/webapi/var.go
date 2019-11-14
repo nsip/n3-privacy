@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"sync"
 
-	g "github.com/nsip/n3-privacy/Server/global"
+	glb "github.com/nsip/n3-privacy/Server/global"
 	"github.com/nsip/n3-privacy/Server/storage"
 )
 
@@ -20,9 +20,13 @@ var (
 )
 
 func initMutex() {
-	v := reflect.ValueOf(g.Cfg.Route)
+	v := reflect.ValueOf(glb.Cfg.Route)
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i).Interface().(string)
 		mMtx[field] = &sync.Mutex{}
 	}
+}
+
+func initDB() {
+	db = storage.NewDB(glb.Cfg.Storage.DataBase)
 }

@@ -17,12 +17,26 @@ func NewDBByMap() interface{} {
 func (db *memMap) init() *memMap {
 	db.mIDMask = make(map[string]string)
 	db.mIDHash = make(map[string]string)
+	db.mUIDlkCTX = make(map[string]string)
+	db.mCTXlkUID = make(map[string]string)
 	// load listID from database
 	// listID = ......
 	//
-	db.mUIDlkCTX = make(map[string]string)
-	db.mCTXlkUID = make(map[string]string)
 	return db
+}
+
+// PolicyCount :
+func (db *memMap) PolicyCount() int {
+	return len(listID)
+}
+
+// PolicyID :
+func (db *memMap) PolicyID(uid, ctx, rw, object string) []string {
+	return getPolicyID(uid, ctx, rw, object)
+}
+
+func (db *memMap) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
+	return getPolicyID(uid, ctx, rw, objects...)
 }
 
 // UpdatePolicy :
@@ -47,17 +61,18 @@ func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 		db.mCTXlkUID[ctx] += (linker + uid)
 	}
 
+	logMeta(policy, ctx, rw)
 	return nil
 }
 
-func (db *memMap) GetPolicyHash(id string) (string, bool) {
+func (db *memMap) PolicyHash(id string) (string, bool) {
 	if hashcode, ok := db.mIDHash[id]; ok {
 		return hashcode, ok
 	}
 	return "", false
 }
 
-func (db *memMap) GetPolicy(id string) (string, bool) {
+func (db *memMap) Policy(id string) (string, bool) {
 	if mask, ok := db.mIDMask[id]; ok {
 		return mask, ok
 	}

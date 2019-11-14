@@ -75,13 +75,22 @@ func validate(policy string) (string, error) {
 	return pp.FmtJSONStr(policy), nil
 }
 
-// GetPolicyID :
-func GetPolicyID(uid, ctx, object, rw string) (lsID []string) {
-	oid := hash(object)[:lenOfOID]
-	sid := hash(uid + ctx + rw)[:lenOfSID]
-	for _, id := range listID {
-		if sHasPrefix(id, oid) && sHasSuffix(id, sid) {
-			lsID = append(lsID, id)
+func getPolicyID(uid, ctx, rw string, objects ...string) (lsID []string) {
+	sufid := hash(uid + ctx + rw)[:lenOfSID]
+	if len(objects) > 0 {
+		for _, object := range objects {
+			oid := hash(object)[:lenOfOID]
+			for _, id := range listID {
+				if sHasPrefix(id, oid) && sHasSuffix(id, sufid) {
+					lsID = append(lsID, id)
+				}
+			}
+		}
+	} else {
+		for _, id := range listID {
+			if sHasSuffix(id, sufid) {
+				lsID = append(lsID, id)
+			}
 		}
 	}
 	return lsID

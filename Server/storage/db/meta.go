@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	glb "github.com/nsip/n3-privacy/Server/global"
 	"github.com/nsip/n3-privacy/jkv"
-
 	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
@@ -14,13 +14,20 @@ import (
 type MetaData struct {
 	Object string   `json:"object"`
 	Fields []string `json:"fields"`
+	Remark string   `json:"remark"`
 }
 
-// RecordMeta :
-func RecordMeta(policy, metafile string) (updated bool) {
+// logMeta :
+func logMeta(policy, namespace, rw string) (updated bool) {
+	path := glb.Cfg.Storage.MetaPath
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, os.ModePerm)
+	}
+	metafile := path + namespace + ".json"
+
 	jkvM := jkv.NewJKV(policy, hash(policy))
 	object := jkvM.LsL12Fields[1][0]
-	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2]}
+	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2], Remark: rw}
 	if b, e := json.Marshal(md); e == nil {
 		newPolicy := pp.FmtJSONStr(string(b))
 		// first meta.

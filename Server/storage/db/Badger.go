@@ -54,6 +54,10 @@ func (db *badgerDB) init() *badgerDB {
 	cmn.FailOnErr("%v", db.err)
 	db.mIDHash, db.err = badger.Open(badger.DefaultOptions(path + "IDHash"))
 	cmn.FailOnErr("%v", db.err)
+	db.mUIDlkCTX, db.err = badger.Open(badger.DefaultOptions(path + "UIDlkCTX"))
+	cmn.FailOnErr("%v", db.err)
+	db.mCTXlkUID, db.err = badger.Open(badger.DefaultOptions(path + "CTXlkUID"))
+	cmn.FailOnErr("%v", db.err)
 
 	// *** load listID *** //
 	countID := func() int {
@@ -73,18 +77,23 @@ func (db *badgerDB) init() *badgerDB {
 		return len(listID)
 	}
 	countID()
-
-	//
-	db.mUIDlkCTX, db.err = badger.Open(badger.DefaultOptions(path + "UIDlkCTX"))
-	cmn.FailOnErr("%v", db.err)
-	db.mCTXlkUID, db.err = badger.Open(badger.DefaultOptions(path + "CTXlkUID"))
-	cmn.FailOnErr("%v", db.err)
-
 	return db
 }
 
 func (db *badgerDB) close() {
 	closeBadgerDB(db.mIDPolicy, db.mIDHash, db.mUIDlkCTX, db.mCTXlkUID)
+}
+
+func (db *badgerDB) PolicyCount() int {
+	return len(listID)
+}
+
+func (db *badgerDB) PolicyID(uid, ctx, rw, object string) []string {
+	return getPolicyID(uid, ctx, rw, object)
+}
+
+func (db *badgerDB) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
+	return getPolicyID(uid, ctx, rw, objects...)
 }
 
 func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
@@ -125,7 +134,6 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 		txUIDlkCTX.Set([]byte(uid), []byte(lkCTX))
 		err = commitAllTxn(txUIDlkCTX)
 	}
-
 	// for extention query
 	txCTXlkUID := db.mCTXlkUID.NewTransaction(true)
 	defer txCTXlkUID.Discard()
@@ -139,17 +147,34 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 		err = commitAllTxn(txCTXlkUID)
 	}
 
+	logMeta(policy, ctx, rw)
 	return err
 }
 
-// func (db *badgerDB) GetPolicyID(uid, ctx, object, rw string) []string {
-// 	return nil
-// }
-
-func (db *badgerDB) GetPolicyHash(id string) (string, bool) {
+func (db *badgerDB) PolicyHash(id string) (string, bool) {
+	txIDHash := db.mIDHash.NewTransaction(true)
+	defer txIDHash.Discard()
+	if item, e := txIDHash.Get([]byte(id)); e == nil {
+		hashcode := ""
+		e = item.Value(func(v []byte) error {
+			hashcode = string(v)
+			return nil
+		})
+		return hashcode, true
+	}
 	return "", false
 }
 
-func (db *badgerDB) GetPolicy(id string) (string, bool) {
+func (db *badgerDB) Policy(id string) (string, bool) {
+	txIDPolicy := db.mIDPolicy.NewTransaction(true)
+	defer txIDPolicy.Discard()
+	if item, e := txIDPolicy.Get([]byte(id)); e == nil {
+		policy := ""
+		e = item.Value(func(v []byte) error {
+			policy = string(v)
+			return nil
+		})
+		return policy, true
+	}
 	return "", false
 }

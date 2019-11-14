@@ -9,8 +9,11 @@ import (
 // DB :
 type DB interface {
 	UpdatePolicy(policy, uid, ctx, rw string) error
-	GetPolicyHash(id string) (string, bool)
-	GetPolicy(id string) (string, bool)
+	PolicyCount() int
+	PolicyID(uid, ctx, rw, object string) []string
+	PolicyIDs(uid, ctx, rw string, objects ...string) []string
+	PolicyHash(id string) (string, bool)
+	Policy(id string) (string, bool)
 }
 
 // NewDB :

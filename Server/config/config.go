@@ -26,6 +26,8 @@ type Config struct {
 		GetJQ   string
 	}
 	Storage struct {
+		DataBase     string
+		MetaPath     string
 		BadgerDBPath string
 	}
 }
