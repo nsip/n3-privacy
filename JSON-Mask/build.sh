@@ -38,7 +38,7 @@ cp $UPATH/$JQ ./build/Mac/jq
 
 ###
 
-# go get
+go get
 
 GOARCH=amd64
 LDFLAGS="-s -w"

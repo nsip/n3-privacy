@@ -49,18 +49,11 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.GetID].Unlock() }()
 		mMtx[route.GetID].Lock()
 		glb.WDCheck()
-		params := c.QueryParams()
-		if uid, ok := params["uid"]; ok {
-			if ctx, ok := params["ctx"]; ok {
-				if object, ok := params["object"]; ok {
-					if rw, ok := params["rw"]; ok {
-						if mCodes := db.PolicyID(uid[0], ctx[0], object[0], rw[0]); len(mCodes) > 0 {
-							return c.JSON(http.StatusOK, mCodes)
-						}
-						return c.JSON(http.StatusNotFound, "No Policy as your request")
-					}
-				}
+		if ok, uid, ctx, object, rw := url1stValuesOf4(c.QueryParams(), "uid", "ctx", "object", "rw"); ok {
+			if mCodes := db.PolicyID(uid, ctx, rw, object); len(mCodes) > 0 {
+				return c.JSON(http.StatusOK, mCodes)
 			}
+			return c.JSON(http.StatusNotFound, "No Policy as your request")
 		}
 		return c.JSON(http.StatusBadRequest, "<uid>, <ctx>, <object>, and <rw> parameters must be provided")
 	})
@@ -69,8 +62,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.GetHash].Unlock() }()
 		mMtx[route.GetHash].Lock()
 		glb.WDCheck()
-		params := c.QueryParams()
-		if id, ok := params["id"]; ok {
+		if id, ok := c.QueryParams()["id"]; ok {
 			if hashstr, ok := db.PolicyHash(id[0]); ok {
 				return c.JSON(http.StatusOK, hashstr)
 			}
@@ -83,8 +75,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.Get].Unlock() }()
 		mMtx[route.Get].Lock()
 		glb.WDCheck()
-		params := c.QueryParams()
-		if id, ok := params["id"]; ok {
+		if id, ok := c.QueryParams()["id"]; ok {
 			if policy, ok := db.Policy(id[0]); ok {
 				return c.String(http.StatusOK, policy)
 			}
@@ -97,17 +88,12 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.Update].Unlock() }()
 		mMtx[route.Update].Lock()
 		glb.WDCheck()
-		params := c.QueryParams()
-		if uid, ok := params["uid"]; ok {
-			if ctx, ok := params["ctx"]; ok {
-				if rw, ok := params["rw"]; ok {
-					if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
-						db.UpdatePolicy(string(bPolicy), uid[0], ctx[0], rw[0])
-						return c.JSON(http.StatusOK, "OK")
-					}
-					return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")
-				}
+		if ok, uid, ctx, rw := url1stValuesOf3(c.QueryParams(), "uid", "ctx", "rw"); ok {
+			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
+				db.UpdatePolicy(string(bPolicy), uid, ctx, rw)
+				return c.JSON(http.StatusOK, "OK")
 			}
+			return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")
 		}
 		return c.JSON(http.StatusBadRequest, "<uid>, <ctx> and <rw> parameters must be provided")
 	})

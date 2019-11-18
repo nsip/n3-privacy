@@ -10,7 +10,7 @@ UPATH="../preprocess/utils"
 
 mkdir -p ./build/Linux64 ./build/Win64 ./build/Mac
 
-# go get 
+go get 
 
 GOARCH=amd64
 LDFLAGS="-s -w"
