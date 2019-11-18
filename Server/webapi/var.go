@@ -47,49 +47,49 @@ func urlValues(values url.Values, params ...string) (ok bool, lsValues [][]strin
 	return false, nil
 }
 
-func url1stValues(values url.Values, params ...string) (ok bool, ls1stValue []string) {
+func urlOneValueList(values url.Values, idx int, params ...string) (ok bool, lsOneValue []string) {
 	if ok, lsValues := urlValues(values, params...); ok {
 		for _, vs := range lsValues {
-			ls1stValue = append(ls1stValue, vs[0])
+			lsOneValue = append(lsOneValue, vs[idx])
 		}
 	}
-	if len(params) == len(ls1stValue) {
-		return true, ls1stValue
+	if len(params) == len(lsOneValue) {
+		return true, lsOneValue
 	}
 	return false, nil
 }
 
-func url1stValuesOf1(values url.Values, params ...string) (bool, string) {
-	if ok, ls1stValue := url1stValues(values, params...); ok {
-		return true, ls1stValue[0]
+func url1Value(values url.Values, idx int, params ...string) (bool, string) {
+	if ok, ls1Value := urlOneValueList(values, idx, params...); ok {
+		return true, ls1Value[0]
 	}
 	return false, ""
 }
 
-func url1stValuesOf2(values url.Values, params ...string) (bool, string, string) {
-	if ok, ls1stValue := url1stValues(values, params...); ok {
-		return true, ls1stValue[0], ls1stValue[1]
+func url2Values(values url.Values, idx int, params ...string) (bool, string, string) {
+	if ok, ls2Values := urlOneValueList(values, idx, params...); ok {
+		return true, ls2Values[0], ls2Values[1]
 	}
 	return false, "", ""
 }
 
-func url1stValuesOf3(values url.Values, params ...string) (bool, string, string, string) {
-	if ok, ls1stValue := url1stValues(values, params...); ok {
-		return true, ls1stValue[0], ls1stValue[1], ls1stValue[2]
+func url3Values(values url.Values, idx int, params ...string) (bool, string, string, string) {
+	if ok, ls3Values := urlOneValueList(values, idx, params...); ok {
+		return true, ls3Values[0], ls3Values[1], ls3Values[2]
 	}
 	return false, "", "", ""
 }
 
-func url1stValuesOf4(values url.Values, params ...string) (bool, string, string, string, string) {
-	if ok, ls1stValue := url1stValues(values, params...); ok {
-		return true, ls1stValue[0], ls1stValue[1], ls1stValue[2], ls1stValue[3]
+func url4Values(values url.Values, idx int, params ...string) (bool, string, string, string, string) {
+	if ok, ls4Values := urlOneValueList(values, idx, params...); ok {
+		return true, ls4Values[0], ls4Values[1], ls4Values[2], ls4Values[3]
 	}
 	return false, "", "", "", ""
 }
 
-func url1stValuesOf5(values url.Values, params ...string) (bool, string, string, string, string, string) {
-	if ok, ls1stValue := url1stValues(values, params...); ok {
-		return true, ls1stValue[0], ls1stValue[1], ls1stValue[2], ls1stValue[3], ls1stValue[4]
+func url5Values(values url.Values, idx int, params ...string) (bool, string, string, string, string, string) {
+	if ok, ls5Values := urlOneValueList(values, idx, params...); ok {
+		return true, ls5Values[0], ls5Values[1], ls5Values[2], ls5Values[3], ls5Values[4]
 	}
 	return false, "", "", "", "", ""
 }

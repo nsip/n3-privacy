@@ -49,7 +49,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.GetID].Unlock() }()
 		mMtx[route.GetID].Lock()
 		glb.WDCheck()
-		if ok, uid, ctx, object, rw := url1stValuesOf4(c.QueryParams(), "uid", "ctx", "object", "rw"); ok {
+		if ok, uid, ctx, object, rw := url4Values(c.QueryParams(), 0, "uid", "ctx", "object", "rw"); ok {
 			if mCodes := db.PolicyID(uid, ctx, rw, object); len(mCodes) > 0 {
 				return c.JSON(http.StatusOK, mCodes)
 			}
@@ -62,7 +62,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.GetHash].Unlock() }()
 		mMtx[route.GetHash].Lock()
 		glb.WDCheck()
-		if ok, id := url1stValuesOf1(c.QueryParams(), "id"); ok {
+		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if hashstr, ok := db.PolicyHash(id); ok {
 				return c.String(http.StatusOK, hashstr)
 			}
@@ -75,7 +75,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.Get].Unlock() }()
 		mMtx[route.Get].Lock()
 		glb.WDCheck()
-		if ok, id := url1stValuesOf1(c.QueryParams(), "id"); ok {
+		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if policy, ok := db.Policy(id); ok {
 				return c.String(http.StatusOK, policy)
 			}
@@ -88,7 +88,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[route.Update].Unlock() }()
 		mMtx[route.Update].Lock()
 		glb.WDCheck()
-		if ok, uid, ctx, rw := url1stValuesOf3(c.QueryParams(), "uid", "ctx", "rw"); ok {
+		if ok, uid, ctx, rw := url3Values(c.QueryParams(), 0, "uid", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
 				if id, err := db.UpdatePolicy(string(bPolicy), uid, ctx, rw); err == nil {
 					return c.String(http.StatusOK, id)
