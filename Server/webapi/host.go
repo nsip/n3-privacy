@@ -53,35 +53,35 @@ func HostHTTPAsync() {
 			if mCodes := db.PolicyID(uid, ctx, rw, object); len(mCodes) > 0 {
 				return c.JSON(http.StatusOK, mCodes)
 			}
-			return c.JSON(http.StatusNotFound, "No Policy as your request")
+			return c.String(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.JSON(http.StatusBadRequest, "<uid>, <ctx>, <object>, and <rw> parameters must be provided")
+		return c.String(http.StatusBadRequest, "<uid>, <ctx>, <object>, and <rw> parameters must be provided")
 	})
 
 	e.GET(route.GetHash, func(c echo.Context) error {
 		defer func() { mMtx[route.GetHash].Unlock() }()
 		mMtx[route.GetHash].Lock()
 		glb.WDCheck()
-		if id, ok := c.QueryParams()["id"]; ok {
-			if hashstr, ok := db.PolicyHash(id[0]); ok {
-				return c.JSON(http.StatusOK, hashstr)
+		if ok, id := url1stValuesOf1(c.QueryParams(), "id"); ok {
+			if hashstr, ok := db.PolicyHash(id); ok {
+				return c.String(http.StatusOK, hashstr)
 			}
-			return c.JSON(http.StatusNotFound, "No Policy as your request")
+			return c.String(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.JSON(http.StatusBadRequest, "policy <id> parameters must be provided")
+		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
 	e.GET(route.Get, func(c echo.Context) error {
 		defer func() { mMtx[route.Get].Unlock() }()
 		mMtx[route.Get].Lock()
 		glb.WDCheck()
-		if id, ok := c.QueryParams()["id"]; ok {
-			if policy, ok := db.Policy(id[0]); ok {
+		if ok, id := url1stValuesOf1(c.QueryParams(), "id"); ok {
+			if policy, ok := db.Policy(id); ok {
 				return c.String(http.StatusOK, policy)
 			}
-			return c.JSON(http.StatusNotFound, "No Policy as your request")
+			return c.String(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.JSON(http.StatusBadRequest, "policy <id> parameters must be provided")
+		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
 	e.POST(route.Update, func(c echo.Context) error {
@@ -90,12 +90,14 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		if ok, uid, ctx, rw := url1stValuesOf3(c.QueryParams(), "uid", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
-				db.UpdatePolicy(string(bPolicy), uid, ctx, rw)
-				return c.JSON(http.StatusOK, "OK")
+				if id, err := db.UpdatePolicy(string(bPolicy), uid, ctx, rw); err == nil {
+					return c.String(http.StatusOK, id)
+				}
+				return c.String(http.StatusInternalServerError, "Update DB error")
 			}
 			return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")
 		}
-		return c.JSON(http.StatusBadRequest, "<uid>, <ctx> and <rw> parameters must be provided")
+		return c.String(http.StatusBadRequest, "<uid>, <ctx> and <rw> parameters must be provided")
 	})
 
 	e.Start(fSf(":%d", port))

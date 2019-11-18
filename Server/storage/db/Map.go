@@ -10,8 +10,12 @@ type memMap struct {
 
 // NewDBByMap :
 func NewDBByMap() interface{} {
-	db := &memMap{}
-	return db.init()
+	return (&memMap{}).init()
+}
+
+func (db *memMap) loadIDList() int {
+	listID = []string{}
+	return len(listID)
 }
 
 func (db *memMap) init() *memMap {
@@ -20,7 +24,7 @@ func (db *memMap) init() *memMap {
 	db.mUIDlkCTX = make(map[string]string)
 	db.mCTXlkUID = make(map[string]string)
 	// load listID from database
-	// listID = ......
+	db.loadIDList()
 	//
 	return db
 }
@@ -40,12 +44,12 @@ func (db *memMap) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
 }
 
 // UpdatePolicy :
-func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
+func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (id string, err error) {
 	if policy, err = validate(policy); err != nil {
-		return err
+		return "", err
 	}
 
-	id := genPolicyID(policy, uid, ctx, rw)
+	id = genPolicyID(policy, uid, ctx, rw)
 	db.mIDMask[id] = policy
 	db.mIDHash[id] = hash(policy)
 
@@ -62,7 +66,7 @@ func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 	}
 
 	logMeta(policy, ctx, rw)
-	return nil
+	return id, nil
 }
 
 func (db *memMap) PolicyHash(id string) (string, bool) {

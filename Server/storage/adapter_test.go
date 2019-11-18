@@ -32,10 +32,11 @@ func TestUpdatePolicy(t *testing.T) {
 
 	// fPln(db.PolicyCount())
 
-	policy := db.PolicyID(uid, ctx, "r", "Test")[0]
-	fPln(policy)
+	if id := db.PolicyID(uid, ctx, "r", "Test"); len(id) > 0 {
+		fPln(id)
+	}
 
-	for _, id := range db.PolicyIDs(uid, ctx, "r") {
+	for _, id := range db.PolicyIDs(uid, ctx, "r", "testobj") {
 		fPln(id)
 		policy, _ := db.Policy(id)
 		fPln(policy)

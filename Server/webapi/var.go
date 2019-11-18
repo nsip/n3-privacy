@@ -59,6 +59,13 @@ func url1stValues(values url.Values, params ...string) (ok bool, ls1stValue []st
 	return false, nil
 }
 
+func url1stValuesOf1(values url.Values, params ...string) (bool, string) {
+	if ok, ls1stValue := url1stValues(values, params...); ok {
+		return true, ls1stValue[0]
+	}
+	return false, ""
+}
+
 func url1stValuesOf2(values url.Values, params ...string) (bool, string, string) {
 	if ok, ls1stValue := url1stValues(values, params...); ok {
 		return true, ls1stValue[0], ls1stValue[1]

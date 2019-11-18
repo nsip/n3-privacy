@@ -40,10 +40,28 @@ func commitAllTxn(lsTxn ...*badger.Txn) error {
 
 // NewDBByBadger :
 func NewDBByBadger() interface{} {
-	db := &badgerDB{}
-	return db.init()
+	return (&badgerDB{}).init()
 }
 
+// loadIDList :
+func (db *badgerDB) loadIDList() int {
+	opt := badger.DefaultIteratorOptions
+	db.mIDPolicy.View(func(txn *badger.Txn) error {
+		itr := txn.NewIterator(opt)
+		defer itr.Close()
+		for itr.Rewind(); itr.Valid(); itr.Next() {
+			item := itr.Item()
+			item.Value(func(v []byte) error {
+				listID = append(listID, string(item.Key()))
+				return nil
+			})
+		}
+		return nil
+	})
+	return len(listID)
+}
+
+// included in New...
 func (db *badgerDB) init() *badgerDB {
 	path := glb.Cfg.Storage.BadgerDBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
@@ -60,23 +78,8 @@ func (db *badgerDB) init() *badgerDB {
 	cmn.FailOnErr("%v", db.err)
 
 	// *** load listID *** //
-	countID := func() int {
-		opt := badger.DefaultIteratorOptions
-		db.mIDPolicy.View(func(txn *badger.Txn) error {
-			itr := txn.NewIterator(opt)
-			defer itr.Close()
-			for itr.Rewind(); itr.Valid(); itr.Next() {
-				item := itr.Item()
-				item.Value(func(v []byte) error {
-					listID = append(listID, string(item.Key()))
-					return nil
-				})
-			}
-			return nil
-		})
-		return len(listID)
-	}
-	countID()
+	CountID := db.loadIDList()
+	fPln(CountID, "exist in db")
 	return db
 }
 
@@ -96,23 +99,23 @@ func (db *badgerDB) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
 	return getPolicyID(uid, ctx, rw, objects...)
 }
 
-func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
+func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id string, err error) {
 	if policy, err = validate(policy); err != nil {
-		return err
+		return "", err
 	}
 
-	id := genPolicyID(policy, uid, ctx, rw)
+	id = genPolicyID(policy, uid, ctx, rw)
 
 	txIDPolicy := db.mIDPolicy.NewTransaction(true)
 	defer txIDPolicy.Discard()
 	if err = txIDPolicy.Set([]byte(id), []byte(policy)); err != nil {
-		return err
+		return "", err
 	}
 
 	txIDHash := db.mIDHash.NewTransaction(true)
 	defer txIDHash.Discard()
 	if err = txIDHash.Set([]byte(id), []byte(hash(policy))); err != nil {
-		return err
+		return "", err
 	}
 
 	// commit
@@ -148,7 +151,7 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (err error) {
 	}
 
 	logMeta(policy, ctx, rw)
-	return err
+	return id, err
 }
 
 func (db *badgerDB) PolicyHash(id string) (string, bool) {

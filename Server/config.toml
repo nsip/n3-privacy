@@ -17,5 +17,5 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   
 [Storage]
   DataBase = "badger" # "map" / "badger" / ...
-  MetaPath = "./data/meta/"
-  BadgerDBPath = "./data/badger/"
+  MetaPath = "/var/tmp/n3-privacy/meta/"
+  BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
