@@ -1,9 +1,10 @@
 package storage
 
-// func dumpCtxByUID(uid string) {
-// 	lsCtx := mUIDlsCTX[uid]
-// 	fPln(uid, lsCtx)
-// }
+// Dump :
+type Dump interface {
+	ListCTXByUID(string) []string
+	ListUIDByCTX(string) []string
+}
 
 // func dumpMIDByUID(uid string) {
 // 	lsMID := mUIDlsMID[uid]

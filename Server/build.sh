@@ -21,7 +21,8 @@ GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH
 cp config.toml $OUTPATH
 cp $UPATH/jq-linux64 "$OUTPATH"jq
-cp $UPATH/jq-linux64 ./storage/jq # for unit test
+cp $UPATH/jq-linux64 ./storage/jq  # for unit test
+cp $UPATH/jq-linux64 ./jq          # for unit test
 
 OUTPATH=./build/Win64/
 GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT.exe

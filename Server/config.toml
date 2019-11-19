@@ -16,6 +16,6 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   GetJQ = "/policy-server/#/jq"
   
 [Storage]
-  DataBase = "map" # "map" / "badger" / ...
+  DataBase = "badger" # "map" / "badger" / ...
   MetaPath = "/var/tmp/n3-privacy/meta/"
   BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"

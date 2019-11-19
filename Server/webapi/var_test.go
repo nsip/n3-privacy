@@ -13,6 +13,6 @@ func TestUrlParam3(t *testing.T) {
 		"3": {"33", "333"},
 	}
 
-	ok, p1, p2, p3 := url1stValuesOf3(url.Values(values), "1", "2", "3")
+	ok, p1, p2, p3 := url3Values(url.Values(values), 0, "1", "2", "3")
 	fPln(ok, p1, p2, p3)
 }

@@ -76,19 +76,19 @@ func validate(policy string) (string, error) {
 }
 
 func getPolicyID(uid, ctx, rw string, objects ...string) (lsID []string) {
-	sufid := hash(uid + ctx + rw)[:lenOfSID]
+	suffix := hash(uid + ctx + rw)[:lenOfSID]
 	if len(objects) > 0 {
 		for _, object := range objects {
 			oid := hash(object)[:lenOfOID]
 			for _, id := range listID {
-				if sHasPrefix(id, oid) && sHasSuffix(id, sufid) {
+				if sHasPrefix(id, oid) && sHasSuffix(id, suffix) {
 					lsID = append(lsID, id)
 				}
 			}
 		}
 	} else {
 		for _, id := range listID {
-			if sHasSuffix(id, sufid) {
+			if sHasSuffix(id, suffix) {
 				lsID = append(lsID, id)
 			}
 		}

@@ -6,3 +6,5 @@ find . -type f -executable -exec sh -c "file -i '{}' | grep -q 'x-executable; ch
 rm -rf ./build
 rm -rf ./data
 rm -rf ./storage/data
+rm -rf /var/tmp/n3-privacy/meta/
+rm -rf /var/tmp/n3-privacy/badger/
