@@ -18,6 +18,7 @@ var (
 var (
 	mMtx = map[string]*sync.Mutex{}
 	db   = storage.NewDB("map")
+	dump storage.Dump
 )
 
 func initMutex() {
@@ -30,6 +31,7 @@ func initMutex() {
 
 func initDB() {
 	db = storage.NewDB(glb.Cfg.Storage.DataBase)
+	dump = db.(storage.Dump)
 }
 
 // ---------------------------------------------- //

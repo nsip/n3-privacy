@@ -34,20 +34,26 @@ func HostHTTPAsync() {
 	initDB()
 
 	// *************************************** List all APP, API *************************************** //
-	e.GET("/", func(c echo.Context) error {
+	path := "/"
+	e.GET(path, func(c echo.Context) error {
 		return c.String(
 			http.StatusOK,
-			fSf("GET    %-50s->  %s\n", fullIP+route.GetID, "Get policy's Fetch ID. If no policy, return empty")+
-				fSf("GET    %-50s->  %s\n", fullIP+route.GetHash, "Get policy's Hash String. If no policy, return empty")+
-				fSf("GET    %-50s->  %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
-				fSf("POST   %-50s->  %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
-				fSf("GET    %-50s->  %s\n", fullIP+route.GetJM, "Get JSON enforcement tool (jm). This tool is dependent on (jq)")+
-				fSf("GET    %-50s->  %s\n", fullIP+route.GetJQ, "Get JQ1.6. Put (jq) into (jm) directory"))
+			fSf("GET    %-55s->  %s\n", fullIP+route.GetID, "Get policy's Fetch ID. If no policy, return empty")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.GetHash, "Get policy's Hash String. If no policy, return empty")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
+				fSf("POST   %-55s->  %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.GetJM, "Get JSON enforcement tool (jm). This tool is dependent on (jq)")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.GetJQ, "Get JQ1.6. Put (jq) into (jm) directory")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.AllCTXOfUID, "Get All Context of A Given UserID")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.AllUIDOfCTX, "Get All UserID of A Given Context")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.AllPIDOfUID, "Get All PolicyID of A Given UserID")+
+				fSf("GET    %-55s->  %s\n", fullIP+route.AllPIDOfCTX, "Get All PolicyID of A Given Context"))
 	})
 
-	e.GET(route.GetID, func(c echo.Context) error {
-		defer func() { mMtx[route.GetID].Unlock() }()
-		mMtx[route.GetID].Lock()
+	path = route.GetID
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, uid, ctx, object, rw := url4Values(c.QueryParams(), 0, "uid", "ctx", "object", "rw"); ok {
 			if mCodes := db.PolicyID(uid, ctx, rw, object); len(mCodes) > 0 {
@@ -58,9 +64,10 @@ func HostHTTPAsync() {
 		return c.String(http.StatusBadRequest, "<uid>, <ctx>, <object>, and <rw> parameters must be provided")
 	})
 
-	e.GET(route.GetHash, func(c echo.Context) error {
-		defer func() { mMtx[route.GetHash].Unlock() }()
-		mMtx[route.GetHash].Lock()
+	path = route.GetHash
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if hashstr, ok := db.PolicyHash(id); ok {
@@ -71,9 +78,10 @@ func HostHTTPAsync() {
 		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
-	e.GET(route.Get, func(c echo.Context) error {
-		defer func() { mMtx[route.Get].Unlock() }()
-		mMtx[route.Get].Lock()
+	path = route.Get
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if policy, ok := db.Policy(id); ok {
@@ -84,9 +92,66 @@ func HostHTTPAsync() {
 		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
 	})
 
-	e.POST(route.Update, func(c echo.Context) error {
-		defer func() { mMtx[route.Update].Unlock() }()
-		mMtx[route.Update].Lock()
+	path = route.AllCTXOfUID
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+		glb.WDCheck()
+		if ok, uid := url1Value(c.QueryParams(), 0, "uid"); ok {
+			if lsCtx := dump.ListCTXByUID(uid); len(lsCtx) > 0 && lsCtx[0] != "" {
+				return c.JSON(http.StatusOK, lsCtx)
+			}
+			return c.String(http.StatusNotFound, "No Context for input UserID")
+		}
+		return c.String(http.StatusBadRequest, "<uid> parameter must be provided")
+	})
+
+	path = route.AllUIDOfCTX
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+		glb.WDCheck()
+		if ok, ctx := url1Value(c.QueryParams(), 0, "ctx"); ok {
+			if lsUID := dump.ListUIDByCTX(ctx); len(lsUID) > 0 && lsUID[0] != "" {
+				return c.JSON(http.StatusOK, lsUID)
+			}
+			return c.String(http.StatusNotFound, "No UserID for input Context")
+		}
+		return c.String(http.StatusBadRequest, "<ctx> parameter must be provided")
+	})
+
+	path = route.AllPIDOfUID
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+		glb.WDCheck()
+		if ok, uid, rw := url2Values(c.QueryParams(), 0, "uid", "rw"); ok {
+			if lsPID := dump.ListPIDByUID(uid, rw); len(lsPID) > 0 && lsPID[0] != "" {
+				return c.JSON(http.StatusOK, lsPID)
+			}
+			return c.String(http.StatusNotFound, "No PolicyID for input UserID")
+		}
+		return c.String(http.StatusBadRequest, "<uid>, <rw> parameter must be provided")
+	})
+
+	path = route.AllPIDOfCTX
+	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+		glb.WDCheck()
+		if ok, ctx, rw := url2Values(c.QueryParams(), 0, "ctx", "rw"); ok {
+			if lsPID := dump.ListPIDByCTX(ctx, rw); len(lsPID) > 0 && lsPID[0] != "" {
+				return c.JSON(http.StatusOK, lsPID)
+			}
+			return c.String(http.StatusNotFound, "No PolicyID for input Context")
+		}
+		return c.String(http.StatusBadRequest, "<ctx>, <rw> parameter must be provided")
+	})
+
+	path = route.Update
+	e.POST(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, uid, ctx, rw := url3Values(c.QueryParams(), 0, "uid", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
