@@ -16,6 +16,20 @@ func TestListCTXByUID(t *testing.T) {
 func TestListUIDByCTX(t *testing.T) {
 	glb.Init()
 	db := NewDB("badger").(Dump)
-	ctx := "ctx1234"
+	ctx := "ctx123456"
 	fPln(db.ListUIDByCTX(ctx))
+}
+
+func TestListPIDByUID(t *testing.T) {
+	glb.Init()
+	db := NewDB("badger").(Dump)
+	uid := "qmiao"
+	fPln(db.ListPIDByUID(uid, "r"))
+}
+
+func TestListPIDByCTX(t *testing.T) {
+	glb.Init()
+	db := NewDB("badger").(Dump)
+	ctx := "ctx123"
+	fPln(db.ListPIDByCTX(ctx, "r"))
 }

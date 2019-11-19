@@ -20,7 +20,7 @@ func TestUpdatePolicy(t *testing.T) {
 	db := NewDB("badger")
 
 	uid := "qmiao"
-	ctx := "ctx123"
+	ctx := "ctx1234"
 	// policy := `{
 	// 	"Test": {
 	// 		"F1": "-----",

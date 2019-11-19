@@ -128,12 +128,14 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id string, err er
 	// for extention query
 	txUIDlkCTX := db.mUIDlkCTX.NewTransaction(true)
 	defer txUIDlkCTX.Discard()
-
 	item, e := txUIDlkCTX.Get([]byte(uid))
 	switch e {
 	case nil:
 		err = item.Value(func(v []byte) error {
-			return txUIDlkCTX.Set([]byte(uid), []byte(string(v)+linker+ctx))
+			if sIndex(string(v), ctx) < 0 {
+				return txUIDlkCTX.Set([]byte(uid), []byte(string(v)+linker+ctx))
+			}
+			return nil
 		})
 	case badger.ErrKeyNotFound:
 		txUIDlkCTX.Set([]byte(uid), []byte(ctx))
@@ -147,7 +149,10 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id string, err er
 	switch e {
 	case nil:
 		err = item.Value(func(v []byte) error {
-			return txCTXlkUID.Set([]byte(ctx), []byte(string(v)+linker+uid))
+			if sIndex(string(v), uid) < 0 {
+				return txCTXlkUID.Set([]byte(ctx), []byte(string(v)+linker+uid))
+			}
+			return nil
 		})
 	case badger.ErrKeyNotFound:
 		txCTXlkUID.Set([]byte(ctx), []byte(uid))
@@ -215,3 +220,25 @@ func (db *badgerDB) ListUIDByCTX(ctx string) (lsUID []string) {
 	}
 	return sSpl(strUID, linker)
 }
+
+func (db *badgerDB) ListPIDByUID(uid, rw string) (lsPID []string) {
+	for _, ctx := range db.ListCTXByUID(uid) {
+		for _, pid := range getPolicyID(uid, ctx, rw) {
+			lsPID = append(lsPID, pid)
+		}
+	}
+	return
+}
+
+func (db *badgerDB) ListPIDByCTX(ctx, rw string) (lsPID []string) {
+	for _, uid := range db.ListUIDByCTX(ctx) {
+		for _, pid := range getPolicyID(uid, ctx, rw) {
+			lsPID = append(lsPID, pid)
+		}
+	}
+	return
+}
+
+// func (db *badgerDB) ListPIDByOBJ(obj, rw string) (lsPID []string) {
+// 	return nil
+// }
