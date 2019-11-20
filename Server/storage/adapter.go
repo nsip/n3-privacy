@@ -14,6 +14,7 @@ type DB interface {
 	PolicyIDs(uid, ctx, rw string, objects ...string) []string
 	PolicyHash(id string) (string, bool)
 	Policy(id string) (string, bool)
+	DeletePolicy(id string) error
 }
 
 // NewDB :

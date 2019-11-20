@@ -12,12 +12,9 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   GetHash = "/policy-server/#/hash"
   Get = "/policy-server/#/policy"
   Update = "/policy-server/#/update"
+  Delete = "/policy-server/#/delete"
   GetJM = "/policy-server/#/jm"
   GetJQ = "/policy-server/#/jq"
-  AllCTXOfUID = "/policy-server/#/uid_allctx"
-  AllUIDOfCTX = "/policy-server/#/ctx_alluid"
-  AllPIDOfUID = "/policy-server/#/uid_allid"
-  AllPIDOfCTX = "/policy-server/#/ctx_allid"
   
 [Storage]
   DataBase = "badger" # "map" / "badger" / ...

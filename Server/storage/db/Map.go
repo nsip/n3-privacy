@@ -2,10 +2,8 @@ package db
 
 // memMap :
 type memMap struct {
-	mIDMask   map[string]string
-	mIDHash   map[string]string
-	mUIDlkCTX map[string]string
-	mCTXlkUID map[string]string
+	mIDMask map[string]string
+	mIDHash map[string]string
 }
 
 // NewDBByMap :
@@ -21,8 +19,6 @@ func (db *memMap) loadIDList() int {
 func (db *memMap) init() *memMap {
 	db.mIDMask = make(map[string]string)
 	db.mIDHash = make(map[string]string)
-	db.mUIDlkCTX = make(map[string]string)
-	db.mCTXlkUID = make(map[string]string)
 	// load listID from database
 	db.loadIDList()
 	//
@@ -57,14 +53,6 @@ func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (id string, err erro
 		listID = append(listID, id)
 	}
 
-	// for extention query
-	if sIndex(db.mUIDlkCTX[uid], ctx) < 0 {
-		db.mUIDlkCTX[uid] += (linker + ctx)
-	}
-	if sIndex(db.mCTXlkUID[ctx], uid) < 0 {
-		db.mCTXlkUID[ctx] += (linker + uid)
-	}
-
 	logMeta(policy, ctx, rw)
 	return id, nil
 }
@@ -81,4 +69,13 @@ func (db *memMap) Policy(id string) (string, bool) {
 		return mask, ok
 	}
 	return "", false
+}
+
+func (db *memMap) DeletePolicy(id string) error {
+	delete(db.mIDMask, id)
+	delete(db.mIDHash, id)
+
+	// listID handle...
+
+	return nil
 }

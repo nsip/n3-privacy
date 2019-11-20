@@ -20,7 +20,7 @@ func TestUpdatePolicy(t *testing.T) {
 	db := NewDB("badger")
 
 	uid := "qmiao"
-	ctx := "ctx1234"
+	ctx := "ctx123"
 	// policy := `{
 	// 	"Test": {
 	// 		"F1": "-----",
@@ -36,7 +36,7 @@ func TestUpdatePolicy(t *testing.T) {
 		fPln(id)
 	}
 
-	for _, id := range db.PolicyIDs(uid, ctx, "r", "testobj") {
+	for _, id := range db.PolicyIDs(uid, ctx, "r", "Test") {
 		fPln(id)
 		policy, _ := db.Policy(id)
 		fPln(policy)

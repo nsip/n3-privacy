@@ -11,8 +11,6 @@ import (
 type badgerDB struct {
 	mIDPolicy *badger.DB
 	mIDHash   *badger.DB
-	mUIDlkCTX *badger.DB
-	mCTXlkUID *badger.DB
 	err       error
 }
 
@@ -27,7 +25,7 @@ func closeBadgerDB(lsDB ...*badger.DB) error {
 	return nil
 }
 
-func cmtAllTxn(lsTxn ...*badger.Txn) error {
+func cmtBadgerTxn(lsTxn ...*badger.Txn) error {
 	for _, tx := range lsTxn {
 		if tx != nil {
 			if err := tx.Commit(); err != nil {
@@ -36,6 +34,59 @@ func cmtAllTxn(lsTxn ...*badger.Txn) error {
 		}
 	}
 	return nil
+}
+
+func updateBadgerDB(dbs []*badger.DB, keys []string, lsValues ...[]string) (err error) {
+	lsTxn := []*badger.Txn{}
+	for i, db := range dbs {
+		txn := db.NewTransaction(true)
+		lsTxn = append(lsTxn, txn)
+		if len(lsValues) == 0 { //                                    delete
+			err = txn.Delete([]byte(keys[i]))
+		} else { //                                                   set
+			err = txn.Set([]byte(keys[i]), []byte(lsValues[0][i]))
+		}
+		if err != nil {
+			break
+		}
+	}
+	defer func() {
+		for _, txn := range lsTxn {
+			txn.Discard()
+		}
+	}()
+	if err == nil {
+		return cmtBadgerTxn(lsTxn...)
+	}
+	return err
+}
+
+func getBadgerDB(dbs []*badger.DB, keys []string) (values []string, err error) {
+	lsTxn := []*badger.Txn{}
+	for i, db := range dbs {
+		txn := db.NewTransaction(true)
+		lsTxn = append(lsTxn, txn)
+		switch item, e := txn.Get([]byte(keys[i])); e {
+		case nil:
+			err = item.Value(func(v []byte) error {
+				values = append(values, string(v))
+				return nil
+			})
+			if err != nil {
+				return nil, err
+			}
+		case badger.ErrKeyNotFound:
+			return nil, e
+		default:
+			cmn.FailOnErr("%v", e)
+		}
+	}
+	defer func() {
+		for _, txn := range lsTxn {
+			txn.Discard()
+		}
+	}()
+	return
 }
 
 // NewDBByBadger :
@@ -72,19 +123,14 @@ func (db *badgerDB) init() *badgerDB {
 	cmn.FailOnErr("%v", db.err)
 	db.mIDHash, db.err = badger.Open(badger.DefaultOptions(path + "IDHash"))
 	cmn.FailOnErr("%v", db.err)
-	db.mUIDlkCTX, db.err = badger.Open(badger.DefaultOptions(path + "UIDlkCTX"))
-	cmn.FailOnErr("%v", db.err)
-	db.mCTXlkUID, db.err = badger.Open(badger.DefaultOptions(path + "CTXlkUID"))
-	cmn.FailOnErr("%v", db.err)
 
-	// *** load listID *** //
 	CountID := db.loadIDList()
 	fPln(CountID, "exist in db")
 	return db
 }
 
 func (db *badgerDB) close() {
-	closeBadgerDB(db.mIDPolicy, db.mIDHash, db.mUIDlkCTX, db.mCTXlkUID)
+	closeBadgerDB(db.mIDPolicy, db.mIDHash)
 }
 
 func (db *badgerDB) PolicyCount() int {
@@ -103,142 +149,37 @@ func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id string, err er
 	if policy, err = validate(policy); err != nil {
 		return "", err
 	}
-
 	id = genPolicyID(policy, uid, ctx, rw)
-
-	txIDPolicy := db.mIDPolicy.NewTransaction(true)
-	defer txIDPolicy.Discard()
-	if err = txIDPolicy.Set([]byte(id), []byte(policy)); err != nil {
-		return "", err
+	err = updateBadgerDB([]*badger.DB{db.mIDPolicy, db.mIDHash}, []string{id, id}, []string{policy, hash(policy)})
+	if err == nil && !xin(id, listID) {
+		listID = append(listID, id)
 	}
-
-	txIDHash := db.mIDHash.NewTransaction(true)
-	defer txIDHash.Discard()
-	if err = txIDHash.Set([]byte(id), []byte(hash(policy))); err != nil {
-		return "", err
-	}
-
-	// commit
-	if err = cmtAllTxn(txIDPolicy, txIDHash); err == nil {
-		if !xin(id, listID) {
-			listID = append(listID, id)
-		}
-	}
-
-	// for extention query
-	txUIDlkCTX := db.mUIDlkCTX.NewTransaction(true)
-	defer txUIDlkCTX.Discard()
-	item, e := txUIDlkCTX.Get([]byte(uid))
-	switch e {
-	case nil:
-		err = item.Value(func(v []byte) error {
-			if sIndex(string(v), ctx) < 0 {
-				return txUIDlkCTX.Set([]byte(uid), []byte(string(v)+linker+ctx))
-			}
-			return nil
-		})
-	case badger.ErrKeyNotFound:
-		txUIDlkCTX.Set([]byte(uid), []byte(ctx))
-	}
-	cmtAllTxn(txUIDlkCTX)
-
-	// for extention query
-	txCTXlkUID := db.mCTXlkUID.NewTransaction(true)
-	defer txCTXlkUID.Discard()
-	item, e = txCTXlkUID.Get([]byte(ctx))
-	switch e {
-	case nil:
-		err = item.Value(func(v []byte) error {
-			if sIndex(string(v), uid) < 0 {
-				return txCTXlkUID.Set([]byte(ctx), []byte(string(v)+linker+uid))
-			}
-			return nil
-		})
-	case badger.ErrKeyNotFound:
-		txCTXlkUID.Set([]byte(ctx), []byte(uid))
-	}
-	cmtAllTxn(txCTXlkUID)
-
 	logMeta(policy, ctx, rw)
 	return id, err
 }
 
+func (db *badgerDB) DeletePolicy(id string) (err error) {
+	if err = updateBadgerDB([]*badger.DB{db.mIDHash, db.mIDPolicy}, []string{id, id}); err == nil {
+		for i, ID := range listID {
+			if ID == id {
+				listID = append(listID[:i], listID[i+1:]...)
+				break
+			}
+		}
+	}
+	return err
+}
+
 func (db *badgerDB) PolicyHash(id string) (string, bool) {
-	txIDHash := db.mIDHash.NewTransaction(true)
-	defer txIDHash.Discard()
-	if item, e := txIDHash.Get([]byte(id)); e == nil {
-		hashcode := ""
-		e = item.Value(func(v []byte) error {
-			hashcode = string(v)
-			return nil
-		})
-		return hashcode, true
+	if values, err := getBadgerDB([]*badger.DB{db.mIDHash}, []string{id}); err == nil {
+		return values[0], true
 	}
 	return "", false
 }
 
 func (db *badgerDB) Policy(id string) (string, bool) {
-	txIDPolicy := db.mIDPolicy.NewTransaction(true)
-	defer txIDPolicy.Discard()
-	if item, e := txIDPolicy.Get([]byte(id)); e == nil {
-		policy := ""
-		e = item.Value(func(v []byte) error {
-			policy = string(v)
-			return nil
-		})
-		return policy, true
+	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
+		return values[0], true
 	}
 	return "", false
 }
-
-// ------------------------------------- //
-
-// ListCTXByUID :
-func (db *badgerDB) ListCTXByUID(uid string) (lsCTX []string) {
-	strCTX := ""
-	txUIDlkCTX := db.mUIDlkCTX.NewTransaction(true)
-	defer txUIDlkCTX.Discard()
-	if item, e := txUIDlkCTX.Get([]byte(uid)); e == nil {
-		item.Value(func(v []byte) error {
-			strCTX = string(v)
-			return nil
-		})
-	}
-	return sSpl(strCTX, linker)
-}
-
-// ListUIDByCTX :
-func (db *badgerDB) ListUIDByCTX(ctx string) (lsUID []string) {
-	strUID := ""
-	txCTXlkUID := db.mCTXlkUID.NewTransaction(true)
-	defer txCTXlkUID.Discard()
-	if item, e := txCTXlkUID.Get([]byte(ctx)); e == nil {
-		item.Value(func(v []byte) error {
-			strUID = string(v)
-			return nil
-		})
-	}
-	return sSpl(strUID, linker)
-}
-
-func (db *badgerDB) ListPIDByUID(uid, rw string) (lsPID []string) {
-	for _, ctx := range db.ListCTXByUID(uid) {
-		for _, pid := range getPolicyID(uid, ctx, rw) {
-			lsPID = append(lsPID, pid)
-		}
-	}
-	return
-}
-
-func (db *badgerDB) ListPIDByCTX(ctx, rw string) (lsPID []string) {
-	for _, uid := range db.ListUIDByCTX(ctx) {
-		for _, pid := range getPolicyID(uid, ctx, rw) {
-			lsPID = append(lsPID, pid)
-		}
-	}
-	return
-}
-
-// func (db *badgerDB) ListPIDByOBJ(obj, rw string) (lsPID []string) {
-// 	return nil
-// }
