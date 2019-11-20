@@ -54,8 +54,12 @@ var (
 	SliceCover  = u.SliceCover
 	MatchAssign = u.MatchAssign
 	XIn         = u.XIn
-	BLANK       = " \t\n\r"
-	hash        = cmn.SHA256Str
+)
+
+var (
+	BLANK    = " \t\n\r"
+	hash     = cmn.SHA256Str
+	hashRExp = cmn.RExpSHA256
 )
 
 const (
