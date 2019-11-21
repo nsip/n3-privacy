@@ -1,0 +1,27 @@
+{
+  "Testlet": [
+    {
+      "NAPTestletRefId": "A----------",
+      "TestletContent": {
+        "NAPTestletLocalId": "----------"
+      },
+      "TestItemList": {
+        "TestItem": [
+          {
+            "TestItemRefId": "----------",
+            "TestItemContent": {
+              "NAPTestItemLocalId": "----------",
+              "ItemSubstitutedForList": {
+                "SubstituteItem": [
+                  {
+                    "SubstituteItemLocalId": "----------"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+} 

@@ -604,6 +604,12 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 
 // Unfold :
 func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
+
+	//
+	// TODO: decide mask level here
+	//
+	//
+
 	frame := ""
 	if len(jkv.lsLvlIPaths[1]) == 0 {
 		frame = ""
@@ -636,7 +642,7 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 				ss := sSpl(jkv.mOIDIPath[oid], pLinker)
 				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				frame = sReplaceAll(frame, oid, Mask(name, obj, iExp, mask))
+				frame = sReplaceAll(frame, oid, Mask(name, obj, mask))
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
 				for _, oid := range hashRExp.FindAllString(obj, -1) {
@@ -662,56 +668,54 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 }
 
 // Mask :
-func Mask(name, obj string, lvl int, maskPathValue map[string]string) string {
+func Mask(name, obj string, maskPathValue map[string]string) string {
 
-	objTmp, _ := IndentFmt(obj)
-	if jkvTmp := NewJKV(objTmp, name); jkvTmp != nil {
-		//fPln("Whole:")
-		//fPln(jkvTmp.JSON)
-	}
+	objTmp, _ := IndentFmt(obj) // partial may not be JSON, so "NewJKV" may not work.
+	jkvTmp := NewJKV(objTmp, name)
+	fPln(jkvTmp.JSON)
+
+	// TODO: check sub-obj matches mask
+	//
 
 	for path, value := range maskPathValue {
 
 		pathset := S(path).RmTailFromLast("@").V()
 		fieldset := S(pathset).RmHeadToLast(pLinker).V()
-		I := sCount(pathset, pLinker) + 1
 		fieldsearch := fSf("\"%s%s", fieldset, TraitFV)
 
-		if lvl+1 == I {
-			if i := sIndex(obj, fieldsearch); i > 0 {
+		if i := sIndex(obj, fieldsearch); i > 0 {
 
-				// pfStart := i
-				// fPln(obj[pfStart : pfStart+len(fieldsearch)])
+			// pfStart := i
+			// fPln(obj[pfStart : pfStart+len(fieldsearch)])
 
-				pvStart, pvEnd := i+len(fieldsearch), 0
-				pv1End, pv2End := 0, 0
-				if obj[pvStart] != '[' {
-					pv1End = sIndex(obj[pvStart:], Trait1EndV)
-					pv2End = sIndex(obj[pvStart:], Trait2EndV)
-				} else {
-					if pv1End = sIndex(obj[pvStart:], Trait3EndV); pv1End >= 0 {
-						pv1End++
-					}
-					if pv2End = sIndex(obj[pvStart:], Trait4EndV); pv2End >= 0 {
-						pv2End++
-					}
+			pvStart, pvEnd := i+len(fieldsearch), 0
+			pv1End, pv2End := 0, 0
+			if obj[pvStart] != '[' {
+				pv1End = sIndex(obj[pvStart:], Trait1EndV)
+				pv2End = sIndex(obj[pvStart:], Trait2EndV)
+			} else {
+				if pv1End = sIndex(obj[pvStart:], Trait3EndV); pv1End >= 0 {
+					pv1End++
 				}
-
-				switch {
-				case pv1End != -1 && pv2End == -1:
-					pvEnd = pv1End
-				case pv1End == -1 && pv2End != -1:
-					pvEnd = pv2End
-				default:
-					pvEnd = int(math.Min(float64(pv1End), float64(pv2End)))
+				if pv2End = sIndex(obj[pvStart:], Trait4EndV); pv2End >= 0 {
+					pv2End++
 				}
+			}
 
-				// val := obj[pvStart : pvStart+pvEnd]
-				// fPln(val)
+			switch {
+			case pv1End != -1 && pv2End == -1:
+				pvEnd = pv1End
+			case pv1End == -1 && pv2End != -1:
+				pvEnd = pv2End
+			default:
+				pvEnd = int(math.Min(float64(pv1End), float64(pv2End)))
+			}
 
-				if hashRExp.FindStringIndex(value) == nil {
-					obj = obj[:pvStart] + value + obj[pvStart+pvEnd:]
-				}
+			// val := obj[pvStart : pvStart+pvEnd]
+			// fPln(val)
+
+			if hashRExp.FindStringIndex(value) == nil {
+				obj = obj[:pvStart] + value + obj[pvStart+pvEnd:]
 			}
 		}
 	}
