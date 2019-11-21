@@ -12,8 +12,8 @@ import (
 
 func TestJSONPolicy(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	data := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
-	mask := pp.FmtJSONFile("../../JSON-Mask/data/xapiMask.json", "../preprocess/utils/")
+	data := pp.FmtJSONFile("../../JSON-Mask/data/sample.json", "../preprocess/utils/")
+	mask := pp.FmtJSONFile("../../JSON-Mask/data/sampleMask.json", "../preprocess/utils/")
 
 	jkvM := NewJKV(mask, "root")
 

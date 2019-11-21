@@ -395,6 +395,10 @@ func (jkv *JKV) init() error {
 		}
 
 		fpaths := fPaths(lsMapFPosFName...)
+		if len(fpaths) == 0 {
+			return err
+		}
+
 		for _, p := range MapKeys(fpaths).([]int) {
 			v, t := jkv.fValueType(p)
 
@@ -541,6 +545,9 @@ func (jkv *JKV) wrapDefault(root string) *JKV {
 		return jkv
 	}
 	json := jkv.JSON
+	if !sHasSuffix(json, "\n") {
+		json += "\n"
+	}
 
 	jsonInd, _ := Indent(json, 2, true)
 	rooted1 := fSf("{\n  \"%s\": %s}\n", root, jsonInd)
@@ -626,8 +633,10 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 
 		if oids := hashRExp.FindAllString(frame, -1); oids != nil {
 			for _, oid := range oids {
+				ss := sSpl(jkv.mOIDIPath[oid], pLinker)
+				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				frame = sReplaceAll(frame, oid, Mask(obj, iExp, mask))
+				frame = sReplaceAll(frame, oid, Mask(name, obj, iExp, mask))
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
 				for _, oid := range hashRExp.FindAllString(obj, -1) {
@@ -653,7 +662,13 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 }
 
 // Mask :
-func Mask(obj string, lvl int, maskPathValue map[string]string) string {
+func Mask(name, obj string, lvl int, maskPathValue map[string]string) string {
+
+	objTmp, _ := IndentFmt(obj)
+	if jkvTmp := NewJKV(objTmp, name); jkvTmp != nil {
+		//fPln("Whole:")
+		//fPln(jkvTmp.JSON)
+	}
 
 	for path, value := range maskPathValue {
 

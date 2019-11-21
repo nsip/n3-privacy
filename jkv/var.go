@@ -148,6 +148,23 @@ func TL(nChar int) (string, int) {
 	return T(lvl), lvl
 }
 
+// IndentFmt :
+func IndentFmt(str string) (string, bool) {
+	str = sTrim(str, BLANK)
+	i := len(str) - 1
+	N := 0
+	if str[i] == '}' {
+		for i = i - 1; i >= 0; i-- {
+			if str[i] == ' ' {
+				N++
+				continue
+			}
+			break
+		}
+	}
+	return Indent(str, -N, true)
+}
+
 // Indent :
 func Indent(str string, n int, ignoreFirstLine bool) (string, bool) {
 	if n == 0 {
