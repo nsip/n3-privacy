@@ -26,7 +26,7 @@ func TestJSONPolicy(t *testing.T) {
 			go func(i int, json string) {
 				defer wg.Done()
 				jkvD := NewJKV(json, "root")
-				maskroot, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
+				maskroot, _ := jkvD.Unfold(0, jkvM)
 				jkvMR := NewJKV(maskroot, "")
 				jkvMR.Wrapped = jkvD.Wrapped
 				jsons[i] = jkvMR.UnwrapDefault().JSON
@@ -37,7 +37,7 @@ func TestJSONPolicy(t *testing.T) {
 
 	} else {
 		jkvD := NewJKV(data, "root")
-		maskroot, _ := jkvD.Unfold(0, jkvM.MapIPathValue)
+		maskroot, _ := jkvD.Unfold(0, jkvM)
 		jkvMR := NewJKV(maskroot, "")
 		jkvMR.Wrapped = jkvD.Wrapped
 		json := jkvMR.UnwrapDefault().JSON

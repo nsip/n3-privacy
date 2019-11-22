@@ -15,7 +15,7 @@ func IsJSON(str string) bool {
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
-// IsJSONArr :
+// IsJSONArr : before using this, make sure it is valid json
 func IsJSONArr(str string) bool {
 	return str[0] == '['
 }
@@ -74,7 +74,7 @@ func SplitJSONArr(json string) []string {
 				break
 			}
 		}
-		json, _ = Indent(json[start:end+1], -2, true)
+		json, _ = IndentFmt(json[start : end+1])
 		if !sHasSuffix(json, "\n") {
 			json += "\n"
 		}
@@ -89,11 +89,11 @@ func SplitJSONArr(json string) []string {
 			defer wg.Done()
 			switch i {
 			case 0:
-				arr[i], _ = Indent(arr[i][4:]+"}", -2, true)
+				arr[i], _ = IndentFmt(arr[i][4:] + "}")
 			case L - 1:
-				arr[i], _ = Indent("{"+arr[i][:len(arr[i])-2], -2, true)
+				arr[i], _ = IndentFmt("{" + arr[i][:len(arr[i])-2])
 			default:
-				arr[i], _ = Indent("{"+arr[i]+"}", -2, true)
+				arr[i], _ = IndentFmt("{" + arr[i] + "}")
 			}
 			if !sHasSuffix(arr[i], "\n") {
 				arr[i] += "\n"
@@ -548,7 +548,7 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 		}
 	}
 
-	unRooted1, _ := Indent(json[i-1:j+2], -2, true)
+	unRooted1, _ := IndentFmt(json[i-1 : j+2])
 	unRooted1 += "\n"
 	// fPln(unRooted1)
 	// unRooted2 := pp.FmtJSONStr(json[i-1:j+2], "/mnt/ramdisk/")
@@ -563,12 +563,7 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 }
 
 // Unfold :
-func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
-
-	//
-	// TODO: decide mask level here
-	//
-	//
+func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 
 	frame := ""
 	if len(jkv.lsLvlIPaths[1]) == 0 {
@@ -594,7 +589,7 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 			}
 		}
 		if toLvl == 1 && iExp == toLvl {
-			return frame, iExp // DEBUG testing, NOT REAL JSON
+			return frame, iExp // DEBUG testing
 		}
 
 		if oIDlist := hashRExp.FindAllString(frame, -1); oIDlist != nil {
@@ -602,8 +597,8 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 				ss := sSpl(jkv.mOIDiPath[oid], pLinker)
 				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				objM := Mask(name, obj, mask)
-				frame = sReplaceAll(frame, oid, objM)
+				objMasked := Mask(name, obj, mask)
+				frame = sReplaceAll(frame, oid, objMasked)
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
 				for _, oid := range hashRExp.FindAllString(obj, -1) {
@@ -613,7 +608,7 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 				}
 			}
 			if toLvl > 1 && iExp+1 == toLvl {
-				return frame, toLvl // DEBUG testing, NOT REAL JSON
+				return frame, toLvl // DEBUG testing
 			}
 
 		} else {
@@ -629,16 +624,20 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 }
 
 // Mask :
-func Mask(name, obj string, maskPathValue map[string]string) string {
+func Mask(name, obj string, mask *JKV) string {
 
-	objTmp, _ := IndentFmt(obj) // partial may not be JSON, so "NewJKV" may not work.
-	jkvTmp := NewJKV(objTmp, name)
-	fPln(jkvTmp.JSON)
+	// objTmp, _ := IndentFmt(obj)
+	// jkvTmp := NewJKV(objTmp, name)
+	// fPln(jkvTmp.JSON)
 
 	// TODO: check sub-obj matches mask
+	aimObj := mask.LsL12Fields[1][0]
+	if name != aimObj {
+		return obj
+	}
 	//
 
-	for path, value := range maskPathValue {
+	for path, value := range mask.MapIPathValue {
 
 		pathset := S(path).RmTailFromLast("@").V()
 		fieldset := S(pathset).RmHeadToLast(pLinker).V()

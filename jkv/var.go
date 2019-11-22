@@ -57,9 +57,12 @@ var (
 )
 
 var (
-	BLANK    = " \t\n\r"
-	hash     = cmn.SHA1Str
-	hashRExp = cmn.RExpSHA1
+	BLANK = " \t\n\r"
+	hash  = func(str string) string {
+		return "\"" + cmn.SHA1Str(str) + "\""
+	}
+	// hash     = cmn.SHA1Str
+	hashRExp = cmn.RExpSHA1 // compiled with ""
 )
 
 const (

@@ -22,7 +22,7 @@ var (
 	sHasPrefix  = strings.HasPrefix
 	sHasSuffix  = strings.HasSuffix
 
-	RExpMD5, _    = regexp.Compile("[a-f0-9]{32}")
-	RExpSHA1, _   = regexp.Compile("[a-f0-9]{40}")
-	RExpSHA256, _ = regexp.Compile("[a-f0-9]{64}")
+	RExpMD5, _    = regexp.Compile("\"[a-f0-9]{32}\"")
+	RExpSHA1, _   = regexp.Compile("\"[a-f0-9]{40}\"")
+	RExpSHA256, _ = regexp.Compile("\"[a-f0-9]{64}\"")
 )
