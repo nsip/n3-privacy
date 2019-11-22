@@ -21,7 +21,7 @@ func IsJSONArr(str string) bool {
 }
 
 // NewJKV :
-func NewJKV(jsonstr, dfltroot string) *JKV {
+func NewJKV(jsonstr, defroot string) *JKV {
 	jkv := &JKV{
 		JSON: jsonstr,
 		LsL12Fields: [][]string{
@@ -34,20 +34,20 @@ func NewJKV(jsonstr, dfltroot string) *JKV {
 			{}, {}, {}, {}, {},
 			{}, {}, {}, {}, {},
 		},
-		mPathMAXIdx:   make(map[string]int),    //
-		mIPathPos:     make(map[string]int),    //
-		MapIPathValue: make(map[string]string), //
-		mIPathOID:     make(map[string]string), //
-		mOIDIPath:     make(map[string]string), //
-		mOIDObj:       make(map[string]string), //
-		mOIDLvl:       make(map[string]int),    // from 1 ...
-		mOIDType:      make(map[string]JTYPE),  // oid's type is OBJ or ARR|OBJ
+		mPathMAXIdx:   make(map[string]int),      //
+		mIPathPos:     make(map[string]int),      //
+		MapIPathValue: make(map[string]string),   //
+		mIPathOID:     make(map[string]string),   //
+		mOIDiPath:     make(map[string]string),   //
+		mOIDObj:       make(map[string]string),   //
+		mOIDLvl:       make(map[string]int),      // from 1 ...
+		mOIDType:      make(map[string]JSONTYPE), // oid-type is OBJ or ARR|OBJ
 	}
 	jkv.init()
-	if dfltroot == "" {
+	if defroot == "" {
 		return jkv
 	}
-	return jkv.wrapDefault(dfltroot)
+	return jkv.wrapDefault(defroot)
 }
 
 // SplitJSONArr :
@@ -105,11 +105,11 @@ func SplitJSONArr(json string) []string {
 }
 
 // MergeJSON :
-func MergeJSON(jsons ...string) (arrstr string) {
-	if len(jsons) == 1 {
-		arrstr, _ = Indent("[\n"+jsons[0], 2, true)
+func MergeJSON(jsonlist ...string) (arrstr string) {
+	if len(jsonlist) == 1 {
+		arrstr, _ = Indent("[\n"+jsonlist[0], 2, true)
 	} else {
-		tmp := sJoin(jsons, ",")
+		tmp := sJoin(jsonlist, ",")
 		tmp = sReplaceAll(tmp, "}\n,{", "},\n{")
 		arrstr, _ = Indent("[\n"+tmp, 2, true)
 	}
@@ -139,10 +139,10 @@ func (jkv *JKV) scan() (int, map[int][]int, map[int]int, error) {
 		NEXT:
 			for i := 0; i < len(s); i++ {
 				// modify levels for array-object
-				if S(s[i:]).HPAny(sTAOS...) {
+				if S(s[i:]).HPAny(sTAOStart...) {
 					offset++
 				}
-				if S(s[i:]).HPAny(sTAOE...) {
+				if S(s[i:]).HPAny(sTAOEnd...) {
 					offset--
 				}
 
@@ -246,11 +246,11 @@ func fPaths(mFPosFNameList ...map[int]string) map[int]string {
 
 // ********************************************************** //
 
-// fValuesOnObjs :
-func fValuesOnObjs(strobjs string) (objs []string) {
+// fValuesOnObjList :
+func fValuesOnObjList(strObjlist string) (objlist []string) {
 	L, mLPStart, mLPEnd := 0, make(map[int][]int), make(map[int][]int)
-	for p := 0; p < len(strobjs); p++ {
-		c := strobjs[p]
+	for p := 0; p < len(strObjlist); p++ {
+		c := strObjlist[p]
 		if c == '{' {
 			L++
 			mLPStart[L] = append(mLPStart[L], p)
@@ -263,13 +263,13 @@ func fValuesOnObjs(strobjs string) (objs []string) {
 	pstarts, pends := mLPStart[1], mLPEnd[1]
 	for i := 0; i < len(pstarts); i++ {
 		s, e := pstarts[i], pends[i]
-		objs = append(objs, strobjs[s:e+1])
+		objlist = append(objlist, strObjlist[s:e+1])
 	}
-	return objs
+	return objlist
 }
 
 // fValueType :
-func (jkv *JKV) fValueType(p int) (v string, t JTYPE) {
+func (jkv *JKV) fValueType(p int) (v string, t JSONTYPE) {
 	getV := func(str string, s int) string {
 		for i := s + 1; i < len(str); i++ {
 			if S(str[i:]).HPAny(Trait1EndV, Trait2EndV) {
@@ -361,14 +361,14 @@ func (jkv *JKV) fValueType(p int) (v string, t JTYPE) {
 }
 
 // pathType :
-func (jkv *JKV) pathType(fpath string, psSort []int, mFPosFPath map[int]string) JTYPE {
+func (jkv *JKV) pathType(fPath string, psSort []int, mFPosFPath map[int]string) JSONTYPE {
 	for _, p := range psSort {
-		if fpath == mFPosFPath[p] {
+		if fPath == mFPosFPath[p] {
 			_, t := jkv.fValueType(p)
 			return t
 		}
 	}
-	panic("Shouldn't be here @ posByPath")
+	panic("Shouldn't be here @ pathType")
 }
 
 // init : prepare <>
@@ -394,12 +394,12 @@ func (jkv *JKV) init() error {
 			}
 		}
 
-		fpaths := fPaths(lsMapFPosFName...)
-		if len(fpaths) == 0 {
+		mFPath := fPaths(lsMapFPosFName...)
+		if len(mFPath) == 0 {
 			return err
 		}
 
-		for _, p := range MapKeys(fpaths).([]int) {
+		for _, p := range MapKeys(mFPath).([]int) {
 			v, t := jkv.fValueType(p)
 
 			oid := ""
@@ -415,7 +415,7 @@ func (jkv *JKV) init() error {
 				}
 			}
 
-			fp := fpaths[p]
+			fp := mFPath[p]
 			fip := fSf("%s@%d", fp, jkv.mPathMAXIdx[fp])
 			jkv.mPathMAXIdx[fp]++
 			jkv.MapIPathValue[fip] = v
@@ -424,25 +424,25 @@ func (jkv *JKV) init() error {
 
 			if !t.IsLeafValue() {
 				jkv.mIPathOID[fip] = oid
-				jkv.mOIDIPath[oid] = fip
+				jkv.mOIDiPath[oid] = fip
 			}
 		}
 
 		//
-		for ipath := range jkv.mIPathOID {
-			n := sCount(ipath, pLinker) + 1
-			jkv.lsLvlIPaths[n] = append(jkv.lsLvlIPaths[n], ipath)
-			// fPf("%s [%d] %s\n", oid, n, ipath)
+		for iPath := range jkv.mIPathOID {
+			n := sCount(iPath, pLinker) + 1
+			jkv.lsLvlIPaths[n] = append(jkv.lsLvlIPaths[n], iPath)
+			// fPf("%s [%d] %s\n", oid, n, iPath)
 		}
 
 		for i := 1; i < len(jkv.lsLvlIPaths); i++ {
 			if Ls, LsPrev := jkv.lsLvlIPaths[i], jkv.lsLvlIPaths[i-1]; len(Ls) > 0 && len(LsPrev) > 0 {
-				for _, ipathP := range LsPrev {
-					pathP := S(ipathP).RmTailFromLast("@").V()
+				for _, iPathP := range LsPrev {
+					pathP := S(iPathP).RmTailFromLast("@").V()
 					chk := pathP + pLinker
-					for _, ipath := range Ls {
-						if S(ipath).HP(chk) {
-							oidP, oid := jkv.mIPathOID[ipathP], jkv.mIPathOID[ipath]
+					for _, iPath := range Ls {
+						if S(iPath).HP(chk) {
+							oidP, oid := jkv.mIPathOID[iPathP], jkv.mIPathOID[iPath]
 							objP, obj := jkv.mOIDObj[oidP], jkv.mOIDObj[oid]
 							jkv.mOIDObj[oidP] = sReplaceAll(objP, obj, oid)
 							jkv.mOIDLvl[oidP], jkv.mOIDLvl[oid] = i-1, i
@@ -452,13 +452,13 @@ func (jkv *JKV) init() error {
 			}
 		}
 
-		// [obj-arr whole value string] -> [aoid arr string]
+		// [obj-arr whole value string] -> [aoID arr string]
 		for oid := range jkv.mOIDObj {
-			if strOIDs := jkv.expAOID(oid); strOIDs != "" {
-				jkv.mOIDObj[oid] = strOIDs
+			if strOIDlist := jkv.aoID2oIDlist(oid); strOIDlist != "" {
+				jkv.mOIDObj[oid] = strOIDlist
 				lvl := jkv.mOIDLvl[oid]
-				for _, aoid := range AOIDStrToOIDs(strOIDs) {
-					jkv.mOIDLvl[aoid] = lvl
+				for _, aoID := range oIDlistStr2oIDlist(strOIDlist) {
+					jkv.mOIDLvl[aoID] = lvl
 				}
 			}
 		}
@@ -469,75 +469,35 @@ func (jkv *JKV) init() error {
 	return errors.New("scan error")
 }
 
-// expAOID : only can be used after mOIDType assigned
-func (jkv *JKV) expAOID(aoid string) string {
-	if typ, ok := jkv.mOIDType[aoid]; ok && typ.IsObjArr() {
-		strobjs := jkv.mOIDObj[aoid]
-		objs := fValuesOnObjs(strobjs)
-		for _, obj := range objs {
+// aoID2oIDlist : only can be used after mOIDType assigned
+func (jkv *JKV) aoID2oIDlist(aoID string) string {
+	if typ, ok := jkv.mOIDType[aoID]; ok && typ.IsObjArr() {
+		strObjlist := jkv.mOIDObj[aoID]
+		objlist := fValuesOnObjList(strObjlist)
+		for _, obj := range objlist {
 			oid := hash(obj)
+			jkv.mOIDType[oid] = OBJ
+			jkv.mOIDiPath[oid] = jkv.mOIDiPath[aoID]
+			jkv.mOIDLvl[oid] = jkv.mOIDLvl[aoID]
 			jkv.mOIDObj[oid] = obj
-			strobjs = sReplace(strobjs, obj, oid, 1)
+			strObjlist = sReplace(strObjlist, obj, oid, 1)
 		}
-		return strobjs
+		return strObjlist
 	}
 	return ""
 }
 
-// AOIDStrToOIDs :
-func AOIDStrToOIDs(aoidstr string) (oids []string) {
-	nComma := sCount(aoidstr, ",")
-	oids = hashRExp.FindAllString(aoidstr, -1)
-	if aoidstr[0] != '[' || aoidstr[len(aoidstr)-1] != ']' || (oids != nil && len(oids) != nComma+1) {
-		panic("error format @ AOIDStr")
+// oIDlistStr2oIDlist : string: "[ ****, ****, **** ]" => [ ****, ****, **** ]
+func oIDlistStr2oIDlist(aoIDStr string) (oidlist []string) {
+	nComma := sCount(aoIDStr, ",")
+	oidlist = hashRExp.FindAllString(aoIDStr, -1)
+	if aoIDStr[0] != '[' || aoIDStr[len(aoIDStr)-1] != ']' || (oidlist != nil && len(oidlist) != nComma+1) {
+		panic("error format @ oIDlistStr2oIDlist")
 	}
 	return
 }
 
 // ******************************************** //
-
-// QueryPV : value ("*.*") for no path checking
-func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]string, maxLvl int) {
-	mLvlOIDs = make(map[int][]string)
-	nGen, valstr := sCount(path, pLinker), ""
-	switch value.(type) {
-	case string:
-		valstr = fSf("\"%v\"", value)
-	default:
-		valstr = fSf("%v", value)
-	}
-
-	for i := 0; i < jkv.mPathMAXIdx[path]; i++ {
-		ipath := fSf("%s@%d", path, i)
-		if v, ok := jkv.MapIPathValue[ipath]; ok && v == valstr {
-			pos, PIPath := jkv.mIPathPos[ipath], ""
-			for upgen := 1; upgen <= nGen; upgen++ {
-				ppath := S(ipath).RmTailFromLastN(pLinker, upgen).V()
-				for j := 0; j < jkv.mPathMAXIdx[ppath]; j++ {
-					pipath := fSf("%s@%d", ppath, j)
-					ppos := jkv.mIPathPos[pipath]
-					if ppos > pos {
-						break
-					}
-					PIPath = pipath
-				}
-				if pid, ok := jkv.MapIPathValue[PIPath]; ok {
-					if _, ok := jkv.mOIDObj[pid]; ok {
-						iLvl := nGen - upgen + 1
-						if !XIn(pid, mLvlOIDs[iLvl]) {
-							mLvlOIDs[iLvl] = append(mLvlOIDs[iLvl], pid)
-							if iLvl > maxLvl {
-								maxLvl = iLvl
-							}
-						}
-					}
-					// break // if search only the first one, break here !
-				}
-			}
-		}
-	}
-	return mLvlOIDs, maxLvl
-}
 
 // wrapDefault :
 func (jkv *JKV) wrapDefault(root string) *JKV {
@@ -588,16 +548,16 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 		}
 	}
 
-	unrooted1, _ := Indent(json[i-1:j+2], -2, true)
-	unrooted1 += "\n"
-	// fPln(unrooted1)
-	// unrooted2 := pp.FmtJSONStr(json[i-1:j+2], "/mnt/ramdisk/")
-	// fPln(unrooted2)
-	// if unrooted1 != unrooted2 {
-	// 	FailOnErr("%v @ UnwrapDefault", errors.New("error unrooted"))
+	unRooted1, _ := Indent(json[i-1:j+2], -2, true)
+	unRooted1 += "\n"
+	// fPln(unRooted1)
+	// unRooted2 := pp.FmtJSONStr(json[i-1:j+2], "/mnt/ramdisk/")
+	// fPln(unRooted2)
+	// if unRooted1 != unRooted2 {
+	// 	FailOnErr("%v @ UnwrapDefault", errors.New("error unRooted"))
 	// }
 
-	jkvUnR := NewJKV(unrooted1, "")
+	jkvUnR := NewJKV(unRooted1, "")
 	jkvUnR.Wrapped = false
 	return jkvUnR
 }
@@ -637,12 +597,13 @@ func (jkv *JKV) Unfold(toLvl int, mask map[string]string) (string, int) {
 			return frame, iExp // DEBUG testing, NOT REAL JSON
 		}
 
-		if oids := hashRExp.FindAllString(frame, -1); oids != nil {
-			for _, oid := range oids {
-				ss := sSpl(jkv.mOIDIPath[oid], pLinker)
+		if oIDlist := hashRExp.FindAllString(frame, -1); oIDlist != nil {
+			for _, oid := range oIDlist {
+				ss := sSpl(jkv.mOIDiPath[oid], pLinker)
 				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				frame = sReplaceAll(frame, oid, Mask(name, obj, mask))
+				objM := Mask(name, obj, mask)
+				frame = sReplaceAll(frame, oid, objM)
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
 				for _, oid := range hashRExp.FindAllString(obj, -1) {
@@ -722,64 +683,3 @@ func Mask(name, obj string, maskPathValue map[string]string) string {
 
 	return obj
 }
-
-// Query : unfinished ...
-// func Query(paths []string, values []interface{}) map[int][]string {
-// 	lPaths, lVals := len(paths), len(values)
-// 	if lPaths != lVals {
-// 		panic("paths' count & values' count are not same!")
-// 	}
-
-// 	mLvlOIDs, pathShared, maxLvl := make(map[int][]string), "", 0
-// 	for i := 0; i < lPaths; i++ {
-// 		path, value := paths[i], values[i]
-// 		mlvloids, maxl := QueryPV(path, value)
-// 		if len(mlvloids) == 0 {
-// 			return nil
-// 		}
-// 		if i == 0 {
-// 			mLvlOIDs, pathShared, maxLvl = mlvloids, path, maxl
-// 			continue
-// 		}
-
-// 		pathShared = func(s1, s2 string) string {
-// 			minl := int(math.Min(float64(len(s1)), float64(len(s2))))
-// 			for i := 0; i < minl; i++ {
-// 				if s1[i] != s2[i] {
-// 					return s1[:i]
-// 				}
-// 			}
-// 			return ""
-// 		}(pathShared, path)
-
-// 		if maxl > maxLvl {
-// 			maxLvl = maxl
-// 		}
-
-// 		lvl := sCount(pathShared, pLinker)
-// 		IDs1, IDs2 := mLvlOIDs[lvl], mlvloids[lvl]
-// 	NEXT:
-// 		for j, id1 := range IDs1 {
-// 			for _, id2 := range IDs2 {
-// 				if id1 == id2 {
-// 					continue NEXT
-// 				}
-// 			}
-// 			// remove id1 from IDs1
-// 			IDs1[j] = IDs1[len(IDs1)-1]
-// 			mLvlOIDs[lvl] = mLvlOIDs[lvl][:len(mLvlOIDs[lvl])-1]
-// 		}
-// 		if len(mLvlOIDs[lvl]) == 0 {
-// 			return nil
-// 		}
-
-// 		// refresh mLvlIDs
-// 		// if i > 0 {
-// 		// 	for l := 1; l <= maxLvl; l++ {
-// 		// 		IDs1, IDs2 = mLvlIDs[l], mlvlids[l]
-
-// 		// 	}
-// 		// }
-// 	}
-// 	return mLvlOIDs
-// }

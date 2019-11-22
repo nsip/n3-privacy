@@ -12,9 +12,9 @@ import (
 )
 
 type (
-	b     = byte
-	S     = w.Str
-	JTYPE int
+	b        = byte
+	S        = w.Str
+	JSONTYPE int
 )
 
 var (
@@ -58,8 +58,8 @@ var (
 
 var (
 	BLANK    = " \t\n\r"
-	hash     = cmn.SHA256Str
-	hashRExp = cmn.RExpSHA256
+	hash     = cmn.SHA1Str
+	hashRExp = cmn.RExpSHA1
 )
 
 const (
@@ -104,25 +104,25 @@ const (
 
 // readonly var
 var (
-	sTAOS   = []string{AOS0, AOS1, AOS2, AOS3, AOS4, AOS5, AOS6, AOS7, AOS8, AOS9, AOS10, AOS11, AOS12}
-	sTAOE   = []string{AOE0, AOE1, AOE2, AOE3, AOE4, AOE5, AOE6, AOE7, AOE8, AOE9, AOE10, AOE11, AOE12}
-	pLinker = PathLinker
+	sTAOStart = []string{AOS0, AOS1, AOS2, AOS3, AOS4, AOS5, AOS6, AOS7, AOS8, AOS9, AOS10, AOS11, AOS12}
+	sTAOEnd   = []string{AOE0, AOE1, AOE2, AOE3, AOE4, AOE5, AOE6, AOE7, AOE8, AOE9, AOE10, AOE11, AOE12}
+	pLinker   = PathLinker
 )
 
 // JKV :
 type JKV struct {
 	JSON          string
-	LsL12Fields   [][]string        // 2D slice for each Level's each ifield
-	lsLvlIPaths   [][]string        // 2D slice for each Level's each ipath
-	mPathMAXIdx   map[string]int    //
-	mIPathPos     map[string]int    //
-	MapIPathValue map[string]string //
-	mIPathOID     map[string]string //
-	mOIDIPath     map[string]string //
-	mOIDObj       map[string]string //
-	mOIDLvl       map[string]int    // from 1 ...
-	mOIDType      map[string]JTYPE  // oid's type is OBJ or ARR|OBJ
-	Wrapped       bool              //
+	LsL12Fields   [][]string          // 2D slice for each Level's each ifield
+	lsLvlIPaths   [][]string          // 2D slice for each Level's each ipath
+	mPathMAXIdx   map[string]int      //
+	mIPathPos     map[string]int      //
+	MapIPathValue map[string]string   //
+	mIPathOID     map[string]string   //
+	mOIDiPath     map[string]string   //
+	mOIDObj       map[string]string   //
+	mOIDLvl       map[string]int      // from 1 ...
+	mOIDType      map[string]JSONTYPE // OID-type is OBJ or ARR|OBJ
+	Wrapped       bool                //
 }
 
 // ********************************************************** //

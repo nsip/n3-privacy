@@ -1,9 +1,9 @@
 {
   "Testlet": [
     {
-      "NAPTestletRefId": "A----------",
+      "NAPTestletRefId": "AC----------",
       "TestletContent": {
-        "NAPTestletLocalId": "----------"
+        "NAPTestletLocalId": "DDD----------"
       },
       "TestItemList": {
         "TestItem": [
@@ -24,4 +24,4 @@
       }
     }
   ]
-} 
+}

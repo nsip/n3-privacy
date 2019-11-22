@@ -1,7 +1,7 @@
 package jkv
 
 const (
-	ARR JTYPE = 1 << iota
+	ARR JSONTYPE = 1 << iota
 	STR
 	BOOL
 	NUM
@@ -10,7 +10,7 @@ const (
 )
 
 var (
-	JT = map[JTYPE]string{
+	JT = map[JSONTYPE]string{
 		ARR:        "ARR",
 		STR:        "STR",
 		BOOL:       "BOOL",
@@ -26,31 +26,31 @@ var (
 )
 
 // Str : JSON Type string
-func (jt JTYPE) Str() string {
+func (jt JSONTYPE) Str() string {
 	return JT[jt]
 }
 
 // IsArr : is json array type
-func (jt JTYPE) IsArr() bool {
+func (jt JSONTYPE) IsArr() bool {
 	return jt&ARR == ARR
 }
 
 // IsObj : is json object type
-func (jt JTYPE) IsObj() bool {
+func (jt JSONTYPE) IsObj() bool {
 	return jt&OBJ == OBJ && jt&ARR != ARR
 }
 
 // IsObjArr : is json object array type
-func (jt JTYPE) IsObjArr() bool {
+func (jt JSONTYPE) IsObjArr() bool {
 	return jt&OBJ == OBJ && jt&ARR == ARR
 }
 
 // IsPrimitive : is json primitive type
-func (jt JTYPE) IsPrimitive() bool {
+func (jt JSONTYPE) IsPrimitive() bool {
 	return jt&OBJ != OBJ && jt&ARR != ARR
 }
 
 // IsLeafValue : is json Primitive OR Primitive array
-func (jt JTYPE) IsLeafValue() bool {
+func (jt JSONTYPE) IsLeafValue() bool {
 	return jt&OBJ != OBJ
 }
