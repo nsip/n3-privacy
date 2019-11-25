@@ -201,3 +201,33 @@ func Indent(str string, n int, ignoreFirstLine bool) (string, bool) {
 	}
 	return sJoin(lines, "\n"), true
 }
+
+// ProjectV :
+func ProjectV(strlist []string, sep, trimToL, trimFromR string) [][]string {
+	nSep := 0
+	for _, str := range strlist {
+		if n := sCount(str, sep); n > nSep {
+			nSep = n
+		}
+	}
+	rtStrList := make([][]string, nSep+1)
+	for _, str := range strlist {
+		for i, s := range sSpl(str, sep) {
+			if trimToL != "" {
+				if fd := sIndex(s, trimToL); fd >= 0 {
+					s = s[fd+1:]
+				}
+			}
+			if trimFromR != "" {
+				if fd := sLastIndex(s, trimFromR); fd >= 0 {
+					s = s[:fd]
+				}
+			}
+			rtStrList[i] = append(rtStrList[i], s)
+		}
+	}
+	for i := 0; i < len(rtStrList); i++ {
+		rtStrList[i] = cmn.ToSet(rtStrList[i]).([]string)
+	}
+	return rtStrList
+}

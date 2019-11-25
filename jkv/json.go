@@ -626,15 +626,20 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 // Mask :
 func Mask(name, obj string, mask *JKV) string {
 
-	// objTmp, _ := IndentFmt(obj)
-	// jkvTmp := NewJKV(objTmp, name)
-	// fPln(jkvTmp.JSON)
+	objTmp, _ := IndentFmt(obj)
+	jkvTmp := NewJKV(objTmp, name)
+	fPln(jkvTmp.JSON)
+	// fTmp := jkvTmp.LsL12Fields[2]
+
+	// mask.MapIPathValue[]
 
 	// TODO: check sub-obj matches mask
-	aimObj := mask.LsL12Fields[1][0]
-	if name != aimObj {
+	if name != mask.LsL12Fields[1][0] {
 		return obj
 	}
+	// if covered, _ := cmn.IsSetCover(jkvTmp.LsL12Fields[2], mask.LsL12Fields[2]); !covered {
+	// 	return obj
+	// }
 	//
 
 	for path, value := range mask.MapIPathValue {
@@ -682,3 +687,5 @@ func Mask(name, obj string, mask *JKV) string {
 
 	return obj
 }
+
+/// --------------------------------------- ///
