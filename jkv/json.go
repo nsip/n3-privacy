@@ -7,6 +7,8 @@ import (
 	"errors"
 	"math"
 	"sync"
+
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
 // IsJSON :
@@ -577,6 +579,8 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 		frame = fSf("{\n  \"%s\": %s\n}", lvl1path, oid)
 	}
 
+	maskLvlFields := ProjectV(MapKeys(mask.MapIPathValue).([]string), pLinker, "", "@")
+
 	// expanding ...
 	iExp := 0
 	for {
@@ -597,7 +601,7 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 				ss := sSpl(jkv.mOIDiPath[oid], pLinker)
 				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				objMasked := Mask(name, obj, mask)
+				objMasked := Mask(name, obj, mask, maskLvlFields)
 				frame = sReplaceAll(frame, oid, objMasked)
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
@@ -624,23 +628,26 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 }
 
 // Mask :
-func Mask(name, obj string, mask *JKV) string {
-
+func Mask(name, obj string, mask *JKV, maskLvlFields [][]string) string {
 	objTmp, _ := IndentFmt(obj)
 	jkvTmp := NewJKV(objTmp, name)
-	fPln(jkvTmp.JSON)
-	// fTmp := jkvTmp.LsL12Fields[2]
+	fTmp := jkvTmp.LsL12Fields[2]
+	// fPln(jkvTmp.JSON)
 
-	// mask.MapIPathValue[]
-
-	// TODO: check sub-obj matches mask
-	if name != mask.LsL12Fields[1][0] {
-		return obj
+	L := 0
+	for i := 0; i < len(maskLvlFields)-1; i++ {
+		if ok, _ := cmn.CanSetCover(maskLvlFields[i], []string{name}); ok {
+			if len(cmn.SetIntersect(fTmp, maskLvlFields[i+1]).([]string)) > 0 {
+				L = i
+				goto DOMASK
+			}
+		}
 	}
-	// if covered, _ := cmn.IsSetCover(jkvTmp.LsL12Fields[2], mask.LsL12Fields[2]); !covered {
-	// 	return obj
-	// }
-	//
+	return obj
+
+DOMASK:
+
+	fPln("L", L)
 
 	for path, value := range mask.MapIPathValue {
 
@@ -687,5 +694,3 @@ func Mask(name, obj string, mask *JKV) string {
 
 	return obj
 }
-
-/// --------------------------------------- ///

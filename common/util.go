@@ -63,8 +63,8 @@ func LocalIP() string {
 	return ""
 }
 
-// IsSetCover : check if setA contains setB ? return the first B-Index of which item is not in setA
-func IsSetCover(setA, setB interface{}) (bool, int) {
+// CanSetCover : check if setA contains setB ? return the first B-Index of which item is not in setA
+func CanSetCover(setA, setB interface{}) (bool, int) {
 	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
 	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
 		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
@@ -86,6 +86,27 @@ NEXT:
 		}
 	}
 	return true, -1
+}
+
+// SetIntersect :
+func SetIntersect(setA, setB interface{}) interface{} {
+	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
+	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
+		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
+	}
+	vA, vB := reflect.ValueOf(setA), reflect.ValueOf(setB)
+	set := reflect.MakeSlice(tA, 0, vA.Len())
+NEXT:
+	for j := 0; j < vB.Len(); j++ {
+		b := vB.Index(j)
+		for i := 0; i < vA.Len(); i++ {
+			if reflect.DeepEqual(b.Interface(), vA.Index(i).Interface()) {
+				set = reflect.Append(set, b)
+				continue NEXT
+			}
+		}
+	}
+	return set.Interface()
 }
 
 // ToSet : convert slice / array to set. i.e. remove duplicated items
