@@ -13,7 +13,7 @@ func prepareJQ(jqDirs ...string) (jqWD, oriWD string, err error) {
 	fn := "prepareJQ"
 	oriWD, err = os.Getwd()
 	cmn.FailOnErr("Getwd() 1 fatal @ %v: %w", fn, err)
-	jqDirs = append(jqDirs, "./")
+	jqDirs = append(jqDirs, "./", "../", "../../")
 	for _, jqWD = range jqDirs {
 		if !strings.HasSuffix(jqWD, "/") {
 			jqWD += "/"

@@ -15,6 +15,10 @@ type DB interface {
 	PolicyHash(id string) (string, bool)
 	Policy(id string) (string, bool)
 	DeletePolicy(id string) error
+	// Optional
+	AllPolicyIDs(rw string) []string               // if rw is "", get all
+	AllPolicyIDsOfOneUser(uid, rw string) []string // if rw is "", get all
+	AllPolicyIDsOfOneCtx(ctx, rw string) []string  // if rw is "", get all
 }
 
 // NewDB :

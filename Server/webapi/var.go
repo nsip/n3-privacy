@@ -93,3 +93,10 @@ func url5Values(values url.Values, idx int, params ...string) (bool, string, str
 	}
 	return false, "", "", "", "", ""
 }
+
+func url6Values(values url.Values, idx int, params ...string) (bool, string, string, string, string, string, string) {
+	if ok, ls6Values := urlOneValueList(values, idx, params...); ok {
+		return true, ls6Values[0], ls6Values[1], ls6Values[2], ls6Values[3], ls6Values[4], ls6Values[5]
+	}
+	return false, "", "", "", "", "", ""
+}

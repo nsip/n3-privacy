@@ -34,11 +34,12 @@ var (
 )
 
 var (
-	hash      = cmn.SHA1Str
+	hash      = cmn.SHA1Str // 32 [40] 64
 	lenOfHash = len(hash("1"))
 	lenOfOID  = lenOfHash / 4 // length of Object-Hash-ID Occupied
 	lenOfFID  = lenOfHash / 4 // length of Fields-Hash-ID Occupied
-	lenOfSID  = lenOfHash / 2 // length of Suffix-Hash-ID Occupied ( Suffix: UserID+ContextID+RW )
+	lenOfUID  = lenOfHash / 4 // length of UserID-Hash-ID Occupied
+	lenOfCTX  = lenOfHash / 4 // length of Context-Hash-ID Occupied
 	listID    = []string{}    // Policy ID List in running time
 )
 
@@ -64,8 +65,9 @@ func genPolicyID(policy, uid, ctx, rw string) string {
 		fCode := hash(sJoin(fields, ""))[:lenOfFID]
 		return oCode + fCode
 	}
-	suffix := hash(uid + ctx + rw)[:lenOfSID]
-	return genPolicyCode(policy) + suffix
+	uCode := hash(uid)[:lenOfUID]
+	cCode := hash(ctx)[:lenOfCTX]
+	return genPolicyCode(policy) + uCode + cCode + rw[:1]
 }
 
 func validate(policy string) (string, error) {
@@ -75,8 +77,9 @@ func validate(policy string) (string, error) {
 	return pp.FmtJSONStr(policy), nil
 }
 
+// listID has already been loaded
 func getPolicyID(uid, ctx, rw string, objects ...string) (lsID []string) {
-	suffix := hash(uid + ctx + rw)[:lenOfSID]
+	suffix := hash(uid)[:lenOfUID] + hash(ctx)[:lenOfCTX] + rw[:1]
 	if len(objects) > 0 {
 		for _, object := range objects {
 			oid := hash(object)[:lenOfOID]

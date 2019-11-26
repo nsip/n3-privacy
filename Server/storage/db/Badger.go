@@ -94,7 +94,7 @@ func NewDBByBadger() interface{} {
 	return (&badgerDB{}).init()
 }
 
-// loadIDList :
+// loadIDList : already invoked by init(), DO NOT call it manually
 func (db *badgerDB) loadIDList() int {
 	opt := badger.DefaultIteratorOptions
 	db.mIDPolicy.View(func(txn *badger.Txn) error {
@@ -112,7 +112,7 @@ func (db *badgerDB) loadIDList() int {
 	return len(listID)
 }
 
-// included in New...
+// init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
 	path := glb.Cfg.Storage.BadgerDBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
@@ -124,8 +124,8 @@ func (db *badgerDB) init() *badgerDB {
 	db.mIDHash, db.err = badger.Open(badger.DefaultOptions(path + "IDHash"))
 	cmn.FailOnErr("%v", db.err)
 
-	CountID := db.loadIDList()
-	fPln(CountID, "exist in db")
+	// fPln(db.loadIDList(), "exist in db")
+	db.loadIDList()
 	return db
 }
 
@@ -182,4 +182,50 @@ func (db *badgerDB) Policy(id string) (string, bool) {
 		return values[0], true
 	}
 	return "", false
+}
+
+// ---------------------------------------------- //
+
+func (db *badgerDB) AllPolicyID(rw string) (lsID []string) {
+	if rw == "" {
+		return append(lsID, listID...)
+	}
+	for _, id := range listID {
+		if sHasSuffix(id, rw) {
+			lsID = append(lsID, id)
+		}
+	}
+	return
+}
+
+func (db *badgerDB) PolicyIDListOfOneUser(uid, rw string) (lsID []string) {
+	uCode := hash(uid)[:lenOfUID]
+	for _, id := range listID {
+		if i := sIndex(id, uCode); i == lenOfHash/2 {
+			if rw == "" {
+				lsID = append(lsID, id)
+				continue
+			}
+			if sHasSuffix(id, rw) {
+				lsID = append(lsID, id)
+			}
+		}
+	}
+	return
+}
+
+func (db *badgerDB) PolicyIDListOfOneCtx(ctx, rw string) (lsID []string) {
+	cCode := hash(ctx)[:lenOfCTX]
+	for _, id := range listID {
+		if i := sIndex(id, cCode); i == lenOfHash*3/4 {
+			if rw == "" {
+				lsID = append(lsID, id)
+				continue
+			}
+			if sHasSuffix(id, rw) {
+				lsID = append(lsID, id)
+			}
+		}
+	}
+	return
 }
