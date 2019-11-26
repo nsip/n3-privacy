@@ -80,7 +80,7 @@ NEXT:
 			if reflect.DeepEqual(b, vA.Index(i).Interface()) {
 				continue NEXT
 			}
-			if i == vA.Len()-1 {
+			if i == vA.Len()-1 { // if b falls down to the last vA item position, which means vA doesn't have b item, return false
 				return false, j
 			}
 		}
@@ -109,6 +109,19 @@ NEXT:
 	return set.Interface()
 }
 
+// SetUnion :
+func SetUnion(setA, setB interface{}) interface{} {
+	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
+	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
+		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
+	}
+	vA, vB := reflect.ValueOf(setA), reflect.ValueOf(setB)
+	set := reflect.MakeSlice(tA, 0, vA.Len()+vB.Len())
+	set = reflect.AppendSlice(set, vA)
+	set = reflect.AppendSlice(set, vB)
+	return ToSet(set.Interface())
+}
+
 // ToSet : convert slice / array to set. i.e. remove duplicated items
 func ToSet(slc interface{}) interface{} {
 	t := reflect.TypeOf(slc)
@@ -129,9 +142,8 @@ NEXT:
 			if reflect.DeepEqual(vItem.Interface(), set.Index(j).Interface()) {
 				continue NEXT
 			}
-			if j == set.Len()-1 {
+			if j == set.Len()-1 { // if vItem falls down to the last set position, which means set doesn't have this item, then add it.
 				set = reflect.Append(set, vItem)
-				continue NEXT
 			}
 		}
 	}

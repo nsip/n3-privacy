@@ -7,8 +7,6 @@ import (
 	"errors"
 	"math"
 	"sync"
-
-	cmn "github.com/nsip/n3-privacy/common"
 )
 
 // IsJSON :
@@ -629,38 +627,45 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 
 // Mask :
 func Mask(name, obj string, mask *JKV, maskLvlFields [][]string) string {
+
+	// check current mask path is valid for current objTmp fields, P1/2
 	objTmp, _ := IndentFmt(obj)
 	jkvTmp := NewJKV(objTmp, name)
-	fTmp := jkvTmp.LsL12Fields[2]
-	// fPln(jkvTmp.JSON)
-
-	L := 0
-	for i := 0; i < len(maskLvlFields)-1; i++ {
-		if ok, _ := cmn.CanSetCover(maskLvlFields[i], []string{name}); ok {
-			if len(cmn.SetIntersect(fTmp, maskLvlFields[i+1]).([]string)) > 0 {
-				L = i
-				goto DOMASK
-			}
+	pathlistTmp := func(name, linker string, fields []string) (pathlist []string) {
+		for _, f := range fields {
+			pathlist = append(pathlist, name+linker+f)
 		}
-	}
-	return obj
-
-DOMASK:
-
-	fPln("L", L)
+		return
+	}(name, pLinker, jkvTmp.LsL12Fields[2])
+	// END -- P1/2 //
 
 	for path, value := range mask.MapIPathValue {
+		path = S(path).RmTailFromLast("@").V()
 
-		pathset := S(path).RmTailFromLast("@").V()
-		fieldset := S(pathset).RmHeadToLast(pLinker).V()
-		fieldsearch := fSf("\"%s%s", fieldset, TraitFV)
+		// check current mask path is valid for current objTmp fields,
+		// if AT LEAST ONE mask path is valid, let this path go through and make effect. P2/2
+		flag := false
+		for _, pathTmp := range pathlistTmp {
+			if path != pathTmp && !sHasSuffix(path, pLinker+pathTmp) {
+				continue
+			}
+			flag = true
+			break
+		}
+		if !flag {
+			continue
+		}
+		// END -- P2/2 //
 
-		if i := sIndex(obj, fieldsearch); i > 0 {
+		field := S(path).RmHeadToLast(pLinker).V()
+		lookfor := fSf("\"%s%s", field, TraitFV)
+
+		if i := sIndex(obj, lookfor); i > 0 {
 
 			// pfStart := i
-			// fPln(obj[pfStart : pfStart+len(fieldsearch)])
+			// fPln(obj[pfStart : pfStart+len(lookfor)])
 
-			pvStart, pvEnd := i+len(fieldsearch), 0
+			pvStart, pvEnd := i+len(lookfor), 0
 			pv1End, pv2End := 0, 0
 			if obj[pvStart] != '[' {
 				pv1End = sIndex(obj[pvStart:], Trait1EndV)
