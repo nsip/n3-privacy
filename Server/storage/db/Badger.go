@@ -12,6 +12,19 @@ type badgerDB struct {
 	mIDPolicy *badger.DB
 	mIDHash   *badger.DB
 	err       error
+	mIDUser   *badger.DB
+	mIDCtx    *badger.DB
+	mIDObject *badger.DB
+}
+
+func openBadgerDB(dbPath string, lsDBName ...string) (lsDB []*badger.DB) {
+	lsDB = make([]*badger.DB, len(lsDBName))
+	for i, name := range lsDBName {
+		db, err := badger.Open(badger.DefaultOptions(dbPath + name))
+		lsDB[i] = db
+		cmn.FailOnErr("%v", err)
+	}
+	return
 }
 
 func closeBadgerDB(lsDB ...*badger.DB) error {
@@ -89,6 +102,30 @@ func getBadgerDB(dbs []*badger.DB, keys []string) (values []string, err error) {
 	return
 }
 
+func getOneBadgerDB(db *badger.DB, keys []string) (values []string, err error) {
+	txn := db.NewTransaction(true)
+	defer txn.Discard()
+	for _, key := range keys {
+		switch item, e := txn.Get([]byte(key)); e {
+		case nil:
+			err = item.Value(func(v []byte) error {
+				values = append(values, string(v))
+				return nil
+			})
+			if err != nil {
+				return nil, err
+			}
+		case badger.ErrKeyNotFound:
+			values = append(values, "")
+		default:
+			cmn.FailOnErr("%v", e)
+		}
+	}
+	return
+}
+
+// ---------------------------------------------- //
+
 // NewDBByBadger :
 func NewDBByBadger() interface{} {
 	return (&badgerDB{}).init()
@@ -119,10 +156,8 @@ func (db *badgerDB) init() *badgerDB {
 		os.MkdirAll(path, os.ModePerm)
 	}
 
-	db.mIDPolicy, db.err = badger.Open(badger.DefaultOptions(path + "IDPolicy"))
-	cmn.FailOnErr("%v", db.err)
-	db.mIDHash, db.err = badger.Open(badger.DefaultOptions(path + "IDHash"))
-	cmn.FailOnErr("%v", db.err)
+	lsDB := openBadgerDB(path, "mIDPolicy", "mIDHash", "mIDUser", "mIDCtx", "mIDObject")
+	db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject = lsDB[0], lsDB[1], lsDB[2], lsDB[3], lsDB[4]
 
 	// fPln(db.loadIDList(), "exist in db")
 	db.loadIDList()
@@ -145,17 +180,20 @@ func (db *badgerDB) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
 	return getPolicyID(uid, ctx, rw, objects...)
 }
 
-func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id string, err error) {
+func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id, obj string, err error) {
 	if policy, err = validate(policy); err != nil {
-		return "", err
+		return "", "", err
 	}
-	id = genPolicyID(policy, uid, ctx, rw)
-	err = updateBadgerDB([]*badger.DB{db.mIDPolicy, db.mIDHash}, []string{id, id}, []string{policy, hash(policy)})
+	id, obj = genPolicyID(policy, uid, ctx, rw)
+	err = updateBadgerDB(
+		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
+		[]string{id, id, hash(uid)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
+		[]string{policy, hash(policy), uid, ctx, obj})
 	if err == nil && !xin(id, listID) {
 		listID = append(listID, id)
 	}
 	logMeta(policy, ctx, rw)
-	return id, err
+	return id, obj, err
 }
 
 func (db *badgerDB) DeletePolicy(id string) (err error) {
@@ -186,7 +224,7 @@ func (db *badgerDB) Policy(id string) (string, bool) {
 
 // ---------------------------------------------- //
 
-func (db *badgerDB) AllPolicyID(rw string) (lsID []string) {
+func (db *badgerDB) ListAllPolicyID(rw string) (lsID []string) {
 	if rw == "" {
 		return append(lsID, listID...)
 	}
@@ -198,7 +236,7 @@ func (db *badgerDB) AllPolicyID(rw string) (lsID []string) {
 	return
 }
 
-func (db *badgerDB) PolicyIDListOfOneUser(uid, rw string) (lsID []string) {
+func (db *badgerDB) ListPolicyIDOfOneUser(uid, rw string) (lsID []string) {
 	uCode := hash(uid)[:lenOfUID]
 	for _, id := range listID {
 		if i := sIndex(id, uCode); i == lenOfHash/2 {
@@ -214,7 +252,7 @@ func (db *badgerDB) PolicyIDListOfOneUser(uid, rw string) (lsID []string) {
 	return
 }
 
-func (db *badgerDB) PolicyIDListOfOneCtx(ctx, rw string) (lsID []string) {
+func (db *badgerDB) ListPolicyIDOfOneCtx(ctx, rw string) (lsID []string) {
 	cCode := hash(ctx)[:lenOfCTX]
 	for _, id := range listID {
 		if i := sIndex(id, cCode); i == lenOfHash*3/4 {
@@ -227,5 +265,80 @@ func (db *badgerDB) PolicyIDListOfOneCtx(ctx, rw string) (lsID []string) {
 			}
 		}
 	}
+	return
+}
+
+func (db *badgerDB) ListAllUser() (users []string) {
+	uCodes := []string{}
+	for _, id := range listID {
+		uCodes = append(uCodes, uCodeByPolicyID(id))
+	}
+	users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListUserOfOneCtx(ctx string) (users []string) {
+	cCode := hash(ctx)[:lenOfCTX]
+	uCodes := []string{}
+	for _, id := range listID {
+		if cCodeByPolicyID(id) == cCode {
+			uCodes = append(uCodes, uCodeByPolicyID(id))
+		}
+	}
+	users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListAllCtx() (ctxList []string) {
+	cCodes := []string{}
+	for _, id := range listID {
+		cCodes = append(cCodes, cCodeByPolicyID(id))
+	}
+	ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListCtxOfOneUser(user string) (ctxList []string) {
+	uCode := hash(user)[:lenOfUID]
+	cCodes := []string{}
+	for _, id := range listID {
+		if uCodeByPolicyID(id) == uCode {
+			cCodes = append(cCodes, cCodeByPolicyID(id))
+		}
+	}
+	ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListAllObject() (objList []string) {
+	oCodes := []string{}
+	for _, id := range listID {
+		oCodes = append(oCodes, oCodeByPolicyID(id))
+	}
+	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListObjectOfOneUser(user string) (objList []string) {
+	uCode := hash(user)[:lenOfUID]
+	oCodes := []string{}
+	for _, id := range listID {
+		if uCodeByPolicyID(id) == uCode {
+			oCodes = append(oCodes, oCodeByPolicyID(id))
+		}
+	}
+	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
+	return
+}
+
+func (db *badgerDB) ListObjectOfOneCtx(ctx string) (objList []string) {
+	cCode := hash(ctx)[:lenOfCTX]
+	oCodes := []string{}
+	for _, id := range listID {
+		if cCodeByPolicyID(id) == cCode {
+			oCodes = append(oCodes, oCodeByPolicyID(id))
+		}
+	}
+	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
 	return
 }

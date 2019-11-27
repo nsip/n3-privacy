@@ -20,10 +20,10 @@ func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
 	db := NewDB("badger")
 
-	uid := "qmiao"
+	uid := "qmiao1"
 	ctx := "ctx123"
 	policy := `{
-		"Test": {
+		"Test1": {
 			"F1": "-----",
 			"F2": "*****",
 			"F3": "~~~~~"
@@ -42,4 +42,12 @@ func TestUpdatePolicy(t *testing.T) {
 		policy, _ := db.Policy(id)
 		fPln(policy)
 	}
+
+	fPln(db.ListAllUser())
+	fPln(db.ListUserOfOneCtx("ctx123"))
+	fPln(db.ListAllCtx())
+	fPln(db.ListCtxOfOneUser("qmiao1"))
+	fPln(db.ListAllObject())
+	fPln(db.ListObjectOfOneUser("qmiao1"))
+	fPln(db.ListObjectOfOneCtx("ctx123"))
 }

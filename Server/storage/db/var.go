@@ -55,19 +55,36 @@ func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
 
-func genPolicyID(policy, uid, ctx, rw string) string {
-	genPolicyCode := func(policy string) string {
+func genPolicyID(policy, uid, ctx, rw string) (string, string) {
+	genPolicyCode := func(policy string) (string, string) {
 		jkvM := jkv.NewJKV(policy, hash(policy))
 		object := jkvM.LsL12Fields[1][0]
 		fields := jkvM.LsL12Fields[2]
 		sort.Strings(fields)
 		oCode := hash(object)[:lenOfOID]
 		fCode := hash(sJoin(fields, ""))[:lenOfFID]
-		return oCode + fCode
+		return oCode + fCode, object
 	}
 	uCode := hash(uid)[:lenOfUID]
 	cCode := hash(ctx)[:lenOfCTX]
-	return genPolicyCode(policy) + uCode + cCode + rw[:1]
+	pCode, object := genPolicyCode(policy)
+	return pCode + uCode + cCode + rw[:1], object
+}
+
+func oCodeByPolicyID(pid string) string {
+	return pid[:lenOfOID]
+}
+
+func fCodeByPolicyID(pid string) string {
+	return pid[lenOfOID : lenOfOID+lenOfFID]
+}
+
+func uCodeByPolicyID(pid string) string {
+	return pid[lenOfOID+lenOfFID : lenOfOID+lenOfFID+lenOfUID]
+}
+
+func cCodeByPolicyID(pid string) string {
+	return pid[lenOfOID+lenOfFID+lenOfUID : lenOfOID+lenOfFID+lenOfUID+lenOfCTX]
 }
 
 func validate(policy string) (string, error) {
@@ -77,7 +94,7 @@ func validate(policy string) (string, error) {
 	return pp.FmtJSONStr(policy), nil
 }
 
-// listID has already been loaded
+// [listID] has already been loaded
 func getPolicyID(uid, ctx, rw string, objects ...string) (lsID []string) {
 	suffix := hash(uid)[:lenOfUID] + hash(ctx)[:lenOfCTX] + rw[:1]
 	if len(objects) > 0 {
