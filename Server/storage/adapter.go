@@ -15,11 +15,12 @@ type DB interface {
 	PolicyHash(id string) (string, bool)
 	Policy(id string) (string, bool)
 	DeletePolicy(id string) error
+
 	// Optional, for management
-	ListPolicyID(user, ctx string, lsRW ...string) [][]string // if variadic is [empty], get all
-	ListUser(lsCtx ...string) [][]string
-	ListCtx(users ...string) [][]string
-	ListObject(user, ctx string) []string
+	MapRWListOfPID(user, ctx string, lsRW ...string) map[string][]string
+	MapCtxListOfUser(lsCtx ...string) map[string][]string
+	MapUserListOfCtx(users ...string) map[string][]string
+	MapUCListOfObject(user, ctx string) map[string][]string
 }
 
 // NewDB :
