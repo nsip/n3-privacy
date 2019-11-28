@@ -71,19 +71,19 @@ func genPolicyID(policy, uid, ctx, rw string) (string, string) {
 	return pCode + uCode + cCode + rw[:1], object
 }
 
-func oCodeByPolicyID(pid string) string {
+func oCodeByPID(pid string) string {
 	return pid[:lenOfOID]
 }
 
-func fCodeByPolicyID(pid string) string {
+func fCodeByPID(pid string) string {
 	return pid[lenOfOID : lenOfOID+lenOfFID]
 }
 
-func uCodeByPolicyID(pid string) string {
+func uCodeByPID(pid string) string {
 	return pid[lenOfOID+lenOfFID : lenOfOID+lenOfFID+lenOfUID]
 }
 
-func cCodeByPolicyID(pid string) string {
+func cCodeByPID(pid string) string {
 	return pid[lenOfOID+lenOfFID+lenOfUID : lenOfOID+lenOfFID+lenOfUID+lenOfCTX]
 }
 

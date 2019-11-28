@@ -47,6 +47,8 @@ func HostHTTPAsync() {
 		// fSf("GET    %-55s-> %s\n", fullIP+route.GetJQ, "Get JQ1.6. Put (jq) into (jm) directory")+
 	})
 
+	// -------------------------- Basic -------------------------- //
+
 	path = route.GetID
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
@@ -111,9 +113,9 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		if ok, uid, ctx, rw := url3Values(c.QueryParams(), 0, "uid", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
-				if id, err := db.UpdatePolicy(string(bPolicy), uid, ctx, rw); err == nil {
+				if id, obj, err := db.UpdatePolicy(string(bPolicy), uid, ctx, rw); err == nil {
 					fPln(db.PolicyCount(), ": exist in db")
-					return c.String(http.StatusOK, id)
+					return c.String(http.StatusOK, id+" - "+obj)
 				}
 				return c.String(http.StatusInternalServerError, "Update DB error")
 			}
@@ -121,6 +123,10 @@ func HostHTTPAsync() {
 		}
 		return c.String(http.StatusBadRequest, "<uid>, <ctx> and <rw> parameters must be provided")
 	})
+
+	// -------------------------- Optional -------------------------- //
+
+	
 
 	e.Start(fSf(":%d", port))
 }

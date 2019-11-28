@@ -222,121 +222,135 @@ func (db *badgerDB) Policy(id string) (string, bool) {
 	return "", false
 }
 
-// ---------------------------------------------- //
+// ----------------------- Optional, for management ----------------------- //
 
-func (db *badgerDB) ListAllPolicyID(rw string) (lsID []string) {
-	if rw == "" {
-		return append(lsID, listID...)
-	}
-	for _, id := range listID {
-		if sHasSuffix(id, rw) {
-			lsID = append(lsID, id)
+func (db *badgerDB) ListPolicyID(user, ctx string, lsRW ...string) (lsID [][]string) {
+	allPolicyID := func(lsRW ...string) (lsID [][]string) {
+		if len(lsRW) == 0 {
+			return [][]string{append([]string{}, listID...)}
 		}
-	}
-	return
-}
-
-func (db *badgerDB) ListPolicyIDOfOneUser(uid, rw string) (lsID []string) {
-	uCode := hash(uid)[:lenOfUID]
-	for _, id := range listID {
-		if i := sIndex(id, uCode); i == lenOfHash/2 {
-			if rw == "" {
-				lsID = append(lsID, id)
-				continue
-			}
-			if sHasSuffix(id, rw) {
-				lsID = append(lsID, id)
+		lsID = make([][]string, len(lsRW))
+		for i, rw := range lsRW {
+			for _, id := range listID {
+				if sHasSuffix(id, rw) {
+					lsID[i] = append(lsID[i], id)
+				}
 			}
 		}
+		return
 	}
-	return
-}
 
-func (db *badgerDB) ListPolicyIDOfOneCtx(ctx, rw string) (lsID []string) {
-	cCode := hash(ctx)[:lenOfCTX]
-	for _, id := range listID {
-		if i := sIndex(id, cCode); i == lenOfHash*3/4 {
-			if rw == "" {
-				lsID = append(lsID, id)
-				continue
-			}
-			if sHasSuffix(id, rw) {
-				lsID = append(lsID, id)
-			}
-		}
+	if user == "" && ctx == "" {
+		return allPolicyID(lsRW...)
 	}
-	return
-}
 
-func (db *badgerDB) ListAllUser() (users []string) {
-	uCodes := []string{}
-	for _, id := range listID {
-		uCodes = append(uCodes, uCodeByPolicyID(id))
-	}
-	users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
-	return
-}
-
-func (db *badgerDB) ListUserOfOneCtx(ctx string) (users []string) {
-	cCode := hash(ctx)[:lenOfCTX]
-	uCodes := []string{}
-	for _, id := range listID {
-		if cCodeByPolicyID(id) == cCode {
-			uCodes = append(uCodes, uCodeByPolicyID(id))
-		}
-	}
-	users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
-	return
-}
-
-func (db *badgerDB) ListAllCtx() (ctxList []string) {
-	cCodes := []string{}
-	for _, id := range listID {
-		cCodes = append(cCodes, cCodeByPolicyID(id))
-	}
-	ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
-	return
-}
-
-func (db *badgerDB) ListCtxOfOneUser(user string) (ctxList []string) {
 	uCode := hash(user)[:lenOfUID]
-	cCodes := []string{}
-	for _, id := range listID {
-		if uCodeByPolicyID(id) == uCode {
-			cCodes = append(cCodes, cCodeByPolicyID(id))
+	cCode := hash(ctx)[:lenOfCTX]
+	lsID = make([][]string, len(lsRW))
+	if len(lsRW) == 0 {
+		lsID = make([][]string, 1)
+	}
+	for i, IDs := range allPolicyID(lsRW...) {
+		for _, id := range IDs {
+			switch {
+			case user == "" && ctx != "":
+				if p := sIndex(id, cCode); p == lenOfHash*3/4 {
+					lsID[i] = append(lsID[i], id)
+				}
+			case user != "" && ctx == "":
+				if p := sIndex(id, uCode); p == lenOfHash/2 {
+					lsID[i] = append(lsID[i], id)
+				}
+			case user != "" && ctx != "":
+				p1, p2 := sIndex(id, uCode), sIndex(id, cCode)
+				if p1 == lenOfHash/2 && p2 == lenOfHash*3/4 {
+					lsID[i] = append(lsID[i], id)
+				}
+			}
 		}
 	}
-	ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
 	return
 }
 
-func (db *badgerDB) ListAllObject() (objList []string) {
-	oCodes := []string{}
-	for _, id := range listID {
-		oCodes = append(oCodes, oCodeByPolicyID(id))
+// TODO ListUser
+func (db *badgerDB) ListUser(lsCtx ...string) (lsUser [][]string) {
+	allUsers := func() (users []string) {
+		uCodes := []string{}
+		for _, id := range listID {
+			uCodes = append(uCodes, uCodeByPID(id))
+		}
+		users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+		return
 	}
-	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
+
+	if len(lsCtx) == 0 {
+		return [][]string{allUsers()}
+	}
+
+	lsUser = make([][]string, len(lsCtx))
+	for i, ctx := range lsCtx {
+		cCode := hash(ctx)[:lenOfCTX]
+		uCodes := []string{}
+		for _, id := range listID {
+			if cCodeByPID(id) == cCode {
+				uCodes = append(uCodes, uCodeByPID(id))
+			}
+		}
+		lsUser[i], _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+	}
 	return
 }
 
-func (db *badgerDB) ListObjectOfOneUser(user string) (objList []string) {
+// TODO ListCtx
+func (db *badgerDB) ListCtx(users ...string) (lsCtx [][]string) {
+	allCtx := func() (ctxList []string) {
+		cCodes := []string{}
+		for _, id := range listID {
+			cCodes = append(cCodes, cCodeByPID(id))
+		}
+		ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+		return
+	}
+
+	if len(users) == 0 {
+		return [][]string{allCtx()}
+	}
+
+	lsCtx = make([][]string, len(users))
+	for i, user := range users {
+		uCode := hash(user)[:lenOfUID]
+		cCodes := []string{}
+		for _, id := range listID {
+			if uCodeByPID(id) == uCode {
+				cCodes = append(cCodes, cCodeByPID(id))
+			}
+		}
+		lsCtx[i], _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+	}
+	return
+}
+
+// TODO ListObject
+func (db *badgerDB) ListObject(user, ctx string) (objList []string) {
 	uCode := hash(user)[:lenOfUID]
-	oCodes := []string{}
-	for _, id := range listID {
-		if uCodeByPolicyID(id) == uCode {
-			oCodes = append(oCodes, oCodeByPolicyID(id))
-		}
-	}
-	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
-	return
-}
-
-func (db *badgerDB) ListObjectOfOneCtx(ctx string) (objList []string) {
 	cCode := hash(ctx)[:lenOfCTX]
 	oCodes := []string{}
 	for _, id := range listID {
-		if cCodeByPolicyID(id) == cCode {
-			oCodes = append(oCodes, oCodeByPolicyID(id))
+		switch {
+		case user == "" && ctx == "":
+			oCodes = append(oCodes, oCodeByPID(id))
+		case user != "" && ctx != "":
+			if uCodeByPID(id) == uCode && cCodeByPID(id) == cCode {
+				oCodes = append(oCodes, oCodeByPID(id))
+			}
+		case user != "" && ctx == "":
+			if uCodeByPID(id) == uCode {
+				oCodes = append(oCodes, oCodeByPID(id))
+			}
+		case user == "" && ctx != "":
+			if cCodeByPID(id) == cCode {
+				oCodes = append(oCodes, oCodeByPID(id))
+			}
 		}
 	}
 	objList, _ = getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))

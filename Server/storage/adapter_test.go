@@ -20,34 +20,32 @@ func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
 	db := NewDB("badger")
 
-	uid := "qmiao1"
-	ctx := "ctx123"
+	uid := "qmiao"
+	ctx := "ctx122"
 	policy := `{
-		"Test1": {
+		"Test": {
 			"F1": "-----",
 			"F2": "*****",
 			"F3": "~~~~~"
 		}
 	}`
 	policy = pp.FmtJSONStr(policy)
-	db.UpdatePolicy(policy, uid, ctx, "r")
+	db.UpdatePolicy(policy, uid, ctx, "w")
 	fPln(db.PolicyCount())
 
-	if id := db.PolicyID(uid, ctx, "r", "Test"); len(id) > 0 {
+	if id := db.PolicyID(uid, ctx, "w", "Test"); len(id) > 0 {
 		fPln(id)
 	}
 
-	for _, id := range db.PolicyIDs(uid, ctx, "r", "Test") {
+	for _, id := range db.PolicyIDs(uid, ctx, "w", "Test") {
 		fPln(id)
 		policy, _ := db.Policy(id)
 		fPln(policy)
 	}
 
-	fPln(db.ListAllUser())
-	fPln(db.ListUserOfOneCtx("ctx123"))
-	fPln(db.ListAllCtx())
-	fPln(db.ListCtxOfOneUser("qmiao1"))
-	fPln(db.ListAllObject())
-	fPln(db.ListObjectOfOneUser("qmiao1"))
-	fPln(db.ListObjectOfOneCtx("ctx123"))
+	fPln(db.ListPolicyID("qmiao1", "", "r", "w"))
+
+	fPln(db.ListUser("ctx122", "ctx123"))
+	fPln(db.ListCtx("qmiao1", "qmiao"))
+	fPln(db.ListObject("qmiao", "ctx123"))
 }

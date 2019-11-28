@@ -16,16 +16,10 @@ type DB interface {
 	Policy(id string) (string, bool)
 	DeletePolicy(id string) error
 	// Optional, for management
-	ListAllPolicyID(rw string) []string            // if rw is "", get all
-	ListPolicyIDOfOneUser(uid, rw string) []string // if rw is "", get all
-	ListPolicyIDOfOneCtx(ctx, rw string) []string  // if rw is "", get all
-	ListAllUser() []string
-	ListUserOfOneCtx(ctx string) []string
-	ListAllCtx() []string
-	ListCtxOfOneUser(user string) []string
-	ListAllObject() []string
-	ListObjectOfOneUser(user string) []string
-	ListObjectOfOneCtx(ctx string) []string
+	ListPolicyID(user, ctx string, lsRW ...string) [][]string // if variadic is [empty], get all
+	ListUser(lsCtx ...string) [][]string
+	ListCtx(users ...string) [][]string
+	ListObject(user, ctx string) []string
 }
 
 // NewDB :
