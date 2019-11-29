@@ -35,3 +35,5 @@ GOOS="darwin" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH
 cp config.toml $OUTPATH
 cp $UPATH/jq-osx-amd64 "$OUTPATH"jq
+
+cp config.toml ../Client/

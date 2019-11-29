@@ -23,7 +23,7 @@ func TestUpdatePolicy(t *testing.T) {
 	user := "qmiao"
 	ctx := "ctx123"
 	policy := `{
-		"Test2": {
+		"Test": {
 			"F1": "-----",
 			"F2": "*****",
 			"F3": "~~~~~",

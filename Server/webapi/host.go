@@ -47,8 +47,6 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfUser, "Get a list of user. If no ctx restriction, return all user")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfCtx, "Get a list of context. If no user restriction, return all context")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfObject, "Get a list of object. If no user or ctx restriction, return all object"))
-		// fSf("GET    %-55s-> %s\n", fullIP+route.GetJM, "Get JSON enforcement tool (jm). This tool is dependent on (jq)")+
-		// fSf("GET    %-55s-> %s\n", fullIP+route.GetJQ, "Get JQ1.6. Put (jq) into (jm) directory")+
 	})
 
 	// -------------------------- Basic -------------------------- //

@@ -35,10 +35,10 @@ type Config struct {
 		ListOfCtx    string
 		ListOfObject string
 	}
-	Storage struct {
-		DataBase     string
-		MetaPath     string
-		BadgerDBPath string
+	// Client
+	Server struct {
+		Protocol string
+		IP       string
 	}
 }
 

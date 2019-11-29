@@ -10,6 +10,7 @@ import (
 var (
 	// Cfg : global variable
 	Cfg *cfg.Config
+
 	// WD : original work directory
 	WD, _ = os.Getwd()
 )
