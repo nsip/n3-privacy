@@ -15,6 +15,10 @@ JQPath = "../../JSON-Mask/build/Linux64/jq"
   Delete = "/policy-server/#/delete"
   GetJM = "/policy-server/#/jm"
   GetJQ = "/policy-server/#/jq"
+  ListOfPID = "/policy-server/#/list/policyid"
+  ListOfUser = "/policy-server/#/list/user"
+  ListOfCtx = "/policy-server/#/list/ctx"
+  ListOfObject = "/policy-server/#/list/object"
   
 [Storage]
   DataBase = "badger" # "map" / "badger" / ...

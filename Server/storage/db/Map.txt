@@ -31,21 +31,21 @@ func (db *memMap) PolicyCount() int {
 }
 
 // PolicyID :
-func (db *memMap) PolicyID(uid, ctx, rw, object string) []string {
-	return getPolicyID(uid, ctx, rw, object)
+func (db *memMap) PolicyID(user, ctx, rw, object string) []string {
+	return getPolicyID(user, ctx, rw, object)
 }
 
-func (db *memMap) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
-	return getPolicyID(uid, ctx, rw, objects...)
+func (db *memMap) PolicyIDs(user, ctx, rw string, objects ...string) []string {
+	return getPolicyID(user, ctx, rw, objects...)
 }
 
 // UpdatePolicy :
-func (db *memMap) UpdatePolicy(policy, uid, ctx, rw string) (id string, err error) {
+func (db *memMap) UpdatePolicy(policy, user, ctx, rw string) (id string, err error) {
 	if policy, err = validate(policy); err != nil {
 		return "", err
 	}
 
-	id = genPolicyID(policy, uid, ctx, rw)
+	id = genPolicyID(policy, user, ctx, rw)
 	db.mIDMask[id] = policy
 	db.mIDHash[id] = hash(policy)
 

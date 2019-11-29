@@ -18,13 +18,17 @@ type Config struct {
 		Version string
 	}
 	Route struct {
-		GetID   string
-		GetHash string
-		Get     string
-		Update  string
-		Delete  string
-		GetJM   string
-		GetJQ   string
+		GetID        string
+		GetHash      string
+		Get          string
+		Update       string
+		Delete       string
+		GetJM        string
+		GetJQ        string
+		ListOfPID    string
+		ListOfUser   string
+		ListOfCtx    string
+		ListOfObject string
 	}
 	Storage struct {
 		DataBase     string

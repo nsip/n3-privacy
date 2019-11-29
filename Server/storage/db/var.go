@@ -55,7 +55,7 @@ func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
 
-func genPolicyID(policy, uid, ctx, rw string) (string, string) {
+func genPolicyID(policy, user, ctx, rw string) (string, string) {
 	genPolicyCode := func(policy string) (string, string) {
 		jkvM := jkv.NewJKV(policy, hash(policy))
 		object := jkvM.LsL12Fields[1][0]
@@ -65,7 +65,7 @@ func genPolicyID(policy, uid, ctx, rw string) (string, string) {
 		fCode := hash(sJoin(fields, ""))[:lenOfFID]
 		return oCode + fCode, object
 	}
-	uCode := hash(uid)[:lenOfUID]
+	uCode := hash(user)[:lenOfUID]
 	cCode := hash(ctx)[:lenOfCTX]
 	pCode, object := genPolicyCode(policy)
 	return pCode + uCode + cCode + rw[:1], object
@@ -95,8 +95,8 @@ func validate(policy string) (string, error) {
 }
 
 // [listID] has already been loaded
-func getPolicyID(uid, ctx, rw string, objects ...string) (lsID []string) {
-	suffix := hash(uid)[:lenOfUID] + hash(ctx)[:lenOfCTX] + rw[:1]
+func getPolicyID(user, ctx, rw string, objects ...string) (lsID []string) {
+	suffix := hash(user)[:lenOfUID] + hash(ctx)[:lenOfCTX] + rw[:1]
 	if len(objects) > 0 {
 		for _, object := range objects {
 			oid := hash(object)[:lenOfOID]

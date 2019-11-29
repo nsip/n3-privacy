@@ -20,10 +20,10 @@ func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
 	db := NewDB("badger")
 
-	uid := "qmiao1"
-	ctx := "ctx124"
+	user := "qmiao"
+	ctx := "ctx123"
 	policy := `{
-		"Test": {
+		"Test2": {
 			"F1": "-----",
 			"F2": "*****",
 			"F3": "~~~~~",
@@ -31,18 +31,18 @@ func TestUpdatePolicy(t *testing.T) {
 		}
 	}`
 	policy = pp.FmtJSONStr(policy)
-	db.UpdatePolicy(policy, uid, ctx, "r")
+	db.UpdatePolicy(policy, user, ctx, "r")
 	fPln(db.PolicyCount())
 
-	fPln(db.MapRWListOfPID("qmiao", "ctx122"))
-	fPln(db.MapCtxListOfUser("ctx122", "ctx124"))
+	fPln(db.MapRWListOfPID("qmiao", "ctx123"))
+	fPln(db.MapCtxListOfUser("ctx123", "ctx124"))
 	fPln(db.MapUserListOfCtx())
 	fPln(db.MapUCListOfObject("qmiao", "ctx122"))
 
-	if id := db.PolicyID(uid, ctx, "w", "Test"); len(id) > 0 {
+	if id := db.PolicyID(user, ctx, "w", "Test"); len(id) > 0 {
 		fPln(id)
 	}
-	for _, id := range db.PolicyIDs(uid, ctx, "w", "Test") {
+	for _, id := range db.PolicyIDs(user, ctx, "w", "Test") {
 		fPln(id)
 		policy, _ := db.Policy(id)
 		fPln(policy)

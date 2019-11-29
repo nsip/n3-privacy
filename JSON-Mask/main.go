@@ -32,8 +32,8 @@ func main() {
 		output = output + ".json"
 	}
 
-	data := strings.ReplaceAll(pp.FmtJSONFile(inputfp), "\r\n", "\n")
-	mask := strings.ReplaceAll(pp.FmtJSONFile(maskfp), "\r\n", "\n")
+	data := pp.FmtJSONFile(inputfp)
+	mask := pp.FmtJSONFile(maskfp)
 	jkvM := jkv.NewJKV(mask, "root")
 
 	if jkv.IsJSONArr(data) {

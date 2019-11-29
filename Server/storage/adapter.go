@@ -8,10 +8,10 @@ import (
 
 // DB :
 type DB interface {
-	UpdatePolicy(policy, uid, ctx, rw string) (string, string, error)
+	UpdatePolicy(policy, user, ctx, rw string) (string, string, error)
 	PolicyCount() int
-	PolicyID(uid, ctx, rw, object string) []string
-	PolicyIDs(uid, ctx, rw string, objects ...string) []string
+	PolicyID(user, ctx, rw, object string) []string
+	PolicyIDs(user, ctx, rw string, objects ...string) []string
 	PolicyHash(id string) (string, bool)
 	Policy(id string) (string, bool)
 	DeletePolicy(id string) error

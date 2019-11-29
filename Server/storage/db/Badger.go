@@ -124,12 +124,12 @@ func getOneBadgerDB(db *badger.DB, keys []string) (values []string, err error) {
 	return
 }
 
-// ---------------------------------------------- //
-
 // NewDBByBadger :
 func NewDBByBadger() interface{} {
 	return (&badgerDB{}).init()
 }
+
+// ----------------------- Basic ----------------------- //
 
 // loadIDList : already invoked by init(), DO NOT call it manually
 func (db *badgerDB) loadIDList() int {
@@ -172,23 +172,23 @@ func (db *badgerDB) PolicyCount() int {
 	return len(listID)
 }
 
-func (db *badgerDB) PolicyID(uid, ctx, rw, object string) []string {
-	return getPolicyID(uid, ctx, rw, object)
+func (db *badgerDB) PolicyID(user, ctx, rw, object string) []string {
+	return getPolicyID(user, ctx, rw, object)
 }
 
-func (db *badgerDB) PolicyIDs(uid, ctx, rw string, objects ...string) []string {
-	return getPolicyID(uid, ctx, rw, objects...)
+func (db *badgerDB) PolicyIDs(user, ctx, rw string, objects ...string) []string {
+	return getPolicyID(user, ctx, rw, objects...)
 }
 
-func (db *badgerDB) UpdatePolicy(policy, uid, ctx, rw string) (id, obj string, err error) {
+func (db *badgerDB) UpdatePolicy(policy, user, ctx, rw string) (id, obj string, err error) {
 	if policy, err = validate(policy); err != nil {
 		return "", "", err
 	}
-	id, obj = genPolicyID(policy, uid, ctx, rw)
+	id, obj = genPolicyID(policy, user, ctx, rw)
 	err = updateBadgerDB(
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
-		[]string{id, id, hash(uid)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
-		[]string{policy, hash(policy), uid, ctx, obj})
+		[]string{id, id, hash(user)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
+		[]string{policy, hash(policy), user, ctx, obj})
 	if err == nil && !xin(id, listID) {
 		listID = append(listID, id)
 	}
@@ -358,10 +358,18 @@ func (db *badgerDB) MapRWListOfPID(user, ctx string, lsRW ...string) map[string]
 	rt := make(map[string][]string)
 	key := fSf("%s@%s", user, ctx)
 	for i, IDs := range db.listPolicyID(user, ctx, lsRW...) {
-		if len(lsRW) == 0 {
-			rt[key] = IDs
+		if user == "" && ctx == "" {
+			rt["all"] = IDs
+		} else if user != "" && ctx == "" {
+			rt[user] = IDs
+		} else if user == "" && ctx != "" {
+			rt[ctx] = IDs
 		} else {
-			rt[key+"@"+lsRW[i]] = IDs
+			if len(lsRW) == 0 {
+				rt[key] = IDs
+			} else {
+				rt[key+"@"+lsRW[i]] = IDs
+			}
 		}
 	}
 	return rt
@@ -392,5 +400,14 @@ func (db *badgerDB) MapUserListOfCtx(users ...string) map[string][]string {
 }
 
 func (db *badgerDB) MapUCListOfObject(user, ctx string) map[string][]string {
-	return map[string][]string{user + "@" + ctx: db.listObject(user, ctx)}
+	key := user + "@" + ctx
+	switch {
+	case user == "" && ctx == "":
+		key = "all"
+	case user != "" && ctx == "":
+		key = user
+	case user == "" && ctx != "":
+		key = ctx
+	}
+	return map[string][]string{key: db.listObject(user, ctx)}
 }

@@ -47,6 +47,7 @@ func urlValues(values url.Values, params ...string) (ok bool, lsValues [][]strin
 	return false, nil
 }
 
+// pick up one index-fixed value item from each values array, then combine them into one array
 func urlOneValueList(values url.Values, idx int, params ...string) (ok bool, lsOneValue []string) {
 	if ok, lsValues := urlValues(values, params...); ok {
 		for _, vs := range lsValues {
