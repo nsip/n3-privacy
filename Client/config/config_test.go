@@ -9,4 +9,5 @@ func TestLoad(t *testing.T) {
 	fPln(cfg.WebService)
 	fPln(cfg.Route)
 	fPln(cfg.Server)
+	fPln(cfg.Access)
 }

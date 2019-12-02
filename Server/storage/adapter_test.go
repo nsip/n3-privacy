@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	glb "github.com/nsip/n3-privacy/Server/global"
+	// pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 func TestAdapter(t *testing.T) {

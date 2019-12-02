@@ -43,10 +43,10 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
 				fSf("POST   %-55s-> %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
 				fSf("DELETE %-55s-> %s\n", fullIP+route.Delete, "Delete policy")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfPID, "Get a list of policy id. If no user or ctx restriction, return all policy id")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfUser, "Get a list of user. If no ctx restriction, return all user")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfCtx, "Get a list of context. If no user restriction, return all context")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListOfObject, "Get a list of object. If no user or ctx restriction, return all object"))
+				fSf("GET    %-55s-> %s\n", fullIP+route.ListPolicyID, "Get a list of policy id. If no user or ctx restriction, return all policy id")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.ListUser, "Get a list of user. If no ctx restriction, return all user")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.ListContext, "Get a list of context. If no user restriction, return all context")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.ListObject, "Get a list of object. If no user or ctx restriction, return all object"))
 	})
 
 	// -------------------------- Basic -------------------------- //
@@ -126,9 +126,9 @@ func HostHTTPAsync() {
 		return c.String(http.StatusBadRequest, "<user>, <ctx> and <rw> parameters must be provided")
 	})
 
-	// -------------------------- Optional -------------------------- //
+	// ---------------------------------------------------- Optional ---------------------------------------------------- //
 
-	path = route.ListOfPID
+	path = route.ListPolicyID
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -145,7 +145,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapRWListOfPID("", ""))
 	})
 
-	path = route.ListOfUser
+	path = route.ListUser
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -156,7 +156,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapCtxListOfUser())
 	})
 
-	path = route.ListOfCtx
+	path = route.ListContext
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -167,7 +167,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapUserListOfCtx())
 	})
 
-	path = route.ListOfObject
+	path = route.ListObject
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()

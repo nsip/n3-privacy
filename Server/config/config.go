@@ -30,10 +30,10 @@ type Config struct {
 		Get          string
 		Update       string
 		Delete       string
-		ListOfPID    string
-		ListOfUser   string
-		ListOfCtx    string
-		ListOfObject string
+		ListPolicyID string
+		ListUser     string
+		ListContext  string
+		ListObject   string
 	}
 	Storage struct {
 		DataBase     string

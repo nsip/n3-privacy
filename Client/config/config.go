@@ -30,15 +30,18 @@ type Config struct {
 		Get          string
 		Update       string
 		Delete       string
-		ListOfPID    string
-		ListOfUser   string
-		ListOfCtx    string
-		ListOfObject string
+		ListPolicyID string
+		ListUser     string
+		ListContext  string
+		ListObject   string
 	}
 	// Client
 	Server struct {
 		Protocol string
 		IP       string
+	}
+	Access struct {
+		Timeout int64
 	}
 }
 
