@@ -1,5 +1,5 @@
 Path = ""
-ErrLog = "./errorlog.txt"
+ErrLog = "./error.log"
 
 # ************************ Server ************************ #
 # ********** Client User DO NOT Modify This Part ********* #
@@ -11,8 +11,8 @@ ErrLog = "./errorlog.txt"
 
 [WebService]
   Port = 1323
-  Version = "0.1.0"
-  Service = "policy-service"
+  Version = "0.1.0"                       # Server internal [Route] use
+  Service = "policy-service"              # Server internal [Route] use
 
 [Route]                                   # Shared with Client #
   GetID = "/#s/#v/id"
@@ -20,11 +20,10 @@ ErrLog = "./errorlog.txt"
   Get = "/#s/#v/policy"
   Update = "/#s/#v/update"
   Delete = "/#s/#v/delete"
-  ListOfPID = "/#s/#v/list/policyid"
-  ListOfUser = "/#s/#v/list/user"
-  ListOfCtx = "/#s/#v/list/ctx"
-  ListOfObject = "/#s/#v/list/object"
-
+  ListPolicyID = "/#s/#v/list/policyid"
+  ListUser = "/#s/#v/list/user"
+  ListContext = "/#s/#v/list/context"
+  ListObject = "/#s/#v/list/object"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #
@@ -32,5 +31,3 @@ ErrLog = "./errorlog.txt"
 [Server]
   Protocol = "http" 
   IP = "192.168.92.133"
-  Port = 1323                 # identical to [WebService] Port 
-  Version = "0.1.0"           # identical to [WebService] Version

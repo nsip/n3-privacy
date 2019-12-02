@@ -2,18 +2,26 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	glb "github.com/nsip/n3-privacy/Client/global"
-	// cfg "github.com/nsip/n3-privacy/Client/config"
+	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 func main() {
-
 	glb.Init()
 	fmt.Println(glb.Cfg.Path)
 
-	// if resp, err := http.Get( glb.Cfg.Path,    "http://192.168.92.133:1323/policy-service/0.1.0/list/object"); err == nil {
-	// 	data, _ := ioutil.ReadAll(resp.Body)
-	// 	fmt.Println(string(data))
-	// }
+	protocol := glb.Cfg.Server.Protocol
+	ip := glb.Cfg.Server.IP
+	port := glb.Cfg.WebService.Port
+	fn := "ListOfObject"
+
+	if ok := initMapFnURL(protocol, ip, port); ok {
+		if resp, err := http.Get(mFnURL[fn]); err == nil {
+			data, _ := ioutil.ReadAll(resp.Body)
+			fmt.Println(pp.FmtJSONStr(string(data)))
+		}
+	}
 }

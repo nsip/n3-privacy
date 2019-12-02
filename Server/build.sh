@@ -37,3 +37,4 @@ cp config.toml $OUTPATH
 cp $UPATH/jq-osx-amd64 "$OUTPATH"jq
 
 cp config.toml ../Client/
+cp jq ../Client/
