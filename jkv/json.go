@@ -577,7 +577,7 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 		frame = fSf("{\n  \"%s\": %s\n}", lvl1path, oid)
 	}
 
-	maskLvlFields := ProjectV(MapKeys(mask.MapIPathValue).([]string), pLinker, "", "@")
+	//	maskLvlFields := ProjectV(MapKeys(mask.MapIPathValue).([]string), pLinker, "", "@")
 
 	// expanding ...
 	iExp := 0
@@ -599,7 +599,7 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 				ss := sSpl(jkv.mOIDiPath[oid], pLinker)
 				name := sSpl(ss[len(ss)-1], "@")[0]
 				obj := jkv.mOIDObj[oid]
-				objMasked := Mask(name, obj, mask, maskLvlFields)
+				objMasked := Mask(name, obj, mask)
 				frame = sReplaceAll(frame, oid, objMasked)
 
 				// [object array whole oid] => [ oid, oid, oid ... ]
@@ -626,7 +626,10 @@ func (jkv *JKV) Unfold(toLvl int, mask *JKV) (string, int) {
 }
 
 // Mask :
-func Mask(name, obj string, mask *JKV, maskLvlFields [][]string) string {
+func Mask(name, obj string, mask *JKV) string {
+	if mask == nil {
+		return obj
+	}
 
 	// check current mask path is valid for current objTmp fields, P1/2
 	objTmp, _ := IndentFmt(obj)

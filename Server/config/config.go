@@ -25,15 +25,15 @@ type Config struct {
 		Service string
 	}
 	Route struct {
-		GetID        string
-		GetHash      string
-		Get          string
-		Update       string
-		Delete       string
-		ListPolicyID string
-		ListUser     string
-		ListContext  string
-		ListObject   string
+		GetID       string
+		GetHash     string
+		Get         string
+		Update      string
+		Delete      string
+		ListID      string
+		ListUser    string
+		ListContext string
+		ListObject  string
 	}
 	Storage struct {
 		DataBase     string

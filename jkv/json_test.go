@@ -2,7 +2,6 @@ package jkv
 
 import (
 	"errors"
-	"io/ioutil"
 	"testing"
 	"time"
 
@@ -12,17 +11,16 @@ import (
 
 func TestSplitJSONArr(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	jarrstr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
-	// jarrstr := pp.FmtJSONFile("../../Server/config/meta.json", "../preprocess/utils/")
-	if jarrstr == "" {
+	jArrStr := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
+	// jArrStr := pp.FmtJSONFile("../../Server/config/meta.json", "../preprocess/utils/")
+	if jArrStr == "" {
 		fPln("Read JSON file error")
 		return
 	}
-	jarrstr = sReplaceAll(jarrstr, "\r\n", "\n")
-	if arr := SplitJSONArr(jarrstr); arr != nil {
-		jarrmstr := MergeJSON(arr...)
-		fPln(jarrmstr)
-		if jarrstr != jarrmstr {
+	if arr := SplitJSONArr(jArrStr); arr != nil {
+		jMergedStr := MergeJSON(arr...)
+		fPln(jMergedStr)
+		if jArrStr != jMergedStr {
 			panic("abc")
 		}
 	} else {
@@ -46,79 +44,69 @@ func TestScan(t *testing.T) {
 
 func TestFieldByPos(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		jkv := NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
-		LVL, mLvlFParr, _, _ := jkv.scan()
-		// for k, v := range mLvlFParr {
-		// 	fPln(k, v)
-		// }
-		mFPosFNameList := jkv.fields(mLvlFParr)
-		for i := 1; i <= LVL; i++ {
-			fPln("---------------->", i)
-			mFPosFName := mFPosFNameList[i]
-			for k, v := range mFPosFName {
-				_, t := jkv.fValueType(k)
-				fPf("%-8d%-20s%-10s\n", k, v, t.Str())
-				// if t.IsPrimitive() {
-				// 	fPf("%-8d%-20s%-10s\n", k, v, t.Str())
-				// } else {
-				// 	fPf("%-8d%-20s\n", k, v)
-				// }
-			}
+	json := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
+	jkv := NewJKV(json, "")
+	LVL, mLvlFParr, _, _ := jkv.scan()
+	// for k, v := range mLvlFParr {
+	// 	fPln(k, v)
+	// }
+	mFPosFNameList := jkv.fields(mLvlFParr)
+	for i := 1; i <= LVL; i++ {
+		fPln("---------------->", i)
+		mFPosFName := mFPosFNameList[i]
+		for k, v := range mFPosFName {
+			_, t := jkv.fValueType(k)
+			fPf("%-8d%-20s%-10s\n", k, v, t.Str())
+			// if t.IsPrimitive() {
+			// 	fPf("%-8d%-20s%-10s\n", k, v, t.Str())
+			// } else {
+			// 	fPf("%-8d%-20s\n", k, v)
+			// }
 		}
 	}
 }
 
 func TestFType(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		jkv := NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
-		value, typ := jkv.fValueType(1617)
-		fPln(typ.Str())
-		if typ == ARR|OBJ {
-			objs := fValuesOnObjList(value)
-			fPln(objs[1])
-		}
+	json := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
+	jkv := NewJKV(json, "")
+	value, typ := jkv.fValueType(1617)
+	fPln(typ.Str())
+	if typ == ARR|OBJ {
+		fPln(fValuesOnObjList(value)[1])
 	}
 }
 
 func TestInit(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/NAPCodeFrame.json"); e == nil {
-		NewJKV(sReplaceAll(string(jsonbytes), "\r\n", "\n"), "")
-	}
+	json := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
+	NewJKV(json, "")
 	fPln("break")
 }
 
 func TestWrap(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/xapi1.json"); e == nil {
-		json := pp.FmtJSONStr(string(jsonbytes), "../preprocess/utils/")
-		jkv := NewJKV(sReplaceAll(json, "\r\n", "\n"), "root")
-		fPln("--- Init ---")
-		fPln(jkv.JSON)
-
-	}
+	json := pp.FmtJSONFile("../../JSON-Mask/data/xapi1.json", "../preprocess/utils/")
+	jkv := NewJKV(json, "root")
+	fPln("--- Init ---")
+	fPln(jkv.JSON)
 }
 
 func TestUnfold(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	if jsonbytes, e := ioutil.ReadFile("../JSON-Mask/data/xapi1.json"); e == nil {
-		// fPln(string(jsonbytes))
 
-		json := pp.FmtJSONStr(string(jsonbytes), "../preprocess/utils/")
-		jkv := NewJKV(sReplaceAll(json, "\r\n", "\n"), "root")
-		fPln("--- Init ---")
-		fPln(jkv.Wrapped)
-		fPln(jkv.Unfold(0, nil))
+	json := pp.FmtJSONFile("../../JSON-Mask/data/xapi1.json", "../preprocess/utils/")
+	jkv := NewJKV(json, "root")
+	fPln("--- Init ---")
+	fPln(jkv.Wrapped)
+	fPln(jkv.Unfold(0, nil))
 
-		// fPln(jkv.mOIDLvl["fe7262a928bbe05f8a42bab98ebec56a8e1e9379"])
-		// fPln(jkv.mOIDLvl["887450b46a52ccad78f6a74f34c2699c649b17cd"]).
+	// fPln(jkv.mOIDLvl["fe7262a928bbe05f8a42bab98ebec56a8e1e9379"])
+	// fPln(jkv.mOIDLvl["887450b46a52ccad78f6a74f34c2699c649b17cd"]).
 
-		fPln(" -------------------------------------- ")
+	fPln(" -------------------------------------- ")
 
-		jkv = jkv.UnwrapDefault()
-		// fPln(jkv.Unfold(0, nil))
-		fPln(jkv.JSON)
-	}
+	jkv = jkv.UnwrapDefault()
+	// fPln(jkv.Unfold(0, nil))
+	fPln(jkv.JSON)
 }

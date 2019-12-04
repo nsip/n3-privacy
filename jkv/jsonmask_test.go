@@ -12,28 +12,35 @@ import (
 
 func TestJSONPolicy(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
-	data := pp.FmtJSONFile("../../JSON-Mask/data/xapi.json", "../preprocess/utils/")
-	mask := pp.FmtJSONFile("../../JSON-Mask/data/xapiMaskP.json", "../preprocess/utils/")
+	data := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
+	mask := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrameMaskP.json", "../preprocess/utils/")
+
+	if data == "" {
+		panic("input data is empty, check its path")
+	}
+	if mask == "" {
+		panic("input mask is empty, check its path")
+	}
 
 	jkvM := NewJKV(mask, "root")
 
 	if IsJSONArr(data) {
-		jsonarr := SplitJSONArr(data)
+		jsonArr := SplitJSONArr(data)
 		wg := sync.WaitGroup{}
-		wg.Add(len(jsonarr))
-		jsons := make([]string, len(jsonarr))
-		for i, json := range jsonarr {
+		wg.Add(len(jsonArr))
+		jsonList := make([]string, len(jsonArr))
+		for i, json := range jsonArr {
 			go func(i int, json string) {
 				defer wg.Done()
 				jkvD := NewJKV(json, "root")
 				maskroot, _ := jkvD.Unfold(0, jkvM)
 				jkvMR := NewJKV(maskroot, "")
 				jkvMR.Wrapped = jkvD.Wrapped
-				jsons[i] = jkvMR.UnwrapDefault().JSON
+				jsonList[i] = jkvMR.UnwrapDefault().JSON
 			}(i, json)
 		}
 		wg.Wait()
-		ioutil.WriteFile("array.json", []byte(MergeJSON(jsons...)), 0666)
+		ioutil.WriteFile("array.json", []byte(MergeJSON(jsonList...)), 0666)
 
 	} else {
 		jkvD := NewJKV(data, "root")
