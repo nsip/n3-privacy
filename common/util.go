@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"reflect"
@@ -44,6 +45,21 @@ func FailOnErr(format string, v ...interface{}) {
 			}
 		}
 	}
+}
+
+// WrapOnErr :
+func WrapOnErr(format string, v ...interface{}) error {
+	for _, p := range v {
+		switch p.(type) {
+		case error:
+			{
+				if p != nil {
+					return fmt.Errorf(format, v...)
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // LocalIP returns the non loopback local IP of the host

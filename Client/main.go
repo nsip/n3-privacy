@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"io/ioutil"
@@ -9,7 +10,7 @@ import (
 
 	glb "github.com/nsip/n3-privacy/Client/global"
 	cmn "github.com/nsip/n3-privacy/common"
-	pp "github.com/nsip/n3-privacy/preprocess"
+	"github.com/nsip/n3-privacy/jkv"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	portPtr := flag.Int("port", 0, "Server Port Number")
 	fnPtr := flag.String("fn", "", "Select From: ["+sJoin(getCfgRouteFields(), " ")+"]")
 	argsPtr := flag.String("args", "", "e.g. id=value1&user=value2&...")
+	policyPtr := flag.String("policy", "", "the path of policy which is to be uploaded")
 	flag.Parse()
 
 	if protocol = *protocolPtr; protocol == "" && cfgOK {
@@ -60,16 +62,37 @@ func main() {
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
 			cmn.FailOnErr("%v", err)
-			if resp.StatusCode == 200 {
-				fPln(pp.FmtJSONStr(string(data)))
-			} else {
+			fPln(string(data))
+			done <- true
+		}()
+	case "Update": // POST
+		go func() {
+			policy, err := ioutil.ReadFile(*policyPtr)
+			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
+			if !jkv.IsJSON(string(policy)) {
+				cmn.FailOnErr("%v", errors.New("policy is not valid JSON file, failed to upload"))
+			}
+			if resp, err := http.Post(url, "application/json", bytes.NewBuffer(policy)); err == nil {
+				defer resp.Body.Close()
+				data, err := ioutil.ReadAll(resp.Body)
+				cmn.FailOnErr("%v", err)
 				fPln(string(data))
 			}
 			done <- true
 		}()
-	case "Update": // POST
-
 	case "Delete": // DELETE
+		go func() {
+			client := &http.Client{}
+			req, err := http.NewRequest("DELETE", url, nil)
+			cmn.FailOnErr("%v", err)
+			resp, err := client.Do(req)
+			cmn.FailOnErr("%v", err)
+			defer resp.Body.Close()
+			data, err := ioutil.ReadAll(resp.Body)
+			cmn.FailOnErr("%v", err)
+			fPln(string(data))
+			done <- true
+		}()
 	}
 
 	select {

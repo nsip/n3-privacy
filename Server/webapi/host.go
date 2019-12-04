@@ -62,7 +62,7 @@ func HostHTTPAsync() {
 			}
 			return c.String(http.StatusNotFound, "No Policy as your request")
 		}
-		return c.String(http.StatusBadRequest, "<user>, <ctx>, <object>, and <rw> parameters must be provided")
+		return c.String(http.StatusBadRequest, "ALL <user>, <ctx>, <object>, and <rw> parameters must be provided")
 	})
 
 	path = route.GetHash
@@ -123,7 +123,7 @@ func HostHTTPAsync() {
 			}
 			return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")
 		}
-		return c.String(http.StatusBadRequest, "<user>, <ctx> and <rw> parameters must be provided")
+		return c.String(http.StatusBadRequest, "ALL <user>, <ctx> and <rw> parameters must be provided")
 	})
 
 	// ---------------------------------------------------- Optional ---------------------------------------------------- //
