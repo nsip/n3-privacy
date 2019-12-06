@@ -49,7 +49,7 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.ListObject, "Get a list of object. If no user or ctx restriction, return all object"))
 	})
 
-	// -------------------------- Basic -------------------------- //
+	// ---------------------------------------------------- Basic ---------------------------------------------------- //
 
 	path = route.GetID
 	e.GET(path, func(c echo.Context) error {
@@ -57,12 +57,24 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, user, ctx, object, rw := url4Values(c.QueryParams(), 0, "user", "ctx", "object", "rw"); ok {
-			if mCodes := db.PolicyID(user, ctx, rw, object); len(mCodes) > 0 {
-				return c.JSON(http.StatusOK, mCodes)
+			if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
+				return c.JSON(http.StatusOK, result{
+					Data:  &pid,
+					Empty: False,
+					Error: "",
+				})
 			}
-			return c.String(http.StatusNotFound, "No Policy as your request")
+			return c.JSON(http.StatusNotFound, result{
+				Data:  EmptyStr,
+				Empty: True,
+				Error: "",
+			})
 		}
-		return c.String(http.StatusBadRequest, "ALL <user>, <ctx>, <object>, and <rw> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, result{
+			Data:  nil,
+			Empty: nil,
+			Error: "ALL [user], [ctx], [object], and [rw] must be provided",
+		})
 	})
 
 	path = route.GetHash
@@ -72,11 +84,23 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if hashstr, ok := db.PolicyHash(id); ok {
-				return c.String(http.StatusOK, hashstr)
+				return c.JSON(http.StatusOK, result{
+					Data:  &hashstr,
+					Empty: False,
+					Error: "",
+				})
 			}
-			return c.String(http.StatusNotFound, "No Policy as your request")
+			return c.JSON(http.StatusNotFound, result{
+				Data:  EmptyStr,
+				Empty: True,
+				Error: "",
+			})
 		}
-		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, result{
+			Data:  nil,
+			Empty: nil,
+			Error: "policy [id] must be provided",
+		})
 	})
 
 	path = route.Get
@@ -86,11 +110,23 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if policy, ok := db.Policy(id); ok {
-				return c.String(http.StatusOK, policy)
+				return c.JSON(http.StatusOK, result{
+					Data:  &policy,
+					Empty: False,
+					Error: "",
+				})
 			}
-			return c.String(http.StatusNotFound, "No Policy as your request")
+			return c.JSON(http.StatusNotFound, result{
+				Data:  EmptyStr,
+				Empty: True,
+				Error: "",
+			})
 		}
-		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, result{
+			Data:  nil,
+			Empty: nil,
+			Error: "policy [id] must be provided",
+		})
 	})
 
 	path = route.Delete
@@ -101,11 +137,23 @@ func HostHTTPAsync() {
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if db.DeletePolicy(id) == nil {
 				fPln(db.PolicyCount(), ": exist in db")
-				return c.String(http.StatusOK, "Policy: "+id+" is deleted")
+				return c.JSON(http.StatusOK, result{
+					Data:  &id,
+					Empty: nil,
+					Error: "",
+				})
 			}
-			return c.String(http.StatusNotFound, "Policy Delete Error")
+			return c.JSON(http.StatusInternalServerError, result{
+				Data:  nil,
+				Empty: nil,
+				Error: "Policy Delete Error",
+			})
 		}
-		return c.String(http.StatusBadRequest, "policy <id> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, result{
+			Data:  nil,
+			Empty: nil,
+			Error: "policy [id] must be provided",
+		})
 	})
 
 	path = route.Update
@@ -115,15 +163,32 @@ func HostHTTPAsync() {
 		glb.WDCheck()
 		if ok, user, ctx, rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
-				if id, obj, err := db.UpdatePolicy(string(bPolicy), user, ctx, rw); err == nil {
+				if id, _, err := db.UpdatePolicy(string(bPolicy), user, ctx, rw); err == nil {
 					fPln(db.PolicyCount(), ": exist in db")
-					return c.String(http.StatusOK, id+" - "+obj)
+					// return c.String(http.StatusOK, id+" - "+obj)
+					return c.JSON(http.StatusOK, result{
+						Data:  &id,
+						Empty: nil,
+						Error: "",
+					})
 				}
-				return c.String(http.StatusInternalServerError, "Update DB error")
+				return c.JSON(http.StatusInternalServerError, result{
+					Data:  nil,
+					Empty: nil,
+					Error: "Update DB error",
+				})
 			}
-			return c.String(http.StatusBadRequest, "Policy is not in BODY, or is not valid JSON")
+			return c.JSON(http.StatusBadRequest, result{
+				Data:  nil,
+				Empty: nil,
+				Error: "Policy is not in Request BODY, or is not valid JSON",
+			})
 		}
-		return c.String(http.StatusBadRequest, "ALL <user>, <ctx> and <rw> parameters must be provided")
+		return c.JSON(http.StatusBadRequest, result{
+			Data:  nil,
+			Empty: nil,
+			Error: "ALL <user>, <ctx> and <rw> must be provided",
+		})
 	})
 
 	// ---------------------------------------------------- Optional ---------------------------------------------------- //

@@ -75,6 +75,7 @@ func updateBadgerDB(dbs []*badger.DB, keys []string, lsValues ...[]string) (err 
 }
 
 func getBadgerDB(dbs []*badger.DB, keys []string) (values []string, err error) {
+	values = make([]string, 0)
 	lsTxn := []*badger.Txn{}
 	for i, db := range dbs {
 		txn := db.NewTransaction(true)
@@ -103,6 +104,7 @@ func getBadgerDB(dbs []*badger.DB, keys []string) (values []string, err error) {
 }
 
 func getOneBadgerDB(db *badger.DB, keys []string) (values []string, err error) {
+	values = make([]string, 0)
 	txn := db.NewTransaction(true)
 	defer txn.Discard()
 	for _, key := range keys {
@@ -172,8 +174,11 @@ func (db *badgerDB) PolicyCount() int {
 	return len(listID)
 }
 
-func (db *badgerDB) PolicyID(user, ctx, rw, object string) []string {
-	return getPolicyID(user, ctx, rw, object)
+func (db *badgerDB) PolicyID(user, ctx, rw, object string) string {
+	if lsID := getPolicyID(user, ctx, rw, object); len(lsID) > 0 {
+		return lsID[0]
+	}
+	return ""
 }
 
 func (db *badgerDB) PolicyIDs(user, ctx, rw string, objects ...string) []string {
@@ -353,6 +358,8 @@ func (db *badgerDB) listObject(user, ctx string) []string {
 	objList, _ := getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
 	return objList
 }
+
+// --------- //
 
 func (db *badgerDB) MapRWListOfPID(user, ctx string, lsRW ...string) map[string][]string {
 	rt := make(map[string][]string)

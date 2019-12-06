@@ -10,7 +10,7 @@ import (
 type DB interface {
 	UpdatePolicy(policy, user, ctx, rw string) (string, string, error)
 	PolicyCount() int
-	PolicyID(user, ctx, rw, object string) []string
+	PolicyID(user, ctx, rw, object string) string
 	PolicyIDs(user, ctx, rw string, objects ...string) []string
 	PolicyHash(id string) (string, bool)
 	Policy(id string) (string, bool)

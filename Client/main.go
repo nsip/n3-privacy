@@ -23,23 +23,32 @@ func main() {
 		switch os.Args[1] {
 		case "-u", "--usage", "usage", "-h", "--help", "help":
 			fPf(`Usage:
-[-f]        mandatory, select from [%s];
-[-protocol] optional, if not provided, use config file's protocol;
-[-ip]       optional, if not provided, use config file's ip;
-[-port]     optional, if not provided, use config file's port;
-[-args]     mandatory for *, further info can gain from Server's response by ignoring this flag. 
-[-policy]   conditional, only available for [-f=Update]. It is the path of policy which is to be uploaded 
+[-f]                 mandatory, one of [%[1]v];
+[-protocol]          optional, config file [protocol] applies when missing;
+[-ip]                optional, config file [ip] applies when missing;
+[-port]              optional, config file [port] applies when missing;
+[-args]              mandatory for [GetID/GetHash/Get/Update/Delete]. 
+[-policy]            conditional, only available for [-f=Update]. It is the path of policy which is to be uploaded
+
 Examples:
-Get a Policy ID*:    "privacy-client -f=GetID -args='user=(nsip)&ctx=(ctx123)&object=(StaffPersonal)&rw=(r)'"
-Get a Policy Hash*:  "privacy-client -f=GetHash -args='id=(policy id)'"
-Get a Policy*:       "privacy-client -f=Get -args='id=(policy id)'"
-Update a Policy*:    "privacy-client -f=Update -policy='./policy.json' -args='user=(nsip)&ctx=(ctx123)&rw=(r)'"
-Delete a Policy*:    "privacy-client -f=Delete -args='id=(policy id)'"
-List some Policy ID: "privacy-client -f=ListID [-args='']"
-List some Context:   "privacy-client -f=ListContext [-args='']"
-List some Users:     "privacy-client -f=ListUser [-args='']"
-List some Objects:   "privacy-client -f=ListObject [-args='']"
-`, sJoin(getCfgRouteFields(), " "))
+Get a Policy ID:     "%[2]v -f=GetID -args='user=(nsip)&ctx=(ctx123)&object=(StaffPersonal)&rw=(r)'"
+Get a Policy Hash:   "%[2]v -f=GetHash -args='id=(policy id)'"
+Get a Policy:        "%[2]v -f=Get -args='id=(policy id)'"
+Update a Policy:     "%[2]v -f=Update -policy='./policy.json' -args='user=(nsip)&ctx=(ctx123)&rw=(r)'"
+Delete a Policy:     "%[2]v -f=Delete -args='id=(policy id)'"
+List some Policy ID: "%[2]v -f=ListID [-args='']"
+List some Context:   "%[2]v -f=ListContext [-args='']"
+List some Users:     "%[2]v -f=ListUser [-args='']"
+List some Objects:   "%[2]v -f=ListObject [-args='']"
+
+[GetID/GetHash/Get/Update/Delete] are BASIC functions, return {"data": "***", "empty": true/false, "error": "***" }
+If "error" is NOT empty string (""), other fields' outcome are useless!
+"empty" is only apply to [GetID/GetHash/Get]; If "error" is ("") and "empty" is true, which means found nothing without errors.
+For [Update/Delete], if successful, "data" returns processed (Policy-ID), otherwise it returns ("") and check "error" for details.
+
+[ListID/ListContext/ListUser/ListObject] are MANAGEMENT functions, only return { "condition": array of [Policy-ID/Context/User/Object] }
+No "error" or "empty" fields.
+`, sJoin(getCfgRouteFields(), " "), "privacy-client")
 			return
 		}
 	}
@@ -88,7 +97,17 @@ List some Objects:   "privacy-client -f=ListObject [-args='']"
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
 			cmn.FailOnErr("%v", err)
-			fPln(string(data))
+
+			// var objmap map[string]interface{}
+			// json.Unmarshal(data, &objmap)
+			// fPln(objmap["data"])
+			// if !jkv.IsJSON(string(objmap["data"].(string))) {
+			// 	panic("return error")
+			// }
+
+			if data != nil {
+				fPln(string(data))
+			}
 			done <- true
 		}()
 	case "Update": // POST
@@ -102,7 +121,9 @@ List some Objects:   "privacy-client -f=ListObject [-args='']"
 				defer resp.Body.Close()
 				data, err := ioutil.ReadAll(resp.Body)
 				cmn.FailOnErr("%v", err)
-				fPln(string(data))
+				if data != nil {
+					fPln(string(data))
+				}
 			}
 			done <- true
 		}()
@@ -116,14 +137,16 @@ List some Objects:   "privacy-client -f=ListObject [-args='']"
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
 			cmn.FailOnErr("%v", err)
-			fPln(string(data))
+			if data != nil {
+				fPln(string(data))
+			}
 			done <- true
 		}()
 	}
 
 	select {
 	case <-timeout:
-		cmn.FailOnErr("%v", errors.New(fSf("Didn't Get Policy API Response in time. %d(s)", glb.Cfg.Access.Timeout)))
+		cmn.FailOnErr("%v", errors.New(fSf("Didn't Get Policy Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
 	case <-done:
 	}
 }

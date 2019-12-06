@@ -32,6 +32,22 @@ func initDB() {
 	db = storage.NewDB(glb.Cfg.Storage.DataBase)
 }
 
+type result struct {
+	Data  *string `json:"data"`
+	Empty *bool   `json:"empty"`
+	Error string  `json:"error"`
+}
+
+// Const
+var (
+	fFalse    = false
+	fTrue     = true
+	fEmptyStr = ""
+	False     = &fFalse
+	True      = &fTrue
+	EmptyStr  = &fEmptyStr
+)
+
 // ---------------------------------------------- //
 
 // urlValues :
