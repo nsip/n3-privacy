@@ -11,6 +11,9 @@ var (
 	// Cfg : global variable
 	Cfg *cfg.Config
 
+	// EncPwd :
+	EncPwd = "password"
+
 	// WD : original work directory
 	WD, _ = os.Getwd()
 )

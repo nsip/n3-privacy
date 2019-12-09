@@ -30,7 +30,7 @@ ErrLog = "./error.log"
 
 [Server]
   Protocol = "http" 
-  IP = "192.168.92.133"
+  IP = "192.168.31.38"
 
 [Access]
   Timeout = 3

@@ -190,10 +190,11 @@ func (db *badgerDB) UpdatePolicy(policy, user, ctx, rw string) (id, obj string, 
 		return "", "", err
 	}
 	id, obj = genPolicyID(policy, user, ctx, rw)
+	encPolicy := string(cmn.Encrypt([]byte(policy), glb.EncPwd))
 	err = updateBadgerDB(
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
 		[]string{id, id, hash(user)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
-		[]string{policy, hash(policy), user, ctx, obj})
+		[]string{encPolicy, hash(policy), user, ctx, obj})
 	if err == nil && !xin(id, listID) {
 		listID = append(listID, id)
 	}
@@ -222,7 +223,9 @@ func (db *badgerDB) PolicyHash(id string) (string, bool) {
 
 func (db *badgerDB) Policy(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
-		return values[0], true
+		if policy, err := cmn.Decrypt([]byte(values[0]), glb.EncPwd); err == nil {
+			return string(policy), true
+		}
 	}
 	return "", false
 }

@@ -36,3 +36,9 @@ func TestSetUnion(t *testing.T) {
 	arr2 := []string{"C", "d", "A"}
 	fPln(SetUnion(arr1, arr2).([]string))
 }
+
+func TestEncrypt(e *testing.T) {
+	data := Encrypt([]byte("abc"), "A")
+	//fPln(string(data))
+	fPln(string(Decrypt(data, "a")))
+}

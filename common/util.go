@@ -1,11 +1,15 @@
 package common
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/md5"
+	"crypto/rand"
 	"crypto/sha1"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"reflect"
@@ -60,6 +64,37 @@ func WrapOnErr(format string, v ...interface{}) error {
 		}
 	}
 	return nil
+}
+
+// Encrypt :
+func Encrypt(data []byte, password string) []byte {
+	if password == "" {
+		return data
+	}
+	block, _ := aes.NewCipher([]byte(MD5Str(password)))
+	gcm, err := cipher.NewGCM(block)
+	FailOnErr("%v", err)
+	nonce := make([]byte, gcm.NonceSize())
+	_, err = io.ReadFull(rand.Reader, nonce)
+	FailOnErr("%v", err)
+	return gcm.Seal(nonce, nonce, data, nil)
+}
+
+// Decrypt :
+func Decrypt(data []byte, password string) ([]byte, error) {
+	if password == "" {
+		return data, nil
+	}
+	key := []byte(MD5Str(password))
+	block, err := aes.NewCipher(key)
+	FailOnErr("%v", err)
+	gcm, err := cipher.NewGCM(block)
+	FailOnErr("%v", err)
+	nonceSize := gcm.NonceSize()
+	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	// FailOnErr("%v", err)
+	return plaintext, err
 }
 
 // LocalIP returns the non loopback local IP of the host

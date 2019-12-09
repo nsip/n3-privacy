@@ -187,7 +187,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusBadRequest, result{
 			Data:  nil,
 			Empty: nil,
-			Error: "ALL <user>, <ctx> and <rw> must be provided",
+			Error: "ALL [user], [ctx] and [rw] must be provided",
 		})
 	})
 
