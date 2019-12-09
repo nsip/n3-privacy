@@ -14,8 +14,7 @@ import (
 	"github.com/nsip/n3-privacy/jkv"
 )
 
-func main() {
-
+func v1() {
 	protocol, ip, port := "", "", 0
 	cfgOK := glb.Init()
 
@@ -89,9 +88,9 @@ No "error" or "empty" fields.
 	timeout := time.After(time.Duration(glb.Cfg.Access.Timeout) * time.Second)
 	done := make(chan bool)
 
-	switch *fnPtr {
-	case "GetID", "GetHash", "Get", "ListID", "ListUser", "ListContext", "ListObject": // GET
-		go func() {
+	go func() {
+		switch *fnPtr {
+		case "GetID", "GetHash", "Get", "ListID", "ListUser", "ListContext", "ListObject": // GET
 			resp, err := http.Get(url)
 			cmn.FailOnErr("%v", err)
 			defer resp.Body.Close()
@@ -108,10 +107,7 @@ No "error" or "empty" fields.
 			if data != nil {
 				fPln(string(data))
 			}
-			done <- true
-		}()
-	case "Update": // POST
-		go func() {
+		case "Update": // POST
 			policy, err := ioutil.ReadFile(*policyPtr)
 			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
 			if !jkv.IsJSON(string(policy)) {
@@ -125,10 +121,7 @@ No "error" or "empty" fields.
 					fPln(string(data))
 				}
 			}
-			done <- true
-		}()
-	case "Delete": // DELETE
-		go func() {
+		case "Delete": // DELETE
 			client := &http.Client{}
 			req, err := http.NewRequest("DELETE", url, nil)
 			cmn.FailOnErr("%v", err)
@@ -140,13 +133,88 @@ No "error" or "empty" fields.
 			if data != nil {
 				fPln(string(data))
 			}
-			done <- true
-		}()
-	}
+		default:
+			cmn.FailOnErr("%v", errors.New("unknown -f"))
+		}
+		done <- true
+	}()
 
 	select {
 	case <-timeout:
-		cmn.FailOnErr("%v", errors.New(fSf("Didn't Get Policy Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
+		cmn.FailOnErr("%v", errors.New(fSf("Didn't Get Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
 	case <-done:
 	}
+}
+
+func v2() {
+
+	if len(os.Args) < 2 {
+		cmn.FailOnErr("%v", errors.New("subcommands: [GetID/GetHash/Get/Update/Delete/ListID/ListContext/ListUser/ListObject]"))
+	}
+
+	protocol, ip, port := "", "", 0
+	cfgOK := glb.Init()
+
+	protocolPtr := flag.String("protocol", "", "e.g. http/https/...")
+	ipPtr := flag.String("ip", "", "Server IP address")
+	portPtr := flag.Int("port", 0, "Server Port Number")
+	// policyPtr := flag.String("policy", "", "the path of policy which is to be uploaded")
+	flag.Parse()
+
+	if protocol = *protocolPtr; protocol == "" && cfgOK {
+		protocol = glb.Cfg.Server.Protocol
+	}
+	if ip = *ipPtr; ip == "" && cfgOK {
+		ip = glb.Cfg.Server.IP
+	}
+	if port = *portPtr; port == 0 && cfgOK {
+		port = glb.Cfg.WebService.Port
+	}
+
+	//
+	if ok := initMapFnURL(protocol, ip, port); !ok {
+		cmn.FailOnErr("%v", errors.New("initMapFnURL fatal"))
+	}
+
+	// if *argsPtr != "" {
+	// 	*argsPtr = "?" + *argsPtr
+	// }
+	// url := mFnURL[*fnPtr] + *argsPtr
+	// fPln("accessing ... " + url)
+
+	timeout := time.After(time.Duration(glb.Cfg.Access.Timeout) * time.Second)
+	done := make(chan bool)
+
+	switch os.Args[1] {
+	case "GetID":
+		cmd := flag.NewFlagSet("GetID", flag.ExitOnError)
+		user := cmd.String("user", "", "user")
+		ctx := cmd.String("ctx", "", "ctx")
+		object := cmd.String("object", "", "object")
+		rw := cmd.String("rw", "", "rw")
+		cmd.Parse(os.Args[2:])
+
+		url := mFnURL[os.Args[1]] + fSf("?user=%s&ctx=%s&object=%s&rw=&s", *user, *ctx, *object, *rw)
+		fPln("accessing ... " + url)
+
+	case "GetHash":
+	case "Get":
+	case "Update":
+	case "Delete":
+	case "ListID":
+	case "ListContext":
+	case "ListUser":
+	case "ListObject":
+	default:
+	}
+
+}
+
+func main() {
+
+	for _, arg := range os.Args {
+		fPln(arg)
+	}
+
+	v1()
 }
