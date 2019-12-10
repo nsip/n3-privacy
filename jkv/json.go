@@ -4,7 +4,6 @@ package jkv
 
 import (
 	"encoding/json"
-	"errors"
 	"math"
 	"sync"
 )
@@ -182,7 +181,7 @@ func (jkv *JKV) scan() (int, map[int][]int, map[int]int, error) {
 
 		return Lm, mLvlFParr, mFPosLvl, nil
 	}
-	return Lm, nil, nil, errors.New("Not a valid JSON string")
+	return Lm, nil, nil, fEf("Not a valid JSON string")
 }
 
 // fields :
@@ -466,7 +465,7 @@ func (jkv *JKV) init() error {
 		return nil
 	}
 
-	return errors.New("scan error")
+	return fEf("scan error")
 }
 
 // aoID2oIDlist : only can be used after mOIDType assigned
@@ -514,7 +513,7 @@ func (jkv *JKV) wrapDefault(root string) *JKV {
 	// rooted2 := fSf("{\n  \"%s\": %s}", root, json)
 	// rooted2 = pp.FmtJSONStr(rooted2, "/mnt/ramdisk/")
 	// if rooted1 != rooted2 {
-	// 	FailOnErr("%v @ wrapDefault", errors.New("error rooted"))
+	// 	FailOnErr("%v @ wrapDefault", fEf("error rooted"))
 	// }
 
 	// fPln(" ----------------------------------------------- ")
@@ -554,7 +553,7 @@ func (jkv *JKV) UnwrapDefault() *JKV {
 	// unRooted2 := pp.FmtJSONStr(json[i-1:j+2], "/mnt/ramdisk/")
 	// fPln(unRooted2)
 	// if unRooted1 != unRooted2 {
-	// 	FailOnErr("%v @ UnwrapDefault", errors.New("error unRooted"))
+	// 	FailOnErr("%v @ UnwrapDefault", fEf("error unRooted"))
 	// }
 
 	jkvUnR := NewJKV(unRooted1, "")

@@ -239,6 +239,7 @@ func (db *badgerDB) listPolicyID(user, ctx string, lsRW ...string) (lsID [][]str
 		}
 		lsID = make([][]string, len(lsRW))
 		for i, rw := range lsRW {
+			lsID[i] = make([]string, 0)
 			for _, id := range listID {
 				if sHasSuffix(id, rw) {
 					lsID[i] = append(lsID[i], id)
@@ -259,6 +260,7 @@ func (db *badgerDB) listPolicyID(user, ctx string, lsRW ...string) (lsID [][]str
 		lsID = make([][]string, 1)
 	}
 	for i, IDs := range allPolicyID(lsRW...) {
+		lsID[i] = make([]string, 0)
 		for _, id := range IDs {
 			switch {
 			case user == "" && ctx != "":

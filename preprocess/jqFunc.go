@@ -1,7 +1,6 @@
 package preprocess
 
 import (
-	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -25,7 +24,7 @@ func prepareJQ(jqDirs ...string) (jqWD, oriWD string, err error) {
 			return jqWD, oriWD, nil
 		}
 	}
-	cmn.FailOnErr("[%s] is not found @ %v", jq, errors.New(fn))
+	cmn.FailOnErr("[%s] is not found @ %v", jq, fEf(fn))
 	return "", "", nil
 }
 
@@ -41,7 +40,7 @@ func FmtJSONStr(json string, jqDirs ...string) string {
 	if output, err := cmd.Output(); err == nil {
 		return string(output)
 	}
-	cmn.FailOnErr("cmd.Output() error @ %v", errors.New("FmtJSONStr"))
+	cmn.FailOnErr("cmd.Output() error @ %v", fEf("FmtJSONStr"))
 	return ""
 }
 
@@ -55,9 +54,9 @@ func FmtJSONFile(file string, jqDirs ...string) string {
 		if output, err := cmd.Output(); err == nil {
 			return string(output)
 		}
-		cmn.FailOnErr("cmd.Output() error @ %v", errors.New("FmtJSONFile"))
+		cmn.FailOnErr("cmd.Output() error @ %v", fEf("FmtJSONFile"))
 		return ""
 	}
-	cmn.FailOnErr("prepareJQ error @ %v", errors.New("FmtJSONFile"))
+	cmn.FailOnErr("prepareJQ error @ %v", fEf("FmtJSONFile"))
 	return ""
 }

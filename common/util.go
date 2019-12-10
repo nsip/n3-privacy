@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"crypto/sha1"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -48,6 +47,13 @@ func FailOnErr(format string, v ...interface{}) {
 				}
 			}
 		}
+	}
+}
+
+// FailOnCondition :
+func FailOnCondition(condition bool, format string, v ...interface{}) {
+	if condition {
+		FailOnErr(format, v...)
 	}
 }
 
@@ -118,7 +124,7 @@ func LocalIP() string {
 func CanSetCover(setA, setB interface{}) (bool, int) {
 	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
 	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
-		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
+		FailOnErr("%v", fEf("parameters only can be [slice] or [array]"))
 	}
 	vA, vB := reflect.ValueOf(setA), reflect.ValueOf(setB)
 	if vA.Len() < vB.Len() {
@@ -143,7 +149,7 @@ NEXT:
 func SetIntersect(setA, setB interface{}) interface{} {
 	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
 	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
-		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
+		FailOnErr("%v", fEf("parameters only can be [slice] or [array]"))
 	}
 	vA, vB := reflect.ValueOf(setA), reflect.ValueOf(setB)
 	set := reflect.MakeSlice(tA, 0, vA.Len())
@@ -164,7 +170,7 @@ NEXT:
 func SetUnion(setA, setB interface{}) interface{} {
 	tA, tB := reflect.TypeOf(setA), reflect.TypeOf(setB)
 	if tA != tB || (tA.Kind() != reflect.Slice && tA.Kind() != reflect.Array) {
-		FailOnErr("%v", errors.New("parameters only can be [slice] or [array]"))
+		FailOnErr("%v", fEf("parameters only can be [slice] or [array]"))
 	}
 	vA, vB := reflect.ValueOf(setA), reflect.ValueOf(setB)
 	set := reflect.MakeSlice(tA, 0, vA.Len()+vB.Len())
@@ -177,7 +183,7 @@ func SetUnion(setA, setB interface{}) interface{} {
 func ToSet(slc interface{}) interface{} {
 	t := reflect.TypeOf(slc)
 	if t.Kind() != reflect.Slice && t.Kind() != reflect.Array {
-		FailOnErr("%v", errors.New("parameter only can be [slice] or [array]"))
+		FailOnErr("%v", fEf("parameter only can be [slice] or [array]"))
 	}
 	v := reflect.ValueOf(slc)
 	if v.Len() == 0 {

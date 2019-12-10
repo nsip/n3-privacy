@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -17,6 +16,7 @@ var (
 	fPf         = fmt.Printf
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
+	fEf         = fmt.Errorf
 	sSpl        = strings.Split
 	sJoin       = strings.Join
 	sCount      = strings.Count
@@ -89,7 +89,7 @@ func cCodeByPID(pid string) string {
 
 func validate(policy string) (string, error) {
 	if !jkv.IsJSON(policy) {
-		return "", errors.New("Not a valid JSON")
+		return "", fEf("Not a valid JSON")
 	}
 	return pp.FmtJSONStr(policy), nil
 }

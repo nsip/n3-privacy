@@ -10,6 +10,7 @@ var (
 	fPf         = fmt.Printf
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
+	fEf         = fmt.Errorf
 	sSpl        = strings.Split
 	sJoin       = strings.Join
 	sCount      = strings.Count

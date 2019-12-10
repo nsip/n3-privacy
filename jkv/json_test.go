@@ -1,7 +1,6 @@
 package jkv
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -24,7 +23,7 @@ func TestSplitJSONArr(t *testing.T) {
 			panic("abc")
 		}
 	} else {
-		cmn.FailOnErr("%v", errors.New("non-formatted json array"))
+		cmn.FailOnErr("%v", fEf("non-formatted json array"))
 	}
 }
 
