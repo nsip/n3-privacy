@@ -38,7 +38,18 @@ func TestSetUnion(t *testing.T) {
 }
 
 func TestEncrypt(e *testing.T) {
-	data := Encrypt([]byte("abc"), "A")
-	//fPln(string(data))
-	fPln(string(Decrypt(data, "a")))
+	data := Encrypt([]byte("abc111"), "A")
+	// fPln(string(data))
+	bytes, _ := Decrypt(data, "A")
+	fPln(string(bytes))
+}
+
+func TestMapPrint(e *testing.T) {
+	MapPrint(map[string]string{
+		// "a": "b",
+		"3": "4 a",
+		"5": "b sss",
+		"7": "B    sss",
+		"1": "2  2345678  223",
+	})
 }

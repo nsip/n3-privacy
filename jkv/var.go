@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	u "github.com/cdutwhu/go-util"
 	w "github.com/cdutwhu/go-wrappers"
 	cmn "github.com/nsip/n3-privacy/common"
 )
@@ -46,15 +45,6 @@ var (
 	sTrimRight  = strings.TrimRight
 	sHasPrefix  = strings.HasPrefix
 	sHasSuffix  = strings.HasSuffix
-	IF          = u.IF
-	MapKeys     = u.MapKeys
-	MapKVs      = u.MapKVs
-	MapsJoin    = u.MapsJoin
-	MapsMerge   = u.MapsMerge
-	MapPrint    = u.MapPrint
-	SliceCover  = u.SliceCover
-	MatchAssign = u.MatchAssign
-	XIn         = u.XIn
 )
 
 var (

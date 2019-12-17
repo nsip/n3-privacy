@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"math"
 	"sync"
+
+	cmn "github.com/nsip/n3-privacy/common"
 )
 
 // IsJSON :
@@ -186,7 +188,7 @@ func (jkv *JKV) scan() (int, map[int][]int, map[int]int, error) {
 
 // fields :
 func (jkv *JKV) fields(mLvlFPos map[int][]int) []map[int]string {
-	s, keys := jkv.JSON, MapKeys(mLvlFPos).([]int)
+	s, keys := jkv.JSON, cmn.MapKeys(mLvlFPos).([]int)
 	nLVL := keys[len(keys)-1]
 	mFPosFNameList := []map[int]string{map[int]string{}} // L0 is empty
 	for L := 1; L <= nLVL; L++ {                         // from L1 to Ln
@@ -206,7 +208,7 @@ func (jkv *JKV) fields(mLvlFPos map[int][]int) []map[int]string {
 // pl2 -> pl1. pl1, pl2 are sorted.
 func merge2fields(mFPosFName1, mFPosFName2 map[int]string) map[int]string {
 	pl2Parent, pl2Path, iPos := make(map[int]string), make(map[int]string), 0
-	pl1, pl2 := MapKeys(mFPosFName1).([]int), MapKeys(mFPosFName2).([]int)
+	pl1, pl2 := cmn.MapKeys(mFPosFName1).([]int), cmn.MapKeys(mFPosFName2).([]int)
 	for _, p2 := range pl2 {
 		for i := iPos; i < len(pl1)-1; i++ {
 			if p2 > pl1[i] && p2 < pl1[i+1] {
@@ -220,7 +222,7 @@ func merge2fields(mFPosFName1, mFPosFName2 map[int]string) map[int]string {
 		}
 		pl2Path[p2] = pl2Parent[p2] + pLinker + mFPosFName2[p2]
 	}
-	return MapsJoin(mFPosFName1, pl2Path).(map[int]string)
+	return cmn.MapsJoin(mFPosFName1, pl2Path).(map[int]string)
 }
 
 // rely on "fields outcome"
@@ -232,7 +234,7 @@ func fPaths(mFPosFNameList ...map[int]string) map[int]string {
 		if len(mFPosFName) == 0 {
 			continue
 		}
-		posList := MapKeys(mFPosFName).([]int)
+		posList := cmn.MapKeys(mFPosFName).([]int)
 		posLists[i] = posList
 	}
 	mFPosFNameMerge := mFPosFNameList[1]
@@ -398,7 +400,7 @@ func (jkv *JKV) init() error {
 			return err
 		}
 
-		for _, p := range MapKeys(mFPath).([]int) {
+		for _, p := range cmn.MapKeys(mFPath).([]int) {
 			v, t := jkv.fValueType(p)
 
 			oid := ""
@@ -641,7 +643,7 @@ func Mask(name, obj string, mask *JKV) string {
 	}(name, pLinker, jkvTmp.LsL12Fields[2])
 	// END -- P1/2 //
 
-	for path, value := range mask.MapIPathValue {
+	for path, valMask := range mask.MapIPathValue {
 		path = S(path).RmTailFromLast("@").V()
 
 		// check current mask path is valid for current objTmp fields,
@@ -667,35 +669,50 @@ func Mask(name, obj string, mask *JKV) string {
 			// pfStart := i
 			// fPln(obj[pfStart : pfStart+len(lookfor)])
 
-			pvStart, pvEnd := i+len(lookfor), 0
+			pvS, pvE := i+len(lookfor), 0
 			pv1End, pv2End := 0, 0
-			if obj[pvStart] != '[' {
-				pv1End = sIndex(obj[pvStart:], Trait1EndV)
-				pv2End = sIndex(obj[pvStart:], Trait2EndV)
+			if obj[pvS] != '[' {
+				pv1End = sIndex(obj[pvS:], Trait1EndV)
+				pv2End = sIndex(obj[pvS:], Trait2EndV)
 			} else {
-				if pv1End = sIndex(obj[pvStart:], Trait3EndV); pv1End >= 0 {
+				if pv1End = sIndex(obj[pvS:], Trait3EndV); pv1End >= 0 {
 					pv1End++
 				}
-				if pv2End = sIndex(obj[pvStart:], Trait4EndV); pv2End >= 0 {
+				if pv2End = sIndex(obj[pvS:], Trait4EndV); pv2End >= 0 {
 					pv2End++
 				}
 			}
 
 			switch {
 			case pv1End != -1 && pv2End == -1:
-				pvEnd = pv1End
+				pvE = pv1End
 			case pv1End == -1 && pv2End != -1:
-				pvEnd = pv2End
+				pvE = pv2End
 			default:
-				pvEnd = int(math.Min(float64(pv1End), float64(pv2End)))
+				pvE = int(math.Min(float64(pv1End), float64(pv2End)))
 			}
 
-			// val := obj[pvStart : pvStart+pvEnd]
-			// fPln(val)
+			valData := obj[pvS : pvS+pvE]
+			// fPln(valData)
 
-			if hashRExp.FindStringIndex(value) == nil {
-				obj = obj[:pvStart] + value + obj[pvStart+pvEnd:]
+			// For Mask-JKV, only use end-leaf Mask Value
+			if hashRExp.FindStringIndex(valMask) == nil {
+				switch valMask {
+				case `"[]"`:
+					if valData[0] != '[' { // only deal with one element to one element-array
+						obj = obj[:pvS] + "[" + valData + "]" + obj[pvS+pvE:] // format is needed for outcome
+					}
+				default:
+					obj = obj[:pvS] + valMask + obj[pvS+pvE:]
+				}
 			}
+
+			// For Mask-JKV, only use end-leaf Mask Value
+			// if hashRExp.FindStringIndex(valMask) == nil {
+			// 	obj = obj[:pvS] + valMask + obj[pvS+pvE:]
+			// } else {
+			// 	fPln(valMask, valData)
+			// }
 		}
 	}
 

@@ -1,5 +1,9 @@
 package jkv
 
+import (
+	cmn "github.com/nsip/n3-privacy/common"
+)
+
 // QueryPV : value ("*.*") for no path checking
 func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]string, maxLvl int) {
 	mLvlOIDs = make(map[int][]string)
@@ -28,7 +32,7 @@ func (jkv *JKV) QueryPV(path string, value interface{}) (mLvlOIDs map[int][]stri
 				if pid, ok := jkv.MapIPathValue[PIPath]; ok {
 					if _, ok := jkv.mOIDObj[pid]; ok {
 						iLvl := nGen - upGen + 1
-						if !XIn(pid, mLvlOIDs[iLvl]) {
+						if !cmn.XIn(pid, mLvlOIDs[iLvl]) {
 							mLvlOIDs[iLvl] = append(mLvlOIDs[iLvl], pid)
 							if iLvl > maxLvl {
 								maxLvl = iLvl

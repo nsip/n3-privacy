@@ -1,7 +1,9 @@
 {
   "Testlet": {
     "NAPTestletRefId": "[]",
-    "TestletContent": "[]",
+    "TestletContent": {
+      "NAPTestletLocalId": "[]"
+    },
     "TestItemList": {
       "TestItem": [
         {

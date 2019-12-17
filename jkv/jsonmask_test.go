@@ -13,16 +13,15 @@ import (
 func TestJSONPolicy(t *testing.T) {
 	defer cmn.TmTrack(time.Now())
 	data := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrame.json", "../preprocess/utils/")
-	mask := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrameMaskP.json", "../preprocess/utils/")
+	mask1 := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrameMaskP.json", "../preprocess/utils/")
+	mask2 := pp.FmtJSONFile("../../JSON-Mask/data/NAPCodeFrameMaskPcopy.json", "../preprocess/utils/")
 
-	if data == "" {
-		panic("input data is empty, check its path")
-	}
-	if mask == "" {
-		panic("input mask is empty, check its path")
-	}
+	cmn.FailOnCondition(data == "", "%v", fEf("input data is empty, check its path"))
+	cmn.FailOnCondition(mask1 == "", "%v", fEf("input mask1 is empty, check its path"))
+	cmn.FailOnCondition(mask2 == "", "%v", fEf("input mask2 is empty, check its path"))
 
-	jkvM := NewJKV(mask, "root")
+	jkvM1 := NewJKV(mask1, "root")
+	jkvM2 := NewJKV(mask2, "root")
 
 	if IsJSONArr(data) {
 		jsonArr := SplitJSONArr(data)
@@ -33,7 +32,7 @@ func TestJSONPolicy(t *testing.T) {
 			go func(i int, json string) {
 				defer wg.Done()
 				jkvD := NewJKV(json, "root")
-				maskroot, _ := jkvD.Unfold(0, jkvM)
+				maskroot, _ := jkvD.Unfold(0, jkvM1)
 				jkvMR := NewJKV(maskroot, "")
 				jkvMR.Wrapped = jkvD.Wrapped
 				jsonList[i] = jkvMR.UnwrapDefault().JSON
@@ -43,11 +42,21 @@ func TestJSONPolicy(t *testing.T) {
 		ioutil.WriteFile("array.json", []byte(MergeJSON(jsonList...)), 0666)
 
 	} else {
+
 		jkvD := NewJKV(data, "root")
-		maskroot, _ := jkvD.Unfold(0, jkvM)
+		maskroot, _ := jkvD.Unfold(0, jkvM1)
 		jkvMR := NewJKV(maskroot, "")
 		jkvMR.Wrapped = jkvD.Wrapped
 		json := jkvMR.UnwrapDefault().JSON
+		json = pp.FmtJSONStr(json, "../preprocess/utils/")
+
+		jkvD = NewJKV(json, "root")
+		maskroot, _ = jkvD.Unfold(0, jkvM2)
+		jkvMR = NewJKV(maskroot, "")
+		jkvMR.Wrapped = jkvD.Wrapped
+		json = jkvMR.UnwrapDefault().JSON
+		json = pp.FmtJSONStr(json, "../preprocess/utils/")
+
 		ioutil.WriteFile("single.json", []byte(json), 0666)
 	}
 }
