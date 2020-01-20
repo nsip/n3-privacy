@@ -9,8 +9,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nsip/n3-privacy/jkv"
-	pp "github.com/nsip/n3-privacy/preprocess"
+	cmn "github.com/cdutwhu/json-util/common"
+	"github.com/cdutwhu/json-util/jkv"
+	pp "github.com/cdutwhu/json-util/preprocess"
+	cfg "github.com/nsip/n3-privacy/Mask/config"
 )
 
 func main() {
@@ -32,19 +34,14 @@ func main() {
 		output = output + ".json"
 	}
 
-	data := pp.FmtJSONFile(inFilePath)
-	mask := pp.FmtJSONFile(maskFilePath)
+	config := cfg.NewCfg("./Config.toml").(*cfg.Config) // Config.toml is hard-coded
 
-	if data == "" {
-		fmt.Println("input data is empty, check its path")
-		return
-	}
-	if mask == "" {
-		fmt.Println("input mask is empty, check its path")
-		return
-	}
+	data := pp.FmtJSONFile(inFilePath, config.JQDir)
+	mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
+	cmn.FailOnCondition(data == "", "%v", fmt.Errorf("input data is empty, check its path"))
+	cmn.FailOnCondition(mask == "", "%v", fmt.Errorf("input mask is empty, check its path"))
 
-	jkvM := jkv.NewJKV(mask, "root")
+	jkvM := jkv.NewJKV(mask, "root", false)
 
 	if jkv.IsJSONArr(data) {
 		jsonArr := jkv.SplitJSONArr(data)
@@ -54,9 +51,9 @@ func main() {
 		for i, json := range jsonArr {
 			go func(i int, json string) {
 				defer wg.Done()
-				jkvD := jkv.NewJKV(json, "root")
+				jkvD := jkv.NewJKV(json, "root", false)
 				maskroot, _ := jkvD.Unfold(0, jkvM)
-				jkvMR := jkv.NewJKV(maskroot, "")
+				jkvMR := jkv.NewJKV(maskroot, "", false)
 				jkvMR.Wrapped = jkvD.Wrapped
 				jsonList[i] = jkvMR.UnwrapDefault().JSON
 			}(i, json)
@@ -65,9 +62,9 @@ func main() {
 		ioutil.WriteFile(output, []byte(jkv.MergeJSON(jsonList...)), 0666)
 
 	} else {
-		jkvD := jkv.NewJKV(data, "root")
+		jkvD := jkv.NewJKV(data, "root", false)
 		maskroot, _ := jkvD.Unfold(0, jkvM)
-		jkvMR := jkv.NewJKV(maskroot, "")
+		jkvMR := jkv.NewJKV(maskroot, "", false)
 		jkvMR.Wrapped = jkvD.Wrapped
 		json := jkvMR.UnwrapDefault().JSON
 		ioutil.WriteFile(output, []byte(json), 0666)

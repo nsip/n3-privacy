@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/cdutwhu/json-util/jkv"
+	pp "github.com/cdutwhu/json-util/preprocess"
 	glb "github.com/nsip/n3-privacy/Server/global"
-	"github.com/nsip/n3-privacy/jkv"
-	pp "github.com/nsip/n3-privacy/preprocess"
 )
 
 // MetaData :
@@ -25,7 +25,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 	}
 	metafile := path + namespace + ".json"
 
-	jkvM := jkv.NewJKV(policy, hash(policy))
+	jkvM := jkv.NewJKV(policy, hash(policy), false)
 	object := jkvM.LsL12Fields[1][0]
 	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2], Remark: rw}
 	if b, e := json.Marshal(md); e == nil {

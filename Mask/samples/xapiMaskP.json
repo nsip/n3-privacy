@@ -1,0 +1,9 @@
+    {
+        "definition": {
+            "type": "[]"
+        },
+        "result": {
+            "completion": "(B)",
+            "success": "(B)"
+        }
+    }

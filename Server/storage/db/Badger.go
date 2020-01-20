@@ -3,9 +3,9 @@ package db
 import (
 	"os"
 
+	cmn "github.com/cdutwhu/json-util/common"
 	badger "github.com/dgraph-io/badger"
 	glb "github.com/nsip/n3-privacy/Server/global"
-	cmn "github.com/nsip/n3-privacy/common"
 )
 
 type badgerDB struct {

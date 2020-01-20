@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
+	cmn "github.com/cdutwhu/json-util/common"
+	"github.com/cdutwhu/json-util/jkv"
 	glb "github.com/nsip/n3-privacy/Client/global"
-	cmn "github.com/nsip/n3-privacy/common"
-	"github.com/nsip/n3-privacy/jkv"
 )
 
 func v2(cfgOK bool) {

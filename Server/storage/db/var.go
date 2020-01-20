@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	u "github.com/cdutwhu/go-util"
-	cmn "github.com/nsip/n3-privacy/common"
-	"github.com/nsip/n3-privacy/jkv"
-	pp "github.com/nsip/n3-privacy/preprocess"
+	cmn "github.com/cdutwhu/json-util/common"
+	"github.com/cdutwhu/json-util/jkv"
+	pp "github.com/cdutwhu/json-util/preprocess"
 )
 
 var (
@@ -57,7 +57,7 @@ func ssLink(s1, s2 string) string {
 
 func genPolicyID(policy, user, ctx, rw string) (string, string) {
 	genPolicyCode := func(policy string) (string, string) {
-		jkvM := jkv.NewJKV(policy, hash(policy))
+		jkvM := jkv.NewJKV(policy, hash(policy), false)
 		object := jkvM.LsL12Fields[1][0]
 		fields := jkvM.LsL12Fields[2]
 		sort.Strings(fields)

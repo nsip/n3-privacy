@@ -4,11 +4,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	cmn "github.com/cdutwhu/json-util/common"
+	"github.com/cdutwhu/json-util/jkv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
-	cmn "github.com/nsip/n3-privacy/common"
-	"github.com/nsip/n3-privacy/jkv"
 )
 
 // HostHTTPAsync : Host a HTTP Server for providing policy json

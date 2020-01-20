@@ -6,6 +6,7 @@ set -e
 GOPATH=`go env GOPATH`
 ORIGINALPATH=`pwd`
 
+rm -rf ./build/
 mkdir -p ./build/Linux64 ./build/Win64 ./build/Mac
 
 go get 
