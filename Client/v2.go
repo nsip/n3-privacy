@@ -9,14 +9,13 @@ import (
 	"time"
 
 	cmn "github.com/cdutwhu/json-util/common"
-	"github.com/cdutwhu/json-util/jkv"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v2(cfgOK bool) {
-	cmn.FailOnCondition(!cfgOK, "%v", fEf("Config File Init Failed"))
-	cmn.FailOnCondition(len(os.Args) < 2, "%v", fEf("need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]"))
-	cmn.FailOnCondition(!initMapFnURL(glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port), "%v", fEf("initMapFnURL fatal"))
+	cmn.FailOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
+	cmn.FailOnErrWhen(len(os.Args) < 2, "%v", fEf("need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]"))
+	cmn.FailOnErrWhen(!initMapFnURL(glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port), "%v", fEf("initMapFnURL fatal"))
 
 	timeout := time.After(time.Duration(glb.Cfg.Access.Timeout) * time.Second)
 	done := make(chan bool)
@@ -37,34 +36,34 @@ func v2(cfgOK bool) {
 
 		switch os.Args[1] {
 		case "GetID":
-			cmn.FailOnCondition(*user == "", "%v", fEf("[-user] must be provided"))
-			cmn.FailOnCondition(*ctx == "", "%v", fEf("[-ctx] must be provided"))
-			cmn.FailOnCondition(*object == "", "%v", fEf("[-object] must be provided"))
-			cmn.FailOnCondition(*rw == "", "%v", fEf("[-rw] must be provided"))
+			cmn.FailOnErrWhen(*user == "", "%v", fEf("[-user] must be provided"))
+			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-ctx] must be provided"))
+			cmn.FailOnErrWhen(*object == "", "%v", fEf("[-object] must be provided"))
+			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] must be provided"))
 			url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", *user, *ctx, *object, *rw)
 			fPln("accessing ... " + url)
 			resp, err = http.Get(url)
 
 		case "GetHash", "Get":
-			cmn.FailOnCondition(*id == "", "%v", fEf("[-id] must be provided"))
+			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] must be provided"))
 			url += fSf("?id=%s", *id)
 			fPln("accessing ... " + url)
 			resp, err = http.Get(url)
 
 		case "Update":
-			cmn.FailOnCondition(*user == "", "%v", fEf("[-user] must be provided"))
-			cmn.FailOnCondition(*ctx == "", "%v", fEf("[-ctx] must be provided"))
-			cmn.FailOnCondition(*rw == "", "%v", fEf("[-rw] must be provided"))
+			cmn.FailOnErrWhen(*user == "", "%v", fEf("[-user] must be provided"))
+			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-ctx] must be provided"))
+			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] must be provided"))
 			url += fSf("?user=%s&ctx=%s&rw=%s", *user, *ctx, *rw)
 			fPln("accessing ... " + url)
-			cmn.FailOnCondition(*policyPtr == "", "%v", fEf("[-policy] must be provided"))
+			cmn.FailOnErrWhen(*policyPtr == "", "%v", fEf("[-policy] must be provided"))
 			policy, err := ioutil.ReadFile(*policyPtr)
 			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
-			cmn.FailOnCondition(!jkv.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, abort"))
+			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, abort"))
 			resp, err = http.Post(url, "application/json", bytes.NewBuffer(policy))
 
 		case "Delete":
-			cmn.FailOnCondition(*id == "", "%v", fEf("[-id] must be provided"))
+			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] must be provided"))
 			url += fSf("?id=%s", *id)
 			fPln("accessing ... " + url)
 			req, err := http.NewRequest("DELETE", url, nil)

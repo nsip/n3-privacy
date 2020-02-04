@@ -9,12 +9,11 @@ import (
 	"time"
 
 	cmn "github.com/cdutwhu/json-util/common"
-	"github.com/cdutwhu/json-util/jkv"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v1(cfgOK bool) {
-	cmn.FailOnCondition(!cfgOK, "%v", fEf("Config File Init Failed"))
+	cmn.FailOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "-u", "--usage", "usage", "-h", "--help", "help":
@@ -68,7 +67,7 @@ No "error" or "empty" fields.
 		port = glb.Cfg.WebService.Port
 	}
 
-	cmn.FailOnCondition(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
+	cmn.FailOnErrWhen(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
 	if _, ok := mFnURL[*fnPtr]; !ok {
 		cmn.FailOnErr("%v", fEf("flag [-f] is missing or invalid. use [-h] for help"))
 	}
@@ -104,7 +103,7 @@ No "error" or "empty" fields.
 		case "Update": // POST
 			policy, err := ioutil.ReadFile(*policyPtr)
 			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
-			cmn.FailOnCondition(!jkv.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
+			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
 			if resp, err := http.Post(url, "application/json", bytes.NewBuffer(policy)); err == nil {
 				defer resp.Body.Close()
 				data, err := ioutil.ReadAll(resp.Body)

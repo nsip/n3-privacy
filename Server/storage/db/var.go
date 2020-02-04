@@ -88,7 +88,7 @@ func cCodeByPID(pid string) string {
 }
 
 func validate(policy string) (string, error) {
-	if !jkv.IsJSON(policy) {
+	if !cmn.IsJSON(policy) {
 		return "", fEf("Not a valid JSON")
 	}
 	return pp.FmtJSONStr(policy), nil

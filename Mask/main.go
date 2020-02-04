@@ -38,8 +38,8 @@ func main() {
 
 	data := pp.FmtJSONFile(inFilePath, config.JQDir)
 	mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
-	cmn.FailOnCondition(data == "", "%v", fmt.Errorf("input data is empty, check its path"))
-	cmn.FailOnCondition(mask == "", "%v", fmt.Errorf("input mask is empty, check its path"))
+	cmn.FailOnErrWhen(data == "", "%v", fmt.Errorf("input data is empty, check path"))
+	cmn.FailOnErrWhen(mask == "", "%v", fmt.Errorf("input mask is empty, check path"))
 
 	jkvM := jkv.NewJKV(mask, "root", false)
 

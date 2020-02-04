@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	cmn "github.com/cdutwhu/json-util/common"
-	"github.com/cdutwhu/json-util/jkv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
@@ -162,7 +161,7 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 		glb.WDCheck()
 		if ok, user, ctx, rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); ok {
-			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && jkv.IsJSON(string(bPolicy)) {
+			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bPolicy)) {
 				if id, _, err := db.UpdatePolicy(string(bPolicy), user, ctx, rw); err == nil {
 					fPln(db.PolicyCount(), ": exist in db")
 					// return c.String(http.StatusOK, id+" - "+obj)
