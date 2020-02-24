@@ -10,34 +10,27 @@ import (
 	"sync"
 
 	cmn "github.com/cdutwhu/json-util/common"
-	"github.com/cdutwhu/json-util/jkv"
-	pp "github.com/cdutwhu/json-util/preprocess"
-	cfg "github.com/nsip/n3-privacy/Mask/config"
+	jkv "github.com/cdutwhu/json-util/jkv"
+	// pp "github.com/cdutwhu/json-util/preprocess"
+	// cfg "github.com/nsip/n3-privacy/Mask/config"
 )
 
-func main() {
-	exe := filepath.Base(os.Args[0])
-	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s [-o='output'] <inputdata.json> <mask.json>\n", exe)
-		return
-	}
+func doMask(inFilePath, maskFilePath, output string) {
 
-	inFilePath, maskFilePath := os.Args[1], os.Args[2]
-	if len(os.Args) == 4 {
-		inFilePath, maskFilePath = os.Args[2], os.Args[3]
-	}
+	// config := cfg.NewCfg("./Config.toml").(*cfg.Config) // Config.toml is hard-coded
+	// data := pp.FmtJSONFile(inFilePath, config.JQDir)
+	// mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
 
-	outputPtr := flag.String("o", "result.json", "a string")
-	flag.Parse()
-	output := *outputPtr
-	if !strings.HasSuffix(output, ".json") {
-		output = output + ".json"
-	}
+	bytes, err := ioutil.ReadFile(inFilePath)
+	cmn.FailOnErr("%v", err)
+	inFile := string(bytes)
+	data := jkv.FormatJSON(inFile, 2)
 
-	config := cfg.NewCfg("./Config.toml").(*cfg.Config) // Config.toml is hard-coded
+	bytes, err = ioutil.ReadFile(maskFilePath)
+	cmn.FailOnErr("%v", err)
+	maskFile := string(bytes)
+	mask := jkv.FormatJSON(maskFile, 2)
 
-	data := pp.FmtJSONFile(inFilePath, config.JQDir)
-	mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
 	cmn.FailOnErrWhen(data == "", "%v", fmt.Errorf("input data is empty, check path"))
 	cmn.FailOnErrWhen(mask == "", "%v", fmt.Errorf("input mask is empty, check path"))
 
@@ -69,4 +62,26 @@ func main() {
 		json := jkvMR.UnwrapDefault().JSON
 		ioutil.WriteFile(output, []byte(json), 0666)
 	}
+}
+
+func main() {
+	exe := filepath.Base(os.Args[0])
+	if len(os.Args) < 3 {
+		fmt.Printf("Usage: %s [-o='output'] <inputdata.json> <mask.json>\n", exe)
+		return
+	}
+
+	inFilePath, maskFilePath := os.Args[1], os.Args[2]
+	if len(os.Args) == 4 {
+		inFilePath, maskFilePath = os.Args[2], os.Args[3]
+	}
+
+	outputPtr := flag.String("o", "result.json", "a string")
+	flag.Parse()
+	output := *outputPtr
+	if !strings.HasSuffix(output, ".json") {
+		output = output + ".json"
+	}
+
+	doMask(inFilePath, maskFilePath, output)
 }

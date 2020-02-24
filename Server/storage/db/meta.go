@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/cdutwhu/json-util/jkv"
-	pp "github.com/cdutwhu/json-util/preprocess"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
@@ -29,7 +28,9 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 	object := jkvM.LsL12Fields[1][0]
 	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2], Remark: rw}
 	if b, e := json.Marshal(md); e == nil {
-		newPolicy := pp.FmtJSONStr(string(b))
+		//newPolicy := pp.FmtJSONStr(string(b))
+		newPolicy := jkv.FormatJSON(string(b), 2)
+
 		// first meta.
 		if _, err := os.Stat(metafile); err != nil && os.IsNotExist(err) {
 			newPolicy, _ = jkv.Indent(newPolicy, 2, false)

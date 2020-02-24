@@ -8,7 +8,6 @@ import (
 	u "github.com/cdutwhu/go-util"
 	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/cdutwhu/json-util/jkv"
-	pp "github.com/cdutwhu/json-util/preprocess"
 )
 
 var (
@@ -91,7 +90,8 @@ func validate(policy string) (string, error) {
 	if !cmn.IsJSON(policy) {
 		return "", fEf("Not a valid JSON")
 	}
-	return pp.FmtJSONStr(policy), nil
+	// return pp.FmtJSONStr(policy), nil
+	return jkv.FormatJSON(policy, 2), nil
 }
 
 // [listID] has already been loaded

@@ -15,11 +15,6 @@ GOARCH=amd64
 LDFLAGS="-s -w"
 OUT=privacy-server
 
-OUTPATH=./build/Linux64/
-GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
-mv $OUT $OUTPATH
-cp config.toml $OUTPATH
-
 OUTPATH=./build/Win64/
 GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT.exe
 mv $OUT.exe $OUTPATH
@@ -28,6 +23,11 @@ cp config.toml $OUTPATH
 OUTPATH=./build/Mac/
 GOOS="darwin" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH
+cp config.toml $OUTPATH
+
+OUTPATH=./build/Linux64/
+GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
+cp $OUT $OUTPATH              # for testing
 cp config.toml $OUTPATH
 
 cp config.toml ../Client/
