@@ -91,7 +91,7 @@ func validate(policy string) (string, error) {
 		return "", fEf("Not a valid JSON")
 	}
 	// return pp.FmtJSONStr(policy), nil
-	return jkv.FormatJSON(policy, 2), nil
+	return jkv.FmtJSON(policy, 2), nil
 }
 
 // [listID] has already been loaded

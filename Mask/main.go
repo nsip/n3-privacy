@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	cmn "github.com/cdutwhu/json-util/common"
 	jkv "github.com/cdutwhu/json-util/jkv"
@@ -21,23 +21,18 @@ func doMask(inFilePath, maskFilePath, output string) {
 	// data := pp.FmtJSONFile(inFilePath, config.JQDir)
 	// mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
 
-	bytes, err := ioutil.ReadFile(inFilePath)
-	cmn.FailOnErr("%v", err)
-	inFile := string(bytes)
-	data := jkv.FormatJSON(inFile, 2)
+	defer cmn.TrackTime(time.Now())
 
-	bytes, err = ioutil.ReadFile(maskFilePath)
-	cmn.FailOnErr("%v", err)
-	maskFile := string(bytes)
-	mask := jkv.FormatJSON(maskFile, 2)
+	data := jkv.FmtJSONFile(inFilePath, 2)
+	mask := jkv.FmtJSONFile(maskFilePath, 2)
 
-	cmn.FailOnErrWhen(data == "", "%v", fmt.Errorf("input data is empty, check path"))
-	cmn.FailOnErrWhen(mask == "", "%v", fmt.Errorf("input mask is empty, check path"))
+	cmn.FailOnErrWhen(data == "", "%v", fEf("input data is empty, check path"))
+	cmn.FailOnErrWhen(mask == "", "%v", fEf("input mask is empty, check path"))
 
 	jkvM := jkv.NewJKV(mask, "root", false)
 
-	if jkv.IsJSONArr(data) {
-		jsonArr := jkv.SplitJSONArr(data)
+	if jkv.MaybeJSONArr(data) {
+		jsonArr := jkv.SplitJSONArr(data, 2)
 		wg := sync.WaitGroup{}
 		wg.Add(len(jsonArr))
 		jsonList := make([]string, len(jsonArr))
@@ -67,7 +62,7 @@ func doMask(inFilePath, maskFilePath, output string) {
 func main() {
 	exe := filepath.Base(os.Args[0])
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s [-o='output'] <inputdata.json> <mask.json>\n", exe)
+		fPf("Usage: %s [-o='output'] <inputdata.json> <mask.json>\n", exe)
 		return
 	}
 
@@ -76,7 +71,7 @@ func main() {
 		inFilePath, maskFilePath = os.Args[2], os.Args[3]
 	}
 
-	outputPtr := flag.String("o", "result.json", "a string")
+	outputPtr := flag.String("o", "out.json", "a string")
 	flag.Parse()
 	output := *outputPtr
 	if !strings.HasSuffix(output, ".json") {

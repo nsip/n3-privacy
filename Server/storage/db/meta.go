@@ -29,7 +29,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2], Remark: rw}
 	if b, e := json.Marshal(md); e == nil {
 		//newPolicy := pp.FmtJSONStr(string(b))
-		newPolicy := jkv.FormatJSON(string(b), 2)
+		newPolicy := jkv.FmtJSON(string(b), 2)
 
 		// first meta.
 		if _, err := os.Stat(metafile); err != nil && os.IsNotExist(err) {
@@ -39,7 +39,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 
 		} else {
 			b, _ = ioutil.ReadFile(metafile)
-			policies := jkv.SplitJSONArr(string(b))
+			policies := jkv.SplitJSONArr(string(b), 2)
 			// update
 			for i, policy := range policies {
 				md := MetaData{}
