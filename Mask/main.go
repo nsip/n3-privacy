@@ -47,7 +47,7 @@ func doMask(inFilePath, maskFilePath, output string) {
 			}(i, json)
 		}
 		wg.Wait()
-		ioutil.WriteFile(output, []byte(jkv.MergeJSON(jsonList...)), 0666)
+		ioutil.WriteFile(output, []byte(jkv.MakeJSONArray(jsonList...)), 0666)
 
 	} else {
 		jkvD := jkv.NewJKV(data, "root", false)
