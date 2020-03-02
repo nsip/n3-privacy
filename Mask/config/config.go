@@ -13,7 +13,6 @@ type Config struct {
 	Path    string
 	PathAbs string
 	ErrLog  string
-	JQDir   string
 }
 
 var (

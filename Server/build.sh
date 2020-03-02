@@ -13,7 +13,7 @@ go get
 
 GOARCH=amd64
 LDFLAGS="-s -w"
-OUT=privacy-server
+OUT=server
 
 OUTPATH=./build/Win64/
 GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT.exe

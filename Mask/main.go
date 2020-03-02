@@ -11,16 +11,9 @@ import (
 
 	cmn "github.com/cdutwhu/json-util/common"
 	jkv "github.com/cdutwhu/json-util/jkv"
-	// pp "github.com/cdutwhu/json-util/preprocess"
-	// cfg "github.com/nsip/n3-privacy/Mask/config"
 )
 
 func doMask(inFilePath, maskFilePath, output string) {
-
-	// config := cfg.NewCfg("./Config.toml").(*cfg.Config) // Config.toml is hard-coded
-	// data := pp.FmtJSONFile(inFilePath, config.JQDir)
-	// mask := pp.FmtJSONFile(maskFilePath, config.JQDir)
-
 	defer cmn.TrackTime(time.Now())
 
 	data := jkv.FmtJSONFile(inFilePath, 2)

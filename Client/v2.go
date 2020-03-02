@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"net/http"
@@ -32,6 +33,7 @@ func v2(cfgOK bool) {
 		object := cmd.String("object", "", "object")
 		rw := cmd.String("rw", "", "read/write")
 		policyPtr := cmd.String("policy", "", "the path of policy which is to be uploaded")
+		fullFlag := cmd.Bool("f", false, "output all attributes content from response")
 		cmd.Parse(os.Args[2:])
 
 		switch os.Args[1] {
@@ -88,10 +90,25 @@ func v2(cfgOK bool) {
 
 		cmn.FailOnErr("%v", err)
 		defer resp.Body.Close()
+
 		data, err = ioutil.ReadAll(resp.Body)
 		cmn.FailOnErr("%v", err)
 		if data != nil {
-			fPln(string(data))
+			m := make(map[string]interface{})
+			cmn.FailOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
+			if *fullFlag {
+				if m["empty"] != nil && m["empty"] != "" {
+					fPf("Is Empty? %v\n", m["empty"])
+				}
+				fPln("-----------------------------")
+				if m["error"] != nil && m["error"] != "" {
+					fPf("ERROR: %v\n", m["error"])
+				}
+				fPln("-----------------------------")
+			}
+			if m["data"] != nil && m["data"] != "" {
+				fPf("%s\n", m["data"])
+			}
 		}
 
 		done <- true
