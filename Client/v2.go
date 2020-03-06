@@ -43,13 +43,11 @@ func v2(cfgOK bool) {
 			cmn.FailOnErrWhen(*object == "", "%v", fEf("[-object] must be provided"))
 			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] must be provided"))
 			url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", *user, *ctx, *object, *rw)
-			fPln("accessing ... " + url)
 			resp, err = http.Get(url)
 
 		case "GetHash", "Get":
 			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] must be provided"))
 			url += fSf("?id=%s", *id)
-			fPln("accessing ... " + url)
 			resp, err = http.Get(url)
 
 		case "Update":
@@ -57,7 +55,6 @@ func v2(cfgOK bool) {
 			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-ctx] must be provided"))
 			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] must be provided"))
 			url += fSf("?user=%s&ctx=%s&rw=%s", *user, *ctx, *rw)
-			fPln("accessing ... " + url)
 			cmn.FailOnErrWhen(*policyPtr == "", "%v", fEf("[-policy] must be provided"))
 			policy, err := ioutil.ReadFile(*policyPtr)
 			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
@@ -67,7 +64,6 @@ func v2(cfgOK bool) {
 		case "Delete":
 			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] must be provided"))
 			url += fSf("?id=%s", *id)
-			fPln("accessing ... " + url)
 			req, err := http.NewRequest("DELETE", url, nil)
 			cmn.FailOnErr("%v", err)
 			resp, err = (&http.Client{}).Do(req)
@@ -81,7 +77,6 @@ func v2(cfgOK bool) {
 			case *ctx != "":
 				url += fSf("?ctx=%s", *ctx)
 			}
-			fPln("accessing ... " + url)
 			resp, err = http.Get(url)
 
 		default:
@@ -93,14 +88,22 @@ func v2(cfgOK bool) {
 
 		data, err = ioutil.ReadAll(resp.Body)
 		cmn.FailOnErr("%v", err)
+
+		// fPln(string(data))
+		// Manage output TODO
+
 		if data != nil {
 			m := make(map[string]interface{})
 			cmn.FailOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
 			if *fullFlag {
+				fPln("accessing ... " + url)
+				fPln("-----------------------------")
+
 				if m["empty"] != nil && m["empty"] != "" {
 					fPf("Is Empty? %v\n", m["empty"])
 				}
 				fPln("-----------------------------")
+
 				if m["error"] != nil && m["error"] != "" {
 					fPf("ERROR: %v\n", m["error"])
 				}

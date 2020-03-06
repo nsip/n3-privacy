@@ -53,7 +53,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 			if !updated {
 				policies = append(policies, newPolicy)
 			}
-			ioutil.WriteFile(metafile, []byte(jkv.MakeJSONArray(policies...)), 0666)
+			ioutil.WriteFile(metafile, []byte(jkv.MakeJSONArr(policies...)), 0666)
 		}
 	}
 	return
