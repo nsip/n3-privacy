@@ -1,9 +1,9 @@
     {
         "definition": {
-            "type": "[]"
+            "type": "-----"
         },
         "result": {
-            "completion": "(B)",
-            "success": "(B)"
+            "completion": "-----",
+            "success": "-----"
         }
     }
