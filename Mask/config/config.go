@@ -8,8 +8,8 @@ import (
 	"github.com/burntsushi/toml"
 )
 
-// Config is toml
-type Config struct {
+// config is toml, type name MUST be identical to file name "config.toml"
+type config struct {
 	Path    string
 	PathAbs string
 	ErrLog  string
@@ -17,7 +17,7 @@ type Config struct {
 
 var (
 	// toml file name must be identical to config struct definition name
-	lsCfg = []interface{}{&Config{}}
+	lsCfg = []interface{}{&config{}}
 )
 
 // NewCfg :
