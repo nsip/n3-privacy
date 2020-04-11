@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	u "github.com/cdutwhu/go-util"
 	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/cdutwhu/json-util/jkv"
 )
@@ -29,7 +28,7 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
-	xin         = u.XIn
+	xin         = cmn.XIn
 )
 
 var (
