@@ -2,7 +2,6 @@ package global
 
 import (
 	"os"
-	"time"
 
 	cfg "github.com/nsip/n3-privacy/Server/config"
 )
@@ -26,16 +25,16 @@ func Init(configs ...string) bool {
 }
 
 // WDCheck :
-func WDCheck() {
-	done := make(chan string)
-	go func() {
-	AGAIN:
-		if path, _ := os.Getwd(); path != WD {
-			time.Sleep(10 * time.Millisecond)
-			goto AGAIN
-		}
-		done <- "done"
-		// fmt.Println("done")
-	}()
-	<-done
-}
+// func WDCheck() {
+// 	done := make(chan string)
+// 	go func() {
+// 	AGAIN:
+// 		if path, _ := os.Getwd(); path != WD {
+// 			time.Sleep(10 * time.Millisecond)
+// 			goto AGAIN
+// 		}
+// 		done <- "done"
+// 		// fmt.Println("done")
+// 	}()
+// 	<-done
+// }

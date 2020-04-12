@@ -17,10 +17,10 @@ type DB interface {
 	DeletePolicy(id string) error
 
 	// Optional, for management
-	MapRWListOfPID(user, ctx string, lsRW ...string) map[string][]string
-	MapCtxListOfUser(lsCtx ...string) map[string][]string
-	MapUserListOfCtx(users ...string) map[string][]string
-	MapUCListOfObject(user, ctx string) map[string][]string
+	MapRW2lsPID(user, ctx string, lsRW ...string) map[string][]string
+	MapCtx2lsUser(lsCtx ...string) map[string][]string
+	MapUser2lsCtx(users ...string) map[string][]string
+	MapUC2lsObject(user, ctx string) map[string][]string
 }
 
 // NewDB :

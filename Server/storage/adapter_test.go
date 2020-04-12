@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	glb "github.com/nsip/n3-privacy/Server/global"
-	// pp "github.com/cdutwhu/json-util/preprocess"
 )
 
 func TestAdapter(t *testing.T) {
@@ -34,10 +33,10 @@ func TestUpdatePolicy(t *testing.T) {
 	// db.UpdatePolicy(policy, user, ctx, "r")
 	// fPln(db.PolicyCount())
 
-	fPln(db.MapRWListOfPID("qmiao", "ctx123"))
-	fPln(db.MapCtxListOfUser("ctx123", "ctx124"))
-	fPln(db.MapUserListOfCtx())
-	fPln(db.MapUCListOfObject("qmiao", "ctx122"))
+	fPln(db.MapRW2lsPID("user", "ctx"))
+	fPln(db.MapCtx2lsUser("ctx", "def"))
+	fPln(db.MapUser2lsCtx())
+	fPln(db.MapUC2lsObject("user", "ctx"))
 
 	// if id := db.PolicyID(user, ctx, "w", "Test"); len(id) > 0 {
 	// 	fPln(id)

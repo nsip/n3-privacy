@@ -366,7 +366,7 @@ func (db *badgerDB) listObject(user, ctx string) []string {
 
 // --------- //
 
-func (db *badgerDB) MapRWListOfPID(user, ctx string, lsRW ...string) map[string][]string {
+func (db *badgerDB) MapRW2lsPID(user, ctx string, lsRW ...string) map[string][]string {
 	rt := make(map[string][]string)
 	key := fSf("%s@%s", user, ctx)
 	for i, IDs := range db.listPolicyID(user, ctx, lsRW...) {
@@ -387,7 +387,7 @@ func (db *badgerDB) MapRWListOfPID(user, ctx string, lsRW ...string) map[string]
 	return rt
 }
 
-func (db *badgerDB) MapCtxListOfUser(lsCtx ...string) map[string][]string {
+func (db *badgerDB) MapCtx2lsUser(lsCtx ...string) map[string][]string {
 	rt := make(map[string][]string)
 	for i, users := range db.listUser(lsCtx...) {
 		if len(lsCtx) == 0 {
@@ -399,7 +399,7 @@ func (db *badgerDB) MapCtxListOfUser(lsCtx ...string) map[string][]string {
 	return rt
 }
 
-func (db *badgerDB) MapUserListOfCtx(users ...string) map[string][]string {
+func (db *badgerDB) MapUser2lsCtx(users ...string) map[string][]string {
 	rt := make(map[string][]string)
 	for i, lsCtx := range db.listCtx(users...) {
 		if len(users) == 0 {
@@ -411,7 +411,7 @@ func (db *badgerDB) MapUserListOfCtx(users ...string) map[string][]string {
 	return rt
 }
 
-func (db *badgerDB) MapUCListOfObject(user, ctx string) map[string][]string {
+func (db *badgerDB) MapUC2lsObject(user, ctx string) map[string][]string {
 	key := user + "@" + ctx
 	switch {
 	case user == "" && ctx == "":

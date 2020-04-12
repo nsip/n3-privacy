@@ -54,7 +54,6 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, user, ctx, object, rw := url4Values(c.QueryParams(), 0, "user", "ctx", "object", "rw"); ok {
 			if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
 				return c.JSON(http.StatusOK, result{
@@ -80,7 +79,6 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if hashstr, ok := db.PolicyHash(id); ok {
 				return c.JSON(http.StatusOK, result{
@@ -106,7 +104,6 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if policy, ok := db.Policy(id); ok {
 				return c.JSON(http.StatusOK, result{
@@ -132,7 +129,6 @@ func HostHTTPAsync() {
 	e.DELETE(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if db.DeletePolicy(id) == nil {
 				fPln(db.PolicyCount(), ": exist in db")
@@ -159,7 +155,6 @@ func HostHTTPAsync() {
 	e.POST(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, user, ctx, rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); ok {
 			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bPolicy)) {
 				if id, _, err := db.UpdatePolicy(string(bPolicy), user, ctx, rw); err == nil {
@@ -196,56 +191,52 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRWListOfPID(user, ctx))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ctx)) // .MapRWListOfPID(user, ctx))
 		}
 		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapRWListOfPID(user, ""))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ""))
 		}
 		if ok, ctx := url1Value(c.QueryParams(), 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRWListOfPID("", ctx))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID("", ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapRWListOfPID("", ""))
+		return c.JSON(http.StatusOK, db.MapRW2lsPID("", ""))
 	})
 
 	path = route.ListUser
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, lsValues := urlValues(c.QueryParams(), "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapCtxListOfUser(lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapCtx2lsUser(lsValues[0]...)) //MapCtxListOfUser(lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapCtxListOfUser())
+		return c.JSON(http.StatusOK, db.MapCtx2lsUser())
 	})
 
 	path = route.ListContext
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, lsValues := urlValues(c.QueryParams(), "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUserListOfCtx(lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapUser2lsCtx(lsValues[0]...)) //MapUserListOfCtx(lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapUserListOfCtx())
+		return c.JSON(http.StatusOK, db.MapUser2lsCtx())
 	})
 
 	path = route.ListObject
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		glb.WDCheck()
 		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUCListOfObject(user, ctx))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ctx)) //.MapUCListOfObject(user, ctx))
 		}
 		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUCListOfObject(user, ""))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ""))
 		}
 		if ok, ctx := url1Value(c.QueryParams(), 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUCListOfObject("", ctx))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject("", ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapUCListOfObject("", ""))
+		return c.JSON(http.StatusOK, db.MapUC2lsObject("", ""))
 	})
 
 	e.Start(fSf(":%d", port))
