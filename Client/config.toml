@@ -20,17 +20,17 @@ ErrLog = "./error.log"
   Get = "/#s/#v/policy"
   Update = "/#s/#v/update"
   Delete = "/#s/#v/delete"
-  ListID = "/#s/#v/list/policyid"
-  ListUser = "/#s/#v/list/user"
-  ListContext = "/#s/#v/list/context"
-  ListObject = "/#s/#v/list/object"
+  LsID = "/#s/#v/list/policyid"
+  LsUser = "/#s/#v/list/user"
+  LsContext = "/#s/#v/list/context"
+  LsObject = "/#s/#v/list/object"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #
 
 [Server]
   Protocol = "http" 
-  IP = "192.168.91.130"
+  IP = "192.168.31.183"
 
 [Access]
   Timeout = 3

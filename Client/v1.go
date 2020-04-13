@@ -31,17 +31,17 @@ Get a Policy Hash:   "%[2]v -f=GetHash -args='id=(policy id)'"
 Get a Policy:        "%[2]v -f=Get -args='id=(policy id)'"
 Update a Policy:     "%[2]v -f=Update -policy='./policy.json' -args='user=(nsip)&ctx=(ctx123)&rw=(r)'"
 Delete a Policy:     "%[2]v -f=Delete -args='id=(policy id)'"
-List some Policy ID: "%[2]v -f=ListID [-args='']"
-List some Context:   "%[2]v -f=ListContext [-args='']"
-List some Users:     "%[2]v -f=ListUser [-args='']"
-List some Objects:   "%[2]v -f=ListObject [-args='']"
+List some Policy ID: "%[2]v -f=LsID [-args='']"
+List some Context:   "%[2]v -f=LsContext [-args='']"
+List some Users:     "%[2]v -f=LsUser [-args='']"
+List some Objects:   "%[2]v -f=LsObject [-args='']"
 
 [GetID/GetHash/Get/Update/Delete] are BASIC functions, return {"data": "***", "empty": true/false, "error": "***" }
 If "error" is NOT empty string (""), other fields' outcome are useless!
 "empty" is only apply to [GetID/GetHash/Get]; If "error" is ("") and "empty" is true, which means found nothing without errors.
 For [Update/Delete], if successful, "data" returns processed (Policy-ID), otherwise it returns ("") and check "error" for details.
 
-[ListID/ListContext/ListUser/ListObject] are MANAGEMENT functions, only return { "condition": array of [Policy-ID/Context/User/Object] }
+[LsID/LsContext/LsUser/LsObject] are MANAGEMENT functions, only return { "condition": array of [Policy-ID/Context/User/Object] }
 No "error" or "empty" fields.
 `, sJoin(getCfgRouteFields(), " "), "privacy-client")
 			return
@@ -83,7 +83,7 @@ No "error" or "empty" fields.
 
 	go func() {
 		switch *fnPtr {
-		case "GetID", "GetHash", "Get", "ListID", "ListUser", "ListContext", "ListObject": // GET
+		case "GetID", "GetHash", "Get", "LsID", "LsUser", "LsContext", "LsObject": // GET
 			resp, err := http.Get(url)
 			cmn.FailOnErr("%v", err)
 			defer resp.Body.Close()

@@ -71,11 +71,11 @@ func v2(cfgOK bool) {
 			resp, err = (&http.Client{}).Do(req)
 
 			// Management Functions:
-		case "ListID", "ListContext", "ListUser", "ListObject":
+		case "LsID", "LsContext", "LsUser", "LsObject":
 			switch arg1 {
-			case "ListContext":
+			case "LsContext":
 				*ctx = ""
-			case "ListUser":
+			case "LsUser":
 				*user = ""
 			}
 			switch {
