@@ -71,7 +71,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusBadRequest, result{
 			Data:  nil,
 			Empty: nil,
-			Error: "ALL [user], [ctx], [object], and [rw] must be provided",
+			Error: "[user], [ctx], [object], and [rw] must be provided",
 		})
 	})
 
@@ -155,34 +155,71 @@ func HostHTTPAsync() {
 	e.POST(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, user, ctx, rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); ok {
-			if bPolicy, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bPolicy)) {
-				if id, _, err := db.UpdatePolicy(string(bPolicy), user, ctx, rw); err == nil {
-					fPln(db.PolicyCount(), ": exist in db")
-					// return c.String(http.StatusOK, id+" - "+obj)
-					return c.JSON(http.StatusOK, result{
-						Data:  &id,
-						Empty: nil,
-						Error: "",
-					})
-				}
-				return c.JSON(http.StatusInternalServerError, result{
-					Data:  nil,
-					Empty: nil,
-					Error: "Update DB error",
-				})
-			}
+
+		name, user, ctx, rw := "", "", "", ""
+		if Ok, Name, User, Ctx, Rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); Ok {
+			name, user, ctx, rw = Name, User, Ctx, Rw
+		} else if Ok, User, Ctx, Rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); Ok {
+			user, ctx, rw = User, Ctx, Rw
+		} else {
 			return c.JSON(http.StatusBadRequest, result{
 				Data:  nil,
 				Empty: nil,
-				Error: "Policy is not in Request BODY, or is not valid JSON",
+				Error: "at least, [user], [ctx] and [rw] must be provided",
+			})
+		}
+
+		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bytes)) {
+			if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
+				fPln(db.PolicyCount(), ": exist in db")
+				// return c.String(http.StatusOK, id+" - "+obj)
+				return c.JSON(http.StatusOK, result{
+					Data:  &id,
+					Empty: nil,
+					Error: "",
+				})
+			}
+			return c.JSON(http.StatusInternalServerError, result{
+				Data:  nil,
+				Empty: nil,
+				Error: "Update DB error",
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
 			Data:  nil,
 			Empty: nil,
-			Error: "ALL [user], [ctx] and [rw] must be provided",
+			Error: "Policy is NOT in Request BODY, or NOT valid JSON",
 		})
+
+		// if ok, name, user, ctx, rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); ok {
+		// 	if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bytes)) {
+		// 		if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
+		// 			fPln(db.PolicyCount(), ": exist in db")
+		// 			// return c.String(http.StatusOK, id+" - "+obj)
+		// 			return c.JSON(http.StatusOK, result{
+		// 				Data:  &id,
+		// 				Empty: nil,
+		// 				Error: "",
+		// 			})
+		// 		}
+		// 		return c.JSON(http.StatusInternalServerError, result{
+		// 			Data:  nil,
+		// 			Empty: nil,
+		// 			Error: "Update DB error",
+		// 		})
+		// 	}
+		// 	return c.JSON(http.StatusBadRequest, result{
+		// 		Data:  nil,
+		// 		Empty: nil,
+		// 		Error: "Policy is NOT in Request BODY, or NOT valid JSON",
+		// 	})
+		// }
+
+		// return c.JSON(http.StatusBadRequest, result{
+		// 	Data:  nil,
+		// 	Empty: nil,
+		// 	Error: "[user], [ctx] and [rw] must be provided",
+		// })
 	})
 
 	// ---------------------------------------------------- Optional ---------------------------------------------------- //

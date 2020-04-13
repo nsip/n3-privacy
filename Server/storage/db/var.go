@@ -53,10 +53,32 @@ func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
 
-func genPolicyID(policy, user, ctx, rw string) (string, string) {
-	genPolicyCode := func(policy string) (string, string) {
-		jkvM := jkv.NewJKV(policy, hash(policy), false)
+func genPolicyID(policy, name, user, ctx, rw string) (string, string) {
+
+	genPolicyCode := func(policy, name string) (string, string) {
+		autoname := false
+		if name == "" {
+			jkvTmp := jkv.NewJKV(policy, "", false)
+			attris := jkvTmp.LsL12Fields[1]
+			if len(attris) == 1 {
+				name = attris[0]
+			} else {
+				sort.Slice(attris, func(i, j int) bool {
+					return attris[i][0] < attris[j][0]
+				})
+				for _, a := range attris {
+					name += string(a[0])
+				}
+			}
+			autoname = true
+		}
+		// fPln(name)
+		jkvM := jkv.NewJKV(policy, name, false)
 		object := jkvM.LsL12Fields[1][0]
+		if !autoname {
+			object = name
+		}
+
 		fields := jkvM.LsL12Fields[2]
 		sort.Strings(fields)
 		oCode := hash(object)[:lenOfOID]
@@ -65,7 +87,7 @@ func genPolicyID(policy, user, ctx, rw string) (string, string) {
 	}
 	uCode := hash(user)[:lenOfUID]
 	cCode := hash(ctx)[:lenOfCTX]
-	pCode, object := genPolicyCode(policy)
+	pCode, object := genPolicyCode(policy, name)
 	return pCode + uCode + cCode + rw[:1], object
 }
 

@@ -185,11 +185,11 @@ func (db *badgerDB) PolicyIDs(user, ctx, rw string, objects ...string) []string 
 	return getPolicyID(user, ctx, rw, objects...)
 }
 
-func (db *badgerDB) UpdatePolicy(policy, user, ctx, rw string) (id, obj string, err error) {
+func (db *badgerDB) UpdatePolicy(policy, name, user, ctx, rw string) (id, obj string, err error) {
 	if policy, err = validate(policy); err != nil {
 		return "", "", err
 	}
-	id, obj = genPolicyID(policy, user, ctx, rw)
+	id, obj = genPolicyID(policy, name, user, ctx, rw)
 	encPolicy := string(cmn.Encrypt([]byte(policy), glb.EncPwd))
 	err = updateBadgerDB(
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},

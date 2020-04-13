@@ -55,11 +55,12 @@ func v2(cfgOK bool) {
 			cmn.FailOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
 			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
 			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
-			url += fSf("?user=%s&ctx=%s&rw=%s", *user, *ctx, *rw)
+			cmn.WarnOnErrWhen(*object == "", "%v", fEf("if [-o] object is ignored, an auto-name will be assigned"))
+			url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", *object, *user, *ctx, *rw)
 			cmn.FailOnErrWhen(*policyPtr == "", "%v", fEf("[-p] policy must be provided"))
 			policy, err := ioutil.ReadFile(*policyPtr)
 			cmn.FailOnErr("%v: %v", err, "Is [-p] policy provided correctly?")
-			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is invalid JSON file, abort"))
+			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is invalid JSON, abort"))
 			resp, err = http.Post(url, "application/json", bytes.NewBuffer(policy))
 
 		case "Delete":

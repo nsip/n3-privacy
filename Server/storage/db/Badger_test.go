@@ -8,6 +8,24 @@ import (
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
+func TestUpdatePolicy(t *testing.T) {
+	glb.Init()
+	db := NewDBByBadger().(*badgerDB)
+	p, e := ioutil.ReadFile("../../../Mask/samples/xapiMask1.json")
+	cmn.FailOnErr("%v", e)
+	id, obj, e := db.UpdatePolicy(string(p), "", "user", "ctx", "r")
+	fPln(id, obj, e)
+}
+
+func TestDeletePolicy(t *testing.T) {
+	glb.Init()
+	db := NewDBByBadger().(*badgerDB)
+	// db.DeletePolicy("92c8797efc18b369ed0a12dea96fec4024700fd9r")
+	for _, pid := range db.PolicyIDs("user", "ctx", "r", "rot") {
+		db.DeletePolicy(pid)
+	}
+}
+
 func TestPolicyCount(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
@@ -17,7 +35,7 @@ func TestPolicyCount(t *testing.T) {
 func TestPolicyID(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
-	fPln(db.PolicyID("user", "ctx", "r", "6375f102e4d2562317fc841a9be2a56b8dfda4ad"))
+	fPln(db.PolicyID("user", "ctx", "r", "root"))
 }
 
 func TestPolicyIDs(t *testing.T) {
@@ -26,31 +44,16 @@ func TestPolicyIDs(t *testing.T) {
 	fPln(db.PolicyIDs("user", "ctx", "r"))
 }
 
-func TestUpdatePolicy(t *testing.T) {
-	glb.Init()
-	db := NewDBByBadger().(*badgerDB)
-	p, e := ioutil.ReadFile("../../../Mask/samples/xapiMask.json")
-	cmn.FailOnErr("%v", e)
-	id, obj, e := db.UpdatePolicy(string(p), "user", "ctx", "r")
-	fPln(id, obj, e)
-}
-
-func TestDeletePolicy(t *testing.T) {
-	glb.Init()
-	db := NewDBByBadger().(*badgerDB)
-	db.DeletePolicy("92c8797efc18b369ed0aa9993e3647589c22335ar")
-}
-
 func TestPolicyHash(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
-	fPln(db.PolicyHash("92c8797efc18b369ed0aa9993e3647589c22335ar"))
+	fPln(db.PolicyHash("dc76e9f0c018b369ed0a12dea96fec4024700fd9r"))
 }
 
 func TestPolicy(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
-	fPln(db.Policy("92c8797efc18b369ed0aa9993e3647589c22335ar"))
+	fPln(db.Policy("dc76e9f0c018b369ed0a12dea96fec4024700fd9r"))
 }
 
 // --------------------- //
@@ -92,7 +95,6 @@ func TestMapCtx2lsUser(t *testing.T) {
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.MapCtx2lsUser())
 	fPln(db.MapCtx2lsUser("ctx"))
-	fPln(db.MapCtx2lsUser("def"))
 }
 
 func TestMapUser2lsCtx(t *testing.T) {
@@ -100,12 +102,10 @@ func TestMapUser2lsCtx(t *testing.T) {
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.MapUser2lsCtx())
 	fPln(db.MapUser2lsCtx("user"))
-	fPln(db.MapUser2lsCtx("abc"))
 }
 
 func TestMapUC2lsObject(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.MapUC2lsObject("user", "ctx"))
-	fPln(db.MapUC2lsObject("abc", "def"))
 }
