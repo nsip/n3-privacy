@@ -41,10 +41,10 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
 				fSf("POST   %-55s-> %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
 				fSf("DELETE %-55s-> %s\n", fullIP+route.Delete, "Delete policy")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListID, "Get a list of policy id. If no user or ctx restriction, return all policy id")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListUser, "Get a list of user. If no ctx restriction, return all user")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListContext, "Get a list of context. If no user restriction, return all context")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.ListObject, "Get a list of object. If no user or ctx restriction, return all object"))
+				fSf("GET    %-55s-> %s\n", fullIP+route.LsID, "Get a list of policy id. If no user or ctx restriction, return all policy id")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.LsUser, "Get a list of user. If no ctx restriction, return all user")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.LsContext, "Get a list of context. If no user restriction, return all context")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object"))
 	})
 
 	// ---------------------------------------------------- Basic ---------------------------------------------------- //
@@ -223,7 +223,7 @@ func HostHTTPAsync() {
 
 	// ---------------------------------------------------- Optional ---------------------------------------------------- //
 
-	path = route.ListID
+	path = route.LsID
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -239,7 +239,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapRW2lsPID("", ""))
 	})
 
-	path = route.ListUser
+	path = route.LsUser
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -249,7 +249,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapCtx2lsUser())
 	})
 
-	path = route.ListContext
+	path = route.LsContext
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -259,7 +259,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusOK, db.MapUser2lsCtx())
 	})
 
-	path = route.ListObject
+	path = route.LsObject
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
