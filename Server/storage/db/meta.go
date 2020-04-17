@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/cdutwhu/json-util/jkv"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
@@ -34,7 +33,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 
 		// first meta.
 		if _, err := os.Stat(metafile); err != nil && os.IsNotExist(err) {
-			newPolicy, _ = cmn.Indent(newPolicy, 2, false)
+			newPolicy, _ = indent(newPolicy, 2, false)
 			newPolicy = fSf("[\n%s]", newPolicy)
 			ioutil.WriteFile(metafile, []byte(newPolicy), 0666) // make sure meta.json is formated
 

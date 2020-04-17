@@ -9,14 +9,13 @@ import (
 	"os"
 	"time"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v2(cfgOK bool) {
-	cmn.FailOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
-	cmn.FailOnErrWhen(len(os.Args) < 2, "%v", fEf("need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]"))
-	cmn.FailOnErrWhen(!initMapFnURL(glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port), "%v", fEf("initMapFnURL Failed"))
+	failOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
+	failOnErrWhen(len(os.Args) < 2, "%v", fEf("need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]"))
+	failOnErrWhen(!initMapFnURL(glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port), "%v", fEf("initMapFnURL Failed"))
 	arg1 := os.Args[1]
 	done := make(chan bool)
 
@@ -39,35 +38,35 @@ func v2(cfgOK bool) {
 
 		switch arg1 {
 		case "GetID":
-			cmn.FailOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
-			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
-			cmn.FailOnErrWhen(*object == "", "%v", fEf("[-o] object must be provided"))
-			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
+			failOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
+			failOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
+			failOnErrWhen(*object == "", "%v", fEf("[-o] object must be provided"))
+			failOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
 			url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", *user, *ctx, *object, *rw)
 			resp, err = http.Get(url)
 
 		case "GetHash", "Get":
-			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
+			failOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
 			url += fSf("?id=%s", *id)
 			resp, err = http.Get(url)
 
 		case "Update":
-			cmn.FailOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
-			cmn.FailOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
-			cmn.FailOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
-			cmn.WarnOnErrWhen(*object == "", "%v", fEf("if [-o] object is ignored, an auto-name will be assigned"))
+			failOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
+			failOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
+			failOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
+			warnOnErrWhen(*object == "", "%v", fEf("if [-o] object is ignored, an auto-name will be assigned"))
 			url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", *object, *user, *ctx, *rw)
-			cmn.FailOnErrWhen(*policyPtr == "", "%v", fEf("[-p] policy must be provided"))
+			failOnErrWhen(*policyPtr == "", "%v", fEf("[-p] policy must be provided"))
 			policy, err := ioutil.ReadFile(*policyPtr)
-			cmn.FailOnErr("%v: %v", err, "Is [-p] policy provided correctly?")
-			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is invalid JSON, abort"))
+			failOnErr("%v: %v", err, "Is [-p] policy provided correctly?")
+			failOnErrWhen(!isJSON(string(policy)), "%v", fEf("policy is invalid JSON, abort"))
 			resp, err = http.Post(url, "application/json", bytes.NewBuffer(policy))
 
 		case "Delete":
-			cmn.FailOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
+			failOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
 			url += fSf("?id=%s", *id)
 			req, err := http.NewRequest("DELETE", url, nil)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			resp, err = (&http.Client{}).Do(req)
 
 			// Management Functions:
@@ -90,14 +89,14 @@ func v2(cfgOK bool) {
 			mngMode = true
 
 		default:
-			cmn.FailOnErr("%v", fEf("unknown subcommand: %v", arg1))
+			failOnErr("%v", fEf("unknown subcommand: %v", arg1))
 		}
 
-		cmn.FailOnErr("%v", err)
+		failOnErr("%v", err)
 		defer resp.Body.Close()
 
 		data, err = ioutil.ReadAll(resp.Body)
-		cmn.FailOnErr("%v", err)
+		failOnErr("%v", err)
 
 		const SepLn = "-----------------------------"
 
@@ -107,7 +106,7 @@ func v2(cfgOK bool) {
 
 		if data != nil {
 			m := make(map[string]interface{})
-			cmn.FailOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
+			failOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
 			if !mngMode {
 				if *fullDump {
 					if m["empty"] != nil && m["empty"] != "" {
@@ -141,7 +140,7 @@ func v2(cfgOK bool) {
 
 	select {
 	case <-time.After(time.Duration(glb.Cfg.Access.Timeout) * time.Second):
-		cmn.FailOnErr("%v", fEf(fSf("Didn't Get Server Response in %d(s)", glb.Cfg.Access.Timeout)))
+		failOnErr("%v", fEf(fSf("Didn't Get Server Response in %d(s)", glb.Cfg.Access.Timeout)))
 	case <-done:
 	}
 }

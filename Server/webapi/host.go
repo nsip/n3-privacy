@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
@@ -27,7 +26,7 @@ func HostHTTPAsync() {
 	}))
 
 	port := glb.Cfg.WebService.Port
-	fullIP := cmn.LocalIP() + fSf(":%d", port)
+	fullIP := localIP() + fSf(":%d", port)
 	route := glb.Cfg.Route
 	initMutex()
 	initDB()
@@ -169,7 +168,7 @@ func HostHTTPAsync() {
 			})
 		}
 
-		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bytes)) {
+		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && isJSON(string(bytes)) {
 			if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
 				fPln(db.PolicyCount(), ": exist in db")
 				// return c.String(http.StatusOK, id+" - "+obj)
@@ -192,7 +191,7 @@ func HostHTTPAsync() {
 		})
 
 		// if ok, name, user, ctx, rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); ok {
-		// 	if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && cmn.IsJSON(string(bytes)) {
+		// 	if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && isJSON(string(bytes)) {
 		// 		if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
 		// 			fPln(db.PolicyCount(), ": exist in db")
 		// 			// return c.String(http.StatusOK, id+" - "+obj)

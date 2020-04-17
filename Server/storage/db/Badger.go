@@ -3,7 +3,6 @@ package db
 import (
 	"os"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	badger "github.com/dgraph-io/badger"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
@@ -22,7 +21,7 @@ func openBadgerDB(dbPath string, lsDBName ...string) (lsDB []*badger.DB) {
 	for i, name := range lsDBName {
 		db, err := badger.Open(badger.DefaultOptions(dbPath + name))
 		lsDB[i] = db
-		cmn.FailOnErr("%v", err)
+		failOnErr("%v", err)
 	}
 	return
 }
@@ -92,7 +91,7 @@ func getBadgerDB(dbs []*badger.DB, keys []string) (values []string, err error) {
 		case badger.ErrKeyNotFound:
 			return nil, e
 		default:
-			cmn.FailOnErr("%v", e)
+			failOnErr("%v", e)
 		}
 	}
 	defer func() {
@@ -120,7 +119,7 @@ func getOneBadgerDB(db *badger.DB, keys []string) (values []string, err error) {
 		case badger.ErrKeyNotFound:
 			values = append(values, "")
 		default:
-			cmn.FailOnErr("%v", e)
+			failOnErr("%v", e)
 		}
 	}
 	return
@@ -190,7 +189,7 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, ctx, rw string) (id, obj st
 		return "", "", err
 	}
 	id, obj = genPolicyID(policy, name, user, ctx, rw)
-	encPolicy := string(cmn.Encrypt([]byte(policy), glb.EncPwd))
+	encPolicy := string(encrypt([]byte(policy), glb.EncPwd))
 	err = updateBadgerDB(
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
 		[]string{id, id, hash(user)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
@@ -223,7 +222,7 @@ func (db *badgerDB) PolicyHash(id string) (string, bool) {
 
 func (db *badgerDB) Policy(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
-		if policy, err := cmn.Decrypt([]byte(values[0]), glb.EncPwd); err == nil {
+		if policy, err := decrypt([]byte(values[0]), glb.EncPwd); err == nil {
 			return string(policy), true
 		}
 	}
@@ -288,7 +287,7 @@ func (db *badgerDB) listUser(lsCtx ...string) (lsUser [][]string) {
 		for _, id := range listID {
 			uCodes = append(uCodes, uCodeByPID(id))
 		}
-		users, _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+		users, _ = getOneBadgerDB(db.mIDUser, toSet(uCodes).([]string))
 		return
 	}
 
@@ -305,7 +304,7 @@ func (db *badgerDB) listUser(lsCtx ...string) (lsUser [][]string) {
 				uCodes = append(uCodes, uCodeByPID(id))
 			}
 		}
-		lsUser[i], _ = getOneBadgerDB(db.mIDUser, cmn.ToSet(uCodes).([]string))
+		lsUser[i], _ = getOneBadgerDB(db.mIDUser, toSet(uCodes).([]string))
 	}
 	return
 }
@@ -316,7 +315,7 @@ func (db *badgerDB) listCtx(users ...string) (lsCtx [][]string) {
 		for _, id := range listID {
 			cCodes = append(cCodes, cCodeByPID(id))
 		}
-		ctxList, _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+		ctxList, _ = getOneBadgerDB(db.mIDCtx, toSet(cCodes).([]string))
 		return
 	}
 
@@ -333,7 +332,7 @@ func (db *badgerDB) listCtx(users ...string) (lsCtx [][]string) {
 				cCodes = append(cCodes, cCodeByPID(id))
 			}
 		}
-		lsCtx[i], _ = getOneBadgerDB(db.mIDCtx, cmn.ToSet(cCodes).([]string))
+		lsCtx[i], _ = getOneBadgerDB(db.mIDCtx, toSet(cCodes).([]string))
 	}
 	return
 }
@@ -360,7 +359,7 @@ func (db *badgerDB) listObject(user, ctx string) []string {
 			}
 		}
 	}
-	objList, _ := getOneBadgerDB(db.mIDObject, cmn.ToSet(oCodes).([]string))
+	objList, _ := getOneBadgerDB(db.mIDObject, toSet(oCodes).([]string))
 	return objList
 }
 

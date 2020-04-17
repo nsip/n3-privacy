@@ -29,6 +29,11 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 	xin         = cmn.XIn
+	failOnErr   = cmn.FailOnErr
+	toSet       = cmn.ToSet
+	indent      = cmn.Indent
+	encrypt     = cmn.Encrypt
+	decrypt     = cmn.Decrypt
 )
 
 var (

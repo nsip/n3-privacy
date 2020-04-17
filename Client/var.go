@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
@@ -14,6 +15,11 @@ var (
 	fSf   = fmt.Sprintf
 	fEf   = fmt.Errorf
 	sJoin = strings.Join
+
+	failOnErr     = cmn.FailOnErr
+	failOnErrWhen = cmn.FailOnErrWhen
+	warnOnErrWhen = cmn.WarnOnErrWhen
+	isJSON        = cmn.IsJSON
 )
 
 var (

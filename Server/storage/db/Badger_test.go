@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
@@ -12,7 +11,7 @@ func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
 	p, e := ioutil.ReadFile("../../../Mask/samples/xapiMask1.json")
-	cmn.FailOnErr("%v", e)
+	failOnErr("%v", e)
 	id, obj, e := db.UpdatePolicy(string(p), "", "user", "ctx", "r")
 	fPln(id, obj, e)
 }

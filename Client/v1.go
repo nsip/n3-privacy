@@ -8,12 +8,11 @@ import (
 	"os"
 	"time"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v1(cfgOK bool) {
-	cmn.FailOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
+	failOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "-u", "--usage", "usage", "-h", "--help", "help":
@@ -67,9 +66,9 @@ No "error" or "empty" fields.
 		port = glb.Cfg.WebService.Port
 	}
 
-	cmn.FailOnErrWhen(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
+	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
 	if _, ok := mFnURL[*fnPtr]; !ok {
-		cmn.FailOnErr("%v", fEf("flag [-f] is missing or invalid. use [-h] for help"))
+		failOnErr("%v", fEf("flag [-f] is missing or invalid. use [-h] for help"))
 	}
 
 	if *argsPtr != "" {
@@ -85,10 +84,10 @@ No "error" or "empty" fields.
 		switch *fnPtr {
 		case "GetID", "GetHash", "Get", "LsID", "LsUser", "LsContext", "LsObject": // GET
 			resp, err := http.Get(url)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 
 			// var objmap map[string]interface{}
 			// json.Unmarshal(data, &objmap)
@@ -102,12 +101,12 @@ No "error" or "empty" fields.
 			}
 		case "Update": // POST
 			policy, err := ioutil.ReadFile(*policyPtr)
-			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
-			cmn.FailOnErrWhen(!cmn.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
+			failOnErr("%v: %v", err, "Is [-policy] provided correctly?")
+			failOnErrWhen(!isJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
 			if resp, err := http.Post(url, "application/json", bytes.NewBuffer(policy)); err == nil {
 				defer resp.Body.Close()
 				data, err := ioutil.ReadAll(resp.Body)
-				cmn.FailOnErr("%v", err)
+				failOnErr("%v", err)
 				if data != nil {
 					fPln(string(data))
 				}
@@ -115,24 +114,24 @@ No "error" or "empty" fields.
 		case "Delete": // DELETE
 			client := &http.Client{}
 			req, err := http.NewRequest("DELETE", url, nil)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			resp, err := client.Do(req)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			if data != nil {
 				fPln(string(data))
 			}
 		default:
-			cmn.FailOnErr("%v", fEf("unknown -f"))
+			failOnErr("%v", fEf("unknown -f"))
 		}
 		done <- true
 	}()
 
 	select {
 	case <-timeout:
-		cmn.FailOnErr("%v", fEf(fSf("Didn't Get Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
+		failOnErr("%v", fEf(fSf("Didn't Get Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
 	case <-done:
 	}
 }

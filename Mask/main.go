@@ -9,18 +9,17 @@ import (
 	"sync"
 	"time"
 
-	cmn "github.com/cdutwhu/json-util/common"
 	jkv "github.com/cdutwhu/json-util/jkv"
 )
 
 func doMask(inFilePath, maskFilePath, output string) {
-	defer cmn.TrackTime(time.Now())
+	defer trackTime(time.Now())
 
 	data := jkv.FmtJSONFile(inFilePath, 2)
 	mask := jkv.FmtJSONFile(maskFilePath, 2)
 
-	cmn.FailOnErrWhen(data == "", "%v", fEf("input data is empty, check path"))
-	cmn.FailOnErrWhen(mask == "", "%v", fEf("input mask is empty, check path"))
+	failOnErrWhen(data == "", "%v", fEf("input data is empty, check path"))
+	failOnErrWhen(mask == "", "%v", fEf("input mask is empty, check path"))
 
 	jkvM := jkv.NewJKV(mask, "root", false)
 
