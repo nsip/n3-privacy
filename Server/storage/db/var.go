@@ -7,6 +7,7 @@ import (
 
 	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/cdutwhu/json-util/jkv"
+	"github.com/cdutwhu/json-util/n3json"
 )
 
 var (
@@ -28,12 +29,20 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
-	xin         = cmn.XIn
-	failOnErr   = cmn.FailOnErr
-	toSet       = cmn.ToSet
-	indent      = cmn.Indent
-	encrypt     = cmn.Encrypt
-	decrypt     = cmn.Decrypt
+
+	xin       = cmn.XIn
+	failOnErr = cmn.FailOnErr
+	toSet     = cmn.ToSet
+	indent    = cmn.Indent
+	encrypt   = cmn.Encrypt
+	decrypt   = cmn.Decrypt
+
+	fmtJSON      = n3json.Fmt
+	fmtJSONFile  = n3json.FmtFile
+	maybeJSONArr = n3json.MaybeArr
+	splitJSONArr = n3json.SplitArr
+	makeJSONArr  = n3json.MakeArr
+	newJKV       = jkv.NewJKV
 )
 
 var (
@@ -63,7 +72,7 @@ func genPolicyID(policy, name, user, ctx, rw string) (string, string) {
 	genPolicyCode := func(policy, name string) (string, string) {
 		autoname := false
 		if name == "" {
-			jkvTmp := jkv.NewJKV(policy, "", false)
+			jkvTmp := newJKV(policy, "", false)
 			attris := jkvTmp.LsL12Fields[1]
 			if len(attris) == 1 {
 				name = attris[0]
@@ -78,7 +87,7 @@ func genPolicyID(policy, name, user, ctx, rw string) (string, string) {
 			autoname = true
 		}
 		// fPln(name)
-		jkvM := jkv.NewJKV(policy, name, false)
+		jkvM := newJKV(policy, name, false)
 		object := jkvM.LsL12Fields[1][0]
 		if !autoname {
 			object = name
@@ -117,7 +126,7 @@ func validate(policy string) (string, error) {
 		return "", fEf("Not a valid JSON")
 	}
 	// return pp.FmtJSONStr(policy), nil
-	return jkv.FmtJSON(policy, 2), nil
+	return fmtJSON(policy, 2), nil
 }
 
 // [listID] has already been loaded

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cdutwhu/json-util/jkv"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
@@ -24,12 +23,12 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 	}
 	metafile := path + namespace + ".json"
 
-	jkvM := jkv.NewJKV(policy, hash(policy), false)
+	jkvM := newJKV(policy, hash(policy), false)
 	object := jkvM.LsL12Fields[1][0]
 	md := &MetaData{Object: object, Fields: jkvM.LsL12Fields[2], Remark: rw}
 	if b, e := json.Marshal(md); e == nil {
 		//newPolicy := pp.FmtJSONStr(string(b))
-		newPolicy := jkv.FmtJSON(string(b), 2)
+		newPolicy := fmtJSON(string(b), 2)
 
 		// first meta.
 		if _, err := os.Stat(metafile); err != nil && os.IsNotExist(err) {
@@ -39,7 +38,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 
 		} else {
 			b, _ = ioutil.ReadFile(metafile)
-			policies := jkv.SplitJSONArr(string(b), 2)
+			policies := splitJSONArr(string(b), 2)
 			// update
 			for i, policy := range policies {
 				md := MetaData{}
@@ -53,7 +52,7 @@ func logMeta(policy, namespace, rw string) (updated bool) {
 			if !updated {
 				policies = append(policies, newPolicy)
 			}
-			ioutil.WriteFile(metafile, []byte(jkv.MakeJSONArr(policies...)), 0666)
+			ioutil.WriteFile(metafile, []byte(makeJSONArr(policies...)), 0666)
 		}
 	}
 	return

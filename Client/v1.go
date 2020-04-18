@@ -92,7 +92,7 @@ No "error" or "empty" fields.
 			// var objmap map[string]interface{}
 			// json.Unmarshal(data, &objmap)
 			// fPln(objmap["data"])
-			// if !jkv.IsJSON(string(objmap["data"].(string))) {
+			// if !isJSON(string(objmap["data"].(string))) {
 			// 	panic("return error")
 			// }
 
