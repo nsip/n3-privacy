@@ -7,6 +7,7 @@ import (
 
 	cmn "github.com/cdutwhu/json-util/common"
 	"github.com/cdutwhu/json-util/jkv"
+	eg "github.com/cdutwhu/json-util/n3errs"
 	"github.com/cdutwhu/json-util/n3json"
 )
 
@@ -15,7 +16,6 @@ var (
 	fPf         = fmt.Printf
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
-	fEf         = fmt.Errorf
 	sSpl        = strings.Split
 	sJoin       = strings.Join
 	sCount      = strings.Count
@@ -123,7 +123,7 @@ func cCodeByPID(pid string) string {
 
 func validate(policy string) (string, error) {
 	if !cmn.IsJSON(policy) {
-		return "", fEf("Not a valid JSON")
+		return "", eg.JSON_INVALID
 	}
 	// return pp.FmtJSONStr(policy), nil
 	return fmtJSON(policy, 2), nil

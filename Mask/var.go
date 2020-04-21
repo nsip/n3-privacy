@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	fEf = fmt.Errorf
 	fPf = fmt.Printf
 
 	failOnErrWhen = cmn.FailOnErrWhen

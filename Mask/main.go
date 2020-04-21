@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	eg "github.com/cdutwhu/json-util/n3errs"
 )
 
 func doMask(inFilePath, maskFilePath, output string) {
@@ -16,8 +18,8 @@ func doMask(inFilePath, maskFilePath, output string) {
 	data := fmtJSONFile(inFilePath, 2)
 	mask := fmtJSONFile(maskFilePath, 2)
 
-	failOnErrWhen(data == "", "%v", fEf("input data is empty, check path"))
-	failOnErrWhen(mask == "", "%v", fEf("input mask is empty, check path"))
+	failOnErrWhen(data == "", "%v: check input file path", eg.FILE_EMPTY)
+	failOnErrWhen(mask == "", "%v: check mask file path", eg.FILE_EMPTY)
 
 	jkvM := newJKV(mask, "root", false)
 

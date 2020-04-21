@@ -9,13 +9,15 @@ import (
 	"os"
 	"time"
 
+	eg "github.com/cdutwhu/json-util/n3errs"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v2(cfgOK bool) {
-	failOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
-	failOnErrWhen(len(os.Args) < 2, "%v", fEf("need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]"))
-	failOnErrWhen(!initMapFnURL(glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port), "%v", fEf("initMapFnURL Failed"))
+	failOnErrWhen(!cfgOK, "%v", eg.CFG_INIT_ERR)
+	protocol, ip, port, timeout := glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port, glb.Cfg.Access.Timeout
+	failOnErrWhen(len(os.Args) < 2, "%v: need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]", eg.CLI_SUBCMD_ERR)
+	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v: MapFnURL", eg.INTERNAL_INIT_ERR)
 	arg1 := os.Args[1]
 	done := make(chan bool)
 
@@ -38,32 +40,32 @@ func v2(cfgOK bool) {
 
 		switch arg1 {
 		case "GetID":
-			failOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
-			failOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
-			failOnErrWhen(*object == "", "%v", fEf("[-o] object must be provided"))
-			failOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
+			failOnErrWhen(*user == "", "%v: [-u] user is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*ctx == "", "%v: [-c] context is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*object == "", "%v: [-o] object is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*rw == "", "%v: [-rw] read/write is required", eg.CLI_FLAG_ERR)
 			url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", *user, *ctx, *object, *rw)
 			resp, err = http.Get(url)
 
 		case "GetHash", "Get":
-			failOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
+			failOnErrWhen(*id == "", "%v: [-id] ID is required", eg.CLI_FLAG_ERR)
 			url += fSf("?id=%s", *id)
 			resp, err = http.Get(url)
 
 		case "Update":
-			failOnErrWhen(*user == "", "%v", fEf("[-u] user must be provided"))
-			failOnErrWhen(*ctx == "", "%v", fEf("[-c] context must be provided"))
-			failOnErrWhen(*rw == "", "%v", fEf("[-rw] read/write must be provided"))
-			warnOnErrWhen(*object == "", "%v", fEf("if [-o] object is ignored, an auto-name will be assigned"))
+			failOnErrWhen(*user == "", "%v: [-u] user is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*ctx == "", "%v: [-c] context is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*rw == "", "%v: [-rw] read/write is required", eg.CLI_FLAG_ERR)
+			warnOnErrWhen(*object == "", "%v: if [-o] object is ignored, an auto-name will be assigned", eg.CLI_FLAG_ERR)
 			url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", *object, *user, *ctx, *rw)
-			failOnErrWhen(*policyPtr == "", "%v", fEf("[-p] policy must be provided"))
+			failOnErrWhen(*policyPtr == "", "%v: [-p] policy is required", eg.CLI_FLAG_ERR)
 			policy, err := ioutil.ReadFile(*policyPtr)
 			failOnErr("%v: %v", err, "Is [-p] policy provided correctly?")
-			failOnErrWhen(!isJSON(string(policy)), "%v", fEf("policy is invalid JSON, abort"))
+			failOnErrWhen(!isJSON(string(policy)), "%v: policy", eg.PARAM_INVALID_JSON)
 			resp, err = http.Post(url, "application/json", bytes.NewBuffer(policy))
 
 		case "Delete":
-			failOnErrWhen(*id == "", "%v", fEf("[-id] ID must be provided"))
+			failOnErrWhen(*id == "", "%v: [-id] ID is required", eg.CLI_FLAG_ERR)
 			url += fSf("?id=%s", *id)
 			req, err := http.NewRequest("DELETE", url, nil)
 			failOnErr("%v", err)
@@ -89,7 +91,7 @@ func v2(cfgOK bool) {
 			mngMode = true
 
 		default:
-			failOnErr("%v", fEf("unknown subcommand: %v", arg1))
+			failOnErr("%v: %v", eg.CLI_SUBCMD_UNKNOWN, arg1)
 		}
 
 		failOnErr("%v", err)
@@ -139,8 +141,8 @@ func v2(cfgOK bool) {
 	}()
 
 	select {
-	case <-time.After(time.Duration(glb.Cfg.Access.Timeout) * time.Second):
-		failOnErr("%v", fEf(fSf("Didn't Get Server Response in %d(s)", glb.Cfg.Access.Timeout)))
+	case <-time.After(time.Duration(timeout) * time.Second):
+		failOnErr("%v: Didn't Get Response in %d(s)", eg.NET_TIMEOUT, timeout)
 	case <-done:
 	}
 }

@@ -13,7 +13,6 @@ var (
 	fPf   = fmt.Printf
 	fPln  = fmt.Println
 	fSf   = fmt.Sprintf
-	fEf   = fmt.Errorf
 	sJoin = strings.Join
 
 	failOnErr     = cmn.FailOnErr

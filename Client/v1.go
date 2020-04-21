@@ -8,11 +8,12 @@ import (
 	"os"
 	"time"
 
+	eg "github.com/cdutwhu/json-util/n3errs"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 func v1(cfgOK bool) {
-	failOnErrWhen(!cfgOK, "%v", fEf("Config File Init Failed"))
+	failOnErrWhen(!cfgOK, "%v", eg.CFG_INIT_ERR)
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "-u", "--usage", "usage", "-h", "--help", "help":
@@ -66,9 +67,9 @@ No "error" or "empty" fields.
 		port = glb.Cfg.WebService.Port
 	}
 
-	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
+	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v: MapFnURL", eg.INTERNAL_INIT_ERR)
 	if _, ok := mFnURL[*fnPtr]; !ok {
-		failOnErr("%v", fEf("flag [-f] is missing or invalid. use [-h] for help"))
+		failOnErr("%v: [-f] is missing or invalid. [-h] for help", eg.CLI_FLAG_ERR)
 	}
 
 	if *argsPtr != "" {
@@ -102,7 +103,7 @@ No "error" or "empty" fields.
 		case "Update": // POST
 			policy, err := ioutil.ReadFile(*policyPtr)
 			failOnErr("%v: %v", err, "Is [-policy] provided correctly?")
-			failOnErrWhen(!isJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
+			failOnErrWhen(!isJSON(string(policy)), "%v: policy is invalid JSON file, failed", eg.CLI_ARG_ERR)
 			if resp, err := http.Post(url, "application/json", bytes.NewBuffer(policy)); err == nil {
 				defer resp.Body.Close()
 				data, err := ioutil.ReadAll(resp.Body)
@@ -124,14 +125,14 @@ No "error" or "empty" fields.
 				fPln(string(data))
 			}
 		default:
-			failOnErr("%v", fEf("unknown -f"))
+			failOnErr("%v: -f=%s", eg.CLI_SUBCMD_UNKNOWN, *fnPtr)
 		}
 		done <- true
 	}()
 
 	select {
 	case <-timeout:
-		failOnErr("%v", fEf(fSf("Didn't Get Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
+		failOnErr("%v: Didn't Get Response in time. %d(s)", eg.NET_TIMEOUT, glb.Cfg.Access.Timeout)
 	case <-done:
 	}
 }
