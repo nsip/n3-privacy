@@ -14,9 +14,21 @@ import (
 )
 
 func v2(cfgOK bool) {
+
 	failOnErrWhen(!cfgOK, "%v", eg.CFG_INIT_ERR)
-	protocol, ip, port, timeout := glb.Cfg.Server.Protocol, glb.Cfg.Server.IP, glb.Cfg.WebService.Port, glb.Cfg.Access.Timeout
-	failOnErrWhen(len(os.Args) < 2, "%v: need subcommands: ["+sJoin(getCfgRouteFields(), " ")+"]", eg.CLI_SUBCMD_ERR)
+
+	cfg := glb.Cfg
+	protocol, ip, port, timeout, elog := cfg.Server.Protocol, cfg.Server.IP, cfg.WebService.Port, cfg.Access.Timeout, cfg.ErrLog
+
+	setLog(elog)
+
+	if e := warnOnErrWhen(len(os.Args) < 2, "%v: need ["+sJoin(getCfgRouteFields(), " ")+"]", eg.CLI_SUBCMD_ERR); e != nil {
+		if isFLog() {
+			fPf("*** %v\n", e)
+		}
+		return
+	}
+
 	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v: MapFnURL", eg.INTERNAL_INIT_ERR)
 	arg1 := os.Args[1]
 	done := make(chan bool)

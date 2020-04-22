@@ -15,9 +15,12 @@ var (
 	fSf   = fmt.Sprintf
 	sJoin = strings.Join
 
+	setLog        = cmn.SetLog
+	resetLog      = cmn.ResetLog
 	failOnErr     = cmn.FailOnErr
 	failOnErrWhen = cmn.FailOnErrWhen
 	warnOnErrWhen = cmn.WarnOnErrWhen
+	isFLog        = cmn.IsFLog
 	isJSON        = cmn.IsJSON
 )
 
