@@ -24,7 +24,7 @@ func v2(cfgOK bool) {
 
 	if e := warnOnErrWhen(len(os.Args) < 2, "%v: need ["+sJoin(getCfgRouteFields(), " ")+"]", eg.CLI_SUBCMD_ERR); e != nil {
 		if isFLog() {
-			fPf("*** %v\n", e)
+			fPf("*** %v   abort\n", e)
 		}
 		return
 	}

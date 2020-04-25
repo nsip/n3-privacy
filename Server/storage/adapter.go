@@ -1,8 +1,7 @@
 package storage
 
 import (
-	"log"
-
+	eg "github.com/cdutwhu/json-util/n3errs"
 	"github.com/nsip/n3-privacy/Server/storage/db"
 )
 
@@ -28,10 +27,11 @@ func NewDB(dbType string) DB {
 	switch dbType {
 	case "badger":
 		return db.NewDBByBadger().(DB)
-	// case "map":
-	// 	return db.NewDBByMap().(DB)
+	case "map":
+		failOnErr("%v: [%s]", eg.NOT_IMPLEMENTED, dbType)
+		return nil
 	default:
-		log.Fatalf("%s is not supported", dbType)
+		failOnErr("%v: [%s]", eg.PARAM_NOT_SUPPORTED, dbType)
 		return nil
 	}
 }

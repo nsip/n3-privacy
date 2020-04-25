@@ -3,7 +3,9 @@ package webapi
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
 
+	eg "github.com/cdutwhu/json-util/n3errs"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
@@ -28,6 +30,10 @@ func HostHTTPAsync() {
 	port := glb.Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
 	route := glb.Cfg.Route
+	file := glb.Cfg.File
+
+	setLog(glb.Cfg.ErrLog)
+
 	initMutex()
 	initDB()
 
@@ -36,7 +42,15 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		return c.String(
 			http.StatusOK,
-			fSf("GET    %-55s-> %s\n", fullIP+route.GetID, "Get policy's ID. If no policy, return empty")+
+			fSf("wget %-40s-> %s\n", fullIP+"/mask-linux64", "Get Mask(Linux64)")+
+				fSf("wget %-40s-> %s\n", fullIP+"/mask-mac", "Get Mask(Mac)")+
+				fSf("wget %-40s-> %s\n", fullIP+"/mask-win64", "Get Mask(Windows64)")+
+				fSf("wget %-40s-> %s\n", fullIP+"/mask-config", "Get Mask config")+
+				fSf("wget %-40s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
+				fSf("wget %-40s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
+				fSf("wget %-40s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
+				fSf("wget %-40s-> %s\n\n", fullIP+"/client-config", "Get Client Config")+
+				fSf("GET    %-55s-> %s\n", fullIP+route.GetID, "Get policy's ID. If no policy, return empty")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.GetHash, "Get policy's Hash String. If no policy, return empty")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
 				fSf("POST   %-55s-> %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
@@ -46,6 +60,32 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsContext, "Get a list of context. If no user restriction, return all context")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object"))
 	})
+
+	mRouteRes := map[string]string{
+		"/mask-linux64":   file.MaskLinux64,
+		"/mask-mac":       file.MaskMac,
+		"/mask-win64":     file.MaskWin64,
+		"/mask-config":    file.MaskConfig,
+		"/client-linux64": file.ClientLinux64,
+		"/client-mac":     file.ClientMac,
+		"/client-win64":   file.ClientWin64,
+		"/client-config":  file.ClientConfig,
+	}
+
+	routeFun := func(rt, res string) func(c echo.Context) error {
+		return func(c echo.Context) (err error) {
+			if _, err = os.Stat(res); err == nil {
+				fPln(rt, res)
+				return c.File(res)
+			}
+			fPf("%v\n", warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res))
+			return err
+		}
+	}
+
+	for rt, res := range mRouteRes {
+		e.GET(rt, routeFun(rt, res))
+	}
 
 	// ---------------------------------------------------- Basic ---------------------------------------------------- //
 

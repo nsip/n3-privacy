@@ -40,6 +40,16 @@ type Config struct {
 		MetaPath     string
 		BadgerDBPath string
 	}
+	File struct {
+		ClientLinux64 string
+		ClientMac     string
+		ClientWin64   string
+		ClientConfig  string
+		MaskLinux64   string
+		MaskMac       string
+		MaskWin64     string
+		MaskConfig    string
+	}
 }
 
 // NewCfg :

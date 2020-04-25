@@ -13,11 +13,15 @@ import (
 
 var (
 	fSf  = fmt.Sprintf
+	fPf  = fmt.Printf
 	fPln = fmt.Println
 
 	localIP       = cmn.LocalIP
 	isJSON        = cmn.IsJSON
 	failOnErrWhen = cmn.FailOnErrWhen
+	warnOnErr     = cmn.WarnOnErr
+	warnOnErrWhen = cmn.WarnOnErrWhen
+	setLog        = cmn.SetLog
 )
 
 var (
