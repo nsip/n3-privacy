@@ -32,7 +32,7 @@ func HostHTTPAsync() {
 	route := glb.Cfg.Route
 	file := glb.Cfg.File
 
-	setLog(glb.Cfg.ErrLog)
+	setLog(glb.Cfg.LogFile)
 
 	initMutex()
 	initDB()
@@ -42,14 +42,16 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		return c.String(
 			http.StatusOK,
-			fSf("wget %-40s-> %s\n", fullIP+"/mask-linux64", "Get Mask(Linux64)")+
-				fSf("wget %-40s-> %s\n", fullIP+"/mask-mac", "Get Mask(Mac)")+
-				fSf("wget %-40s-> %s\n", fullIP+"/mask-win64", "Get Mask(Windows64)")+
-				fSf("wget %-40s-> %s\n", fullIP+"/mask-config", "Get Mask config")+
-				fSf("wget %-40s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
-				fSf("wget %-40s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
-				fSf("wget %-40s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
-				fSf("wget %-40s-> %s\n\n", fullIP+"/client-config", "Get Client Config")+
+			fSf("wget %-55s-> %s\n", fullIP+"/mask-linux64", "Get Mask(Linux64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/mask-mac", "Get Mask(Mac)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/mask-win64", "Get Mask(Windows64)")+
+				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/mask-config", "Get Mask config")+
+				fSf("\n")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
+				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/client-config", "Get Client Config")+
+				fSf("\n")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.GetID, "Get policy's ID. If no policy, return empty")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.GetHash, "Get policy's Hash String. If no policy, return empty")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+

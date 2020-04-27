@@ -18,7 +18,7 @@ var (
 // Config is toml
 type Config struct {
 	Path       string
-	ErrLog     string
+	LogFile    string
 	WebService struct {
 		Port    int
 		Version string

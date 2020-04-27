@@ -11,8 +11,7 @@ import (
 // config is toml, type name MUST be identical to file name "config.toml"
 type config struct {
 	Path    string
-	PathAbs string
-	ErrLog  string
+	LogFile string
 }
 
 var (
@@ -37,20 +36,18 @@ func set(f, abs string) interface{} {
 		name := reflect.TypeOf(cfg).Elem().Name()
 		if sHasSuffix(f, "/"+name+".toml") {
 			if _, e := toml.DecodeFile(f, cfg); e == nil {
-				reflect.ValueOf(cfg).Elem().FieldByName("Path").SetString(f)
-				reflect.ValueOf(cfg).Elem().FieldByName("PathAbs").SetString(abs)
-				save(f, cfg)
-				// modify for runtime
-				return cfg
+				reflect.ValueOf(cfg).Elem().FieldByName("Path").SetString(abs)
+				return save(f, cfg)
 			}
 		}
 	}
 	return nil
 }
 
-func save(path string, cfg interface{}) {
+func save(path string, cfg interface{}) interface{} {
 	if f, e := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, os.ModePerm); e == nil {
 		defer f.Close()
 		toml.NewEncoder(f).Encode(cfg)
 	}
+	return cfg
 }

@@ -27,7 +27,7 @@ cp config.toml $OUTPATH
 
 OUTPATH=./build/Linux64/
 GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
-cp $OUT $OUTPATH              # for testing
+mv $OUT $OUTPATH              # for testing
 cp config.toml $OUTPATH
 
 cp config.toml ../Client/

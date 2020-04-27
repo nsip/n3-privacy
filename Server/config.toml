@@ -1,5 +1,5 @@
 Path = ""
-ErrLog = "./error.log"
+LogFile = "./error.log"
 
 # ************************ Server ************************ #
 # ********** Client User DO NOT Modify This Part ********* #
@@ -26,14 +26,14 @@ ErrLog = "./error.log"
   LsObject = "/#s/#v/list/object"
 
 [File]
-  ClientLinux64 = "../Client/build/Linux64/client"
-  ClientMac = "../Client/build/Mac/client"
-  ClientWin64 = "../Client/build/Win64/client.exe"
-  ClientConfig = "../Client/build/Linux64/config.toml"
-  MaskLinux64 = "../Mask/build/Linux64/jm"
-  MaskMac = "../Mask/build/Mac/jm"
-  MaskWin64 = "../Mask/build/Win64/jm.exe"
-  MaskConfig = "../Mask/build/Linux64/config.toml"
+  ClientLinux64 = "../../../Client/build/Linux64/client"
+  ClientMac = "../../../Client/build/Mac/client"
+  ClientWin64 = "../../../Client/build/Win64/client.exe"
+  ClientConfig = "../../../Client/build/Linux64/config.toml"
+  MaskLinux64 = "../../../Mask/build/Linux64/jm"
+  MaskMac = "../../../Mask/build/Mac/jm"
+  MaskWin64 = "../../../Mask/build/Win64/jm.exe"
+  MaskConfig = "../../../Mask/build/Linux64/config.toml"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #

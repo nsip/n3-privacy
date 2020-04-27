@@ -1,3 +1,2 @@
-Path = "../config.toml"
-PathAbs = "/home/qmiao/go/src/github.com/nsip/n3-privacy/Mask/config.toml"
-ErrLog = "./error.log"
+Path = "/home/qing/go/src/github.com/nsip/n3-privacy/Mask/config.toml"
+LogFile = "./error.log"
