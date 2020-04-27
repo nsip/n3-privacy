@@ -9,7 +9,7 @@ LogFile = "./error.log"
   MetaPath = "/var/tmp/n3-privacy/meta/"
   BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
 
-[WebService]
+[WebService]                              # Shared with Client #
   Port = 1323
   Version = "0.1.0"                       # Server internal [Route] use
   Service = "policy-service"              # Server internal [Route] use
