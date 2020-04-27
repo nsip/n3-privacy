@@ -25,6 +25,7 @@ type Config struct {
 		Service string
 	}
 	Route struct {
+		ROOT      string
 		GetID     string
 		GetHash   string
 		Get       string

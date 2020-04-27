@@ -13,6 +13,5 @@ func TestInitURL(t *testing.T) {
 	port := glb.Cfg.WebService.Port
 	initMapFnURL(protocol, ip, port)
 	fPln(mFnURL)
-
 	fPln(getCfgRouteFields())
 }

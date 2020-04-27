@@ -197,7 +197,7 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, ctx, rw string) (id, obj st
 	if err == nil && !xin(id, listID) {
 		listID = append(listID, id)
 	}
-	logMeta(policy, ctx, rw)
+	// logMeta(policy, ctx, rw)
 	return id, obj, err
 }
 

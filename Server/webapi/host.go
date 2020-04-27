@@ -37,9 +37,12 @@ func HostHTTPAsync() {
 	initMutex()
 	initDB()
 
-	// *************************************** List all APP, API *************************************** //
+	// *************************************** List all API, FILE *************************************** //
 	path := "/"
 	e.GET(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+
 		return c.String(
 			http.StatusOK,
 			fSf("wget %-55s-> %s\n", fullIP+"/mask-linux64", "Get Mask(Linux64)")+

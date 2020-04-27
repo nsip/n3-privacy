@@ -15,6 +15,7 @@ LogFile = "./error.log"
   Service = "policy-service"              # Server internal [Route] use
 
 [Route]                                   # Shared with Client #
+  ROOT = "/"
   GetID = "/#s/#v/id"
   GetHash = "/#s/#v/hash"
   Get = "/#s/#v/policy"

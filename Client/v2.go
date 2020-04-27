@@ -51,6 +51,9 @@ func v2(cfgOK bool) {
 		mngMode := false
 
 		switch arg1 {
+		case "ROOT":
+			resp, err = http.Get(url)
+
 		case "GetID":
 			failOnErrWhen(*user == "", "%v: [-u] user is required", eg.CLI_FLAG_ERR)
 			failOnErrWhen(*ctx == "", "%v: [-c] context is required", eg.CLI_FLAG_ERR)
@@ -119,33 +122,37 @@ func v2(cfgOK bool) {
 		}
 
 		if data != nil {
-			m := make(map[string]interface{})
-			failOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
-			if !mngMode {
-				if *fullDump {
-					if m["empty"] != nil && m["empty"] != "" {
-						fPf("Empty? %v\n%s\n", m["empty"], SepLn)
-					}
-					if m["error"] != nil && m["error"] != "" {
-						fPf("ERROR: %v\n%s\n", m["error"], SepLn)
-					}
-				}
-				if m["data"] != nil && m["data"] != "" {
-					fPf("%s\n", m["data"])
-				}
+			if os.Args[1] == "ROOT" {
+				fPt(string(data))
 			} else {
-				key := ""
-				switch {
-				case *user != "" && *ctx != "":
-					key = fSf("%s@%s", *user, *ctx)
-				case *user != "":
-					key = *user
-				case *ctx != "":
-					key = *ctx
-				default:
-					key = "all"
+				m := make(map[string]interface{})
+				failOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
+				if !mngMode {
+					if *fullDump {
+						if m["empty"] != nil && m["empty"] != "" {
+							fPf("Empty? %v\n%s\n", m["empty"], SepLn)
+						}
+						if m["error"] != nil && m["error"] != "" {
+							fPf("ERROR: %v\n%s\n", m["error"], SepLn)
+						}
+					}
+					if m["data"] != nil && m["data"] != "" {
+						fPf("%s\n", m["data"])
+					}
+				} else {
+					key := ""
+					switch {
+					case *user != "" && *ctx != "":
+						key = fSf("%s@%s", *user, *ctx)
+					case *user != "":
+						key = *user
+					case *ctx != "":
+						key = *ctx
+					default:
+						key = "all"
+					}
+					fPf("%s\n", m[key])
 				}
-				fPf("%s\n", m[key])
 			}
 		}
 
