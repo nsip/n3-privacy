@@ -30,4 +30,6 @@ GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH              # for testing
 cp config.toml $OUTPATH
 
-cp config.toml ../Client/
+# go test -timeout 5s github.com/nsip/n3-privacy/Server -run TestCreateClientCfg
+go test -timeout 5s -run TestCreateClientCfg
+mv ./config_client.toml ../Client/config.toml
