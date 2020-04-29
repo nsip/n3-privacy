@@ -40,7 +40,7 @@ func (db *memMap) PolicyIDs(user, ctx, rw string, objects ...string) []string {
 }
 
 // UpdatePolicy :
-func (db *memMap) UpdatePolicy(policy, user, ctx, rw string) (id string, err error) {
+func (db *memMap) UpdatePolicy(policy, name, user, ctx, rw string) (id string, err error) {
 	if policy, err = validate(policy); err != nil {
 		return "", err
 	}

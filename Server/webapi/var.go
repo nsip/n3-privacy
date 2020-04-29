@@ -6,13 +6,22 @@ import (
 	"reflect"
 	"sync"
 
+	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Server/global"
 	"github.com/nsip/n3-privacy/Server/storage"
 )
 
 var (
 	fSf  = fmt.Sprintf
+	fPf  = fmt.Printf
 	fPln = fmt.Println
+
+	localIP       = cmn.LocalIP
+	isJSON        = cmn.IsJSON
+	failOnErrWhen = cmn.FailOnErrWhen
+	warnOnErr     = cmn.WarnOnErr
+	warnOnErrWhen = cmn.WarnOnErrWhen
+	setLog        = cmn.SetLog
 )
 
 var (

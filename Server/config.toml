@@ -1,5 +1,5 @@
 Path = ""
-ErrLog = "./error.log"
+LogFile = "./error.log"
 
 # ************************ Server ************************ #
 # ********** Client User DO NOT Modify This Part ********* #
@@ -9,28 +9,39 @@ ErrLog = "./error.log"
   MetaPath = "/var/tmp/n3-privacy/meta/"
   BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
 
-[WebService]
+[WebService]                              # Shared with Client #
   Port = 1323
   Version = "0.1.0"                       # Server internal [Route] use
   Service = "policy-service"              # Server internal [Route] use
 
 [Route]                                   # Shared with Client #
+  ROOT = "/"
   GetID = "/#s/#v/id"
   GetHash = "/#s/#v/hash"
   Get = "/#s/#v/policy"
   Update = "/#s/#v/update"
   Delete = "/#s/#v/delete"
-  ListID = "/#s/#v/list/policyid"
-  ListUser = "/#s/#v/list/user"
-  ListContext = "/#s/#v/list/context"
-  ListObject = "/#s/#v/list/object"
+  LsID = "/#s/#v/list/policyid"
+  LsUser = "/#s/#v/list/user"
+  LsContext = "/#s/#v/list/context"
+  LsObject = "/#s/#v/list/object"
+
+[File]
+  ClientLinux64 = "../../../Client/build/Linux64/client"
+  ClientMac = "../../../Client/build/Mac/client"
+  ClientWin64 = "../../../Client/build/Win64/client.exe"
+  ClientConfig = "../../../Client/build/Linux64/config.toml"
+  MaskLinux64 = "../../../Mask/build/Linux64/jm"
+  MaskMac = "../../../Mask/build/Mac/jm"
+  MaskWin64 = "../../../Mask/build/Win64/jm.exe"
+  MaskConfig = "../../../Mask/build/Linux64/config.toml"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #
 
 [Server]
   Protocol = "http" 
-  IP = "192.168.92.143"
+  IP = "127.0.0.1"
 
 [Access]
   Timeout = 3

@@ -8,13 +8,12 @@ import (
 	"os"
 	"time"
 
+	eg "github.com/cdutwhu/json-util/n3errs"
 	glb "github.com/nsip/n3-privacy/Client/global"
-	cmn "github.com/nsip/n3-privacy/common"
-	"github.com/nsip/n3-privacy/jkv"
 )
 
 func v1(cfgOK bool) {
-	cmn.FailOnCondition(!cfgOK, "%v", fEf("Config File Init Failed"))
+	failOnErrWhen(!cfgOK, "%v", eg.CFG_INIT_ERR)
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "-u", "--usage", "usage", "-h", "--help", "help":
@@ -32,17 +31,17 @@ Get a Policy Hash:   "%[2]v -f=GetHash -args='id=(policy id)'"
 Get a Policy:        "%[2]v -f=Get -args='id=(policy id)'"
 Update a Policy:     "%[2]v -f=Update -policy='./policy.json' -args='user=(nsip)&ctx=(ctx123)&rw=(r)'"
 Delete a Policy:     "%[2]v -f=Delete -args='id=(policy id)'"
-List some Policy ID: "%[2]v -f=ListID [-args='']"
-List some Context:   "%[2]v -f=ListContext [-args='']"
-List some Users:     "%[2]v -f=ListUser [-args='']"
-List some Objects:   "%[2]v -f=ListObject [-args='']"
+List some Policy ID: "%[2]v -f=LsID [-args='']"
+List some Context:   "%[2]v -f=LsContext [-args='']"
+List some Users:     "%[2]v -f=LsUser [-args='']"
+List some Objects:   "%[2]v -f=LsObject [-args='']"
 
 [GetID/GetHash/Get/Update/Delete] are BASIC functions, return {"data": "***", "empty": true/false, "error": "***" }
 If "error" is NOT empty string (""), other fields' outcome are useless!
 "empty" is only apply to [GetID/GetHash/Get]; If "error" is ("") and "empty" is true, which means found nothing without errors.
 For [Update/Delete], if successful, "data" returns processed (Policy-ID), otherwise it returns ("") and check "error" for details.
 
-[ListID/ListContext/ListUser/ListObject] are MANAGEMENT functions, only return { "condition": array of [Policy-ID/Context/User/Object] }
+[LsID/LsContext/LsUser/LsObject] are MANAGEMENT functions, only return { "condition": array of [Policy-ID/Context/User/Object] }
 No "error" or "empty" fields.
 `, sJoin(getCfgRouteFields(), " "), "privacy-client")
 			return
@@ -68,9 +67,9 @@ No "error" or "empty" fields.
 		port = glb.Cfg.WebService.Port
 	}
 
-	cmn.FailOnCondition(!initMapFnURL(protocol, ip, port), "%v", fEf("initMapFnURL fatal"))
+	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v: MapFnURL", eg.INTERNAL_INIT_ERR)
 	if _, ok := mFnURL[*fnPtr]; !ok {
-		cmn.FailOnErr("%v", fEf("flag [-f] is missing or invalid. use [-h] for help"))
+		failOnErr("%v: [-f] is missing or invalid. [-h] for help", eg.CLI_FLAG_ERR)
 	}
 
 	if *argsPtr != "" {
@@ -84,17 +83,17 @@ No "error" or "empty" fields.
 
 	go func() {
 		switch *fnPtr {
-		case "GetID", "GetHash", "Get", "ListID", "ListUser", "ListContext", "ListObject": // GET
+		case "GetID", "GetHash", "Get", "LsID", "LsUser", "LsContext", "LsObject": // GET
 			resp, err := http.Get(url)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 
 			// var objmap map[string]interface{}
 			// json.Unmarshal(data, &objmap)
 			// fPln(objmap["data"])
-			// if !jkv.IsJSON(string(objmap["data"].(string))) {
+			// if !isJSON(string(objmap["data"].(string))) {
 			// 	panic("return error")
 			// }
 
@@ -103,12 +102,12 @@ No "error" or "empty" fields.
 			}
 		case "Update": // POST
 			policy, err := ioutil.ReadFile(*policyPtr)
-			cmn.FailOnErr("%v: %v", err, "Is [-policy] provided correctly?")
-			cmn.FailOnCondition(!jkv.IsJSON(string(policy)), "%v", fEf("policy is not valid JSON file, failed to upload"))
+			failOnErr("%v: %v", err, "Is [-policy] provided correctly?")
+			failOnErrWhen(!isJSON(string(policy)), "%v: policy is invalid JSON file, failed", eg.CLI_ARG_ERR)
 			if resp, err := http.Post(url, "application/json", bytes.NewBuffer(policy)); err == nil {
 				defer resp.Body.Close()
 				data, err := ioutil.ReadAll(resp.Body)
-				cmn.FailOnErr("%v", err)
+				failOnErr("%v", err)
 				if data != nil {
 					fPln(string(data))
 				}
@@ -116,24 +115,24 @@ No "error" or "empty" fields.
 		case "Delete": // DELETE
 			client := &http.Client{}
 			req, err := http.NewRequest("DELETE", url, nil)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			resp, err := client.Do(req)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			defer resp.Body.Close()
 			data, err := ioutil.ReadAll(resp.Body)
-			cmn.FailOnErr("%v", err)
+			failOnErr("%v", err)
 			if data != nil {
 				fPln(string(data))
 			}
 		default:
-			cmn.FailOnErr("%v", fEf("unknown -f"))
+			failOnErr("%v: -f=%s", eg.CLI_SUBCMD_UNKNOWN, *fnPtr)
 		}
 		done <- true
 	}()
 
 	select {
 	case <-timeout:
-		cmn.FailOnErr("%v", fEf(fSf("Didn't Get Server Response in time. %d(s)", glb.Cfg.Access.Timeout)))
+		failOnErr("%v: Didn't Get Response in time. %d(s)", eg.NET_TIMEOUT, glb.Cfg.Access.Timeout)
 	case <-done:
 	}
 }

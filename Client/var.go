@@ -5,15 +5,24 @@ import (
 	"reflect"
 	"strings"
 
+	cmn "github.com/cdutwhu/json-util/common"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 
 var (
+	fPt   = fmt.Print
 	fPf   = fmt.Printf
 	fPln  = fmt.Println
 	fSf   = fmt.Sprintf
-	fEf   = fmt.Errorf
 	sJoin = strings.Join
+
+	setLog        = cmn.SetLog
+	resetLog      = cmn.ResetLog
+	failOnErr     = cmn.FailOnErr
+	failOnErrWhen = cmn.FailOnErrWhen
+	warnOnErrWhen = cmn.WarnOnErrWhen
+	isFLog        = cmn.IsFLog
+	isJSON        = cmn.IsJSON
 )
 
 var (

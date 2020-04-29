@@ -1,14 +1,13 @@
 package storage
 
 import (
-	"log"
-
+	eg "github.com/cdutwhu/json-util/n3errs"
 	"github.com/nsip/n3-privacy/Server/storage/db"
 )
 
 // DB :
 type DB interface {
-	UpdatePolicy(policy, user, ctx, rw string) (string, string, error)
+	UpdatePolicy(policy, name, user, ctx, rw string) (string, string, error)
 	PolicyCount() int
 	PolicyID(user, ctx, rw, object string) string
 	PolicyIDs(user, ctx, rw string, objects ...string) []string
@@ -17,10 +16,10 @@ type DB interface {
 	DeletePolicy(id string) error
 
 	// Optional, for management
-	MapRWListOfPID(user, ctx string, lsRW ...string) map[string][]string
-	MapCtxListOfUser(lsCtx ...string) map[string][]string
-	MapUserListOfCtx(users ...string) map[string][]string
-	MapUCListOfObject(user, ctx string) map[string][]string
+	MapRW2lsPID(user, ctx string, lsRW ...string) map[string][]string
+	MapCtx2lsUser(lsCtx ...string) map[string][]string
+	MapUser2lsCtx(users ...string) map[string][]string
+	MapUC2lsObject(user, ctx string) map[string][]string
 }
 
 // NewDB :
@@ -28,10 +27,11 @@ func NewDB(dbType string) DB {
 	switch dbType {
 	case "badger":
 		return db.NewDBByBadger().(DB)
-	// case "map":
-	// 	return db.NewDBByMap().(DB)
+	case "map":
+		failOnErr("%v: [%s]", eg.NOT_IMPLEMENTED, dbType)
+		return nil
 	default:
-		log.Fatalf("%s is not supported", dbType)
+		failOnErr("%v: [%s]", eg.PARAM_NOT_SUPPORTED, dbType)
 		return nil
 	}
 }

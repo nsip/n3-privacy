@@ -3,6 +3,8 @@ package storage
 import (
 	"fmt"
 	"strings"
+
+	cmn "github.com/cdutwhu/json-util/common"
 )
 
 var (
@@ -23,4 +25,6 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
+
+	failOnErr = cmn.FailOnErr
 )

@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strings"
 
-	u "github.com/cdutwhu/go-util"
-	cmn "github.com/nsip/n3-privacy/common"
-	"github.com/nsip/n3-privacy/jkv"
-	pp "github.com/nsip/n3-privacy/preprocess"
+	cmn "github.com/cdutwhu/json-util/common"
+	"github.com/cdutwhu/json-util/jkv"
+	eg "github.com/cdutwhu/json-util/n3errs"
+	"github.com/cdutwhu/json-util/n3json"
 )
 
 var (
@@ -16,7 +16,6 @@ var (
 	fPf         = fmt.Printf
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
-	fEf         = fmt.Errorf
 	sSpl        = strings.Split
 	sJoin       = strings.Join
 	sCount      = strings.Count
@@ -30,7 +29,20 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
-	xin         = u.XIn
+
+	xin       = cmn.XIn
+	failOnErr = cmn.FailOnErr
+	toSet     = cmn.ToSet
+	indent    = cmn.Indent
+	encrypt   = cmn.Encrypt
+	decrypt   = cmn.Decrypt
+
+	fmtJSON      = n3json.Fmt
+	fmtJSONFile  = n3json.FmtFile
+	maybeJSONArr = n3json.MaybeArr
+	splitJSONArr = n3json.SplitArr
+	makeJSONArr  = n3json.MakeArr
+	newJKV       = jkv.NewJKV
 )
 
 var (
@@ -55,10 +67,32 @@ func ssLink(s1, s2 string) string {
 	return fSf("%s%s%s", s1, linker, s2)
 }
 
-func genPolicyID(policy, user, ctx, rw string) (string, string) {
-	genPolicyCode := func(policy string) (string, string) {
-		jkvM := jkv.NewJKV(policy, hash(policy))
+func genPolicyID(policy, name, user, ctx, rw string) (string, string) {
+
+	genPolicyCode := func(policy, name string) (string, string) {
+		autoname := false
+		if name == "" {
+			jkvTmp := newJKV(policy, "", false)
+			attris := jkvTmp.LsL12Fields[1]
+			if len(attris) == 1 {
+				name = attris[0]
+			} else {
+				sort.Slice(attris, func(i, j int) bool {
+					return attris[i][0] < attris[j][0]
+				})
+				for _, a := range attris {
+					name += string(a[0])
+				}
+			}
+			autoname = true
+		}
+		// fPln(name)
+		jkvM := newJKV(policy, name, false)
 		object := jkvM.LsL12Fields[1][0]
+		if !autoname {
+			object = name
+		}
+
 		fields := jkvM.LsL12Fields[2]
 		sort.Strings(fields)
 		oCode := hash(object)[:lenOfOID]
@@ -67,7 +101,7 @@ func genPolicyID(policy, user, ctx, rw string) (string, string) {
 	}
 	uCode := hash(user)[:lenOfUID]
 	cCode := hash(ctx)[:lenOfCTX]
-	pCode, object := genPolicyCode(policy)
+	pCode, object := genPolicyCode(policy, name)
 	return pCode + uCode + cCode + rw[:1], object
 }
 
@@ -88,10 +122,11 @@ func cCodeByPID(pid string) string {
 }
 
 func validate(policy string) (string, error) {
-	if !jkv.IsJSON(policy) {
-		return "", fEf("Not a valid JSON")
+	if !cmn.IsJSON(policy) {
+		return "", eg.JSON_INVALID
 	}
-	return pp.FmtJSONStr(policy), nil
+	// return pp.FmtJSONStr(policy), nil
+	return fmtJSON(policy, 2), nil
 }
 
 // [listID] has already been loaded

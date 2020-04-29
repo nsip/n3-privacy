@@ -18,27 +18,38 @@ var (
 // Config is toml
 type Config struct {
 	Path       string
-	ErrLog     string
+	LogFile    string
 	WebService struct {
 		Port    int
 		Version string
 		Service string
 	}
 	Route struct {
-		GetID       string
-		GetHash     string
-		Get         string
-		Update      string
-		Delete      string
-		ListID      string
-		ListUser    string
-		ListContext string
-		ListObject  string
+		ROOT      string
+		GetID     string
+		GetHash   string
+		Get       string
+		Update    string
+		Delete    string
+		LsID      string
+		LsUser    string
+		LsContext string
+		LsObject  string
 	}
 	Storage struct {
 		DataBase     string
 		MetaPath     string
 		BadgerDBPath string
+	}
+	File struct {
+		ClientLinux64 string
+		ClientMac     string
+		ClientWin64   string
+		ClientConfig  string
+		MaskLinux64   string
+		MaskMac       string
+		MaskWin64     string
+		MaskConfig    string
 	}
 }
 
