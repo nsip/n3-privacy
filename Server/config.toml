@@ -41,7 +41,7 @@ LogFile = "./error.log"
 
 [Server]
   Protocol = "http" 
-  IP = "192.168.92.143"
+  IP = "127.0.0.1"
 
 [Access]
   Timeout = 3
