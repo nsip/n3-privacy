@@ -10,13 +10,11 @@
 
 ## Getting Started
 
-1. Goto /Mask, run 'build.sh', create executable.
+1. Goto /Mask, run 'build.sh', make executable.
 
-2. Goto /Server, run 'build.sh', create executable.
-   run executable with 'config.toml' including Port setting etc. (a copy of config.toml exist in /Server)
+2. Goto /Server, run 'build.sh', make executable and meanwhile push a copy of Client config to its folder.
 
-3. Goto /Client, run 'build.sh', create executable.
-   run executable with 'config.toml' including IP setting etc. (a copy of config.toml exist in /Client)
+3. Goto /Client, run 'build.sh', make executable.
 
 4. Building Server should be prior to Building Client ! 
 
