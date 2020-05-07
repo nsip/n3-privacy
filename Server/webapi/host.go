@@ -7,6 +7,7 @@ import (
 
 	eg "github.com/cdutwhu/json-util/n3errs"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
@@ -20,6 +21,10 @@ func HostHTTPAsync() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("2G"))
 
+	// Add Jaeger Tracer into Middleware
+	c := jaegertracing.New(e, nil)
+	defer c.Close()
+
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"*"},
@@ -27,12 +32,13 @@ func HostHTTPAsync() {
 		AllowCredentials: true,
 	}))
 
-	port := glb.Cfg.WebService.Port
+	cfg := glb.Cfg
+	port := cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
-	route := glb.Cfg.Route
-	file := glb.Cfg.File
+	route := cfg.Route
+	file := cfg.File
 
-	setLog(glb.Cfg.LogFile)
+	setLog(cfg.LogFile)
 
 	initMutex()
 	initDB()
@@ -65,6 +71,8 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsContext, "Get a list of context. If no user restriction, return all context")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object"))
 	})
+
+	// -------------------------------------------------------------------------- //
 
 	mRouteRes := map[string]string{
 		"/mask-linux64":   file.MaskLinux64,
@@ -273,7 +281,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ctx)) // .MapRWListOfPID(user, ctx))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ctx))
 		}
 		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
 			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ""))
@@ -289,7 +297,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 		if ok, lsValues := urlValues(c.QueryParams(), "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapCtx2lsUser(lsValues[0]...)) //MapCtxListOfUser(lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapCtx2lsUser(lsValues[0]...))
 		}
 		return c.JSON(http.StatusOK, db.MapCtx2lsUser())
 	})
@@ -299,7 +307,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 		if ok, lsValues := urlValues(c.QueryParams(), "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUser2lsCtx(lsValues[0]...)) //MapUserListOfCtx(lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapUser2lsCtx(lsValues[0]...))
 		}
 		return c.JSON(http.StatusOK, db.MapUser2lsCtx())
 	})
@@ -309,7 +317,7 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ctx)) //.MapUCListOfObject(user, ctx))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ctx))
 		}
 		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
 			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ""))

@@ -7,7 +7,7 @@ ORIGINALPATH=`pwd`
 cd ./Mask && ./clean.sh
 cd $ORIGINALPATH
 
-cd ./Server && ./clean.sh
+cd ./Server && ./clean.sh $1
 cd $ORIGINALPATH
 
 cd ./Client && ./clean.sh

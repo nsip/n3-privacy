@@ -1,0 +1,32 @@
+Path = ""
+LogFile = "./error.log"
+
+# ************************ Server ************************ #
+# ********** Client User DO NOT Modify This Part ********* #
+
+[WebService]                              # Shared with Client #
+  Port = 1323
+  Version = "0.1.0"                       # Server internal [Route] use
+  Service = "policy-service"              # Server internal [Route] use
+
+[Route]                                   # Shared with Client #
+  ROOT = "/"
+  GetID = "/#s/#v/id"
+  GetHash = "/#s/#v/hash"
+  Get = "/#s/#v/policy"
+  Update = "/#s/#v/update"
+  Delete = "/#s/#v/delete"
+  LsID = "/#s/#v/list/policyid"
+  LsUser = "/#s/#v/list/user"
+  LsContext = "/#s/#v/list/context"
+  LsObject = "/#s/#v/list/object"
+
+# ************************ Client ************************ #
+# *********** Client User ONLY Modify This Part ********** #
+
+[Server]
+  Protocol = "http" 
+  IP = "127.0.0.1"
+
+[Access]
+  Timeout = 3
