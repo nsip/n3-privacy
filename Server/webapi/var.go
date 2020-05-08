@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	cmn "github.com/cdutwhu/json-util/common"
+	ext "github.com/cdutwhu/json-util/external"
 	glb "github.com/nsip/n3-privacy/Server/global"
 	"github.com/nsip/n3-privacy/Server/storage"
 )
@@ -18,10 +19,13 @@ var (
 
 	localIP       = cmn.LocalIP
 	isJSON        = cmn.IsJSON
+	jsonRoot      = cmn.JSONRoot
 	failOnErrWhen = cmn.FailOnErrWhen
 	warnOnErr     = cmn.WarnOnErr
 	warnOnErrWhen = cmn.WarnOnErrWhen
 	setLog        = cmn.SetLog
+
+	prepare = ext.Prepare
 )
 
 var (

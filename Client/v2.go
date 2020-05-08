@@ -46,12 +46,13 @@ func v2(cfgOK bool) {
 		rw := cmd.String("rw", "", "read/write")
 		policyPtr := cmd.String("p", "", "the path of policy which is to be uploaded")
 		fullDump := cmd.Bool("f", false, "output all attributes content from response")
+		dataPtr := cmd.String("d", "", "the path of json which is to be uploaded")
 		cmd.Parse(os.Args[2:])
 
 		mngMode := false
 
 		switch arg1 {
-		case "ROOT":
+		case "HELP":
 			resp, err = http.Get(url)
 
 		case "GetID":
@@ -85,6 +86,19 @@ func v2(cfgOK bool) {
 			req, err := http.NewRequest("DELETE", url, nil)
 			failOnErr("%v", err)
 			resp, err = (&http.Client{}).Do(req)
+
+			// One Step Enforce:
+		case "GetEnforced":
+			failOnErrWhen(*user == "", "%v: [-u] user is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*ctx == "", "%v: [-c] context is required", eg.CLI_FLAG_ERR)
+			failOnErrWhen(*rw == "", "%v: [-rw] read/write is required", eg.CLI_FLAG_ERR)
+			warnOnErrWhen(*object == "", "%v: if [-o] object is ignored, an auto-name will be assigned", eg.CLI_FLAG_ERR)
+			url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", *object, *user, *ctx, *rw)
+			failOnErrWhen(*dataPtr == "", "%v: [-d] json data is required", eg.CLI_FLAG_ERR)
+			data, err := ioutil.ReadFile(*dataPtr)
+			failOnErr("%v: %v", err, "Is [-d] json data provided correctly?")
+			failOnErrWhen(!isJSON(string(data)), "%v: data", eg.PARAM_INVALID_JSON)
+			resp, err = http.Post(url, "application/json", bytes.NewBuffer(data))
 
 			// Management Functions:
 		case "LsID", "LsContext", "LsUser", "LsObject":
@@ -122,7 +136,7 @@ func v2(cfgOK bool) {
 		}
 
 		if data != nil {
-			if os.Args[1] == "ROOT" {
+			if os.Args[1] == "HELP" {
 				fPt(string(data))
 			} else {
 				m := make(map[string]interface{})

@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
+	mask "github.com/nsip/n3-privacy/Mask/process"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
@@ -44,6 +45,7 @@ func HostHTTPAsync() {
 	initDB()
 
 	// *************************************** List all API, FILE *************************************** //
+
 	path := "/"
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
@@ -66,10 +68,13 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.Get, "Get policy's JSON file. If no policy, return empty")+
 				fSf("POST   %-55s-> %s\n", fullIP+route.Update, "Update policy. If no policy exists, add it")+
 				fSf("DELETE %-55s-> %s\n", fullIP+route.Delete, "Delete policy")+
+				fSf("\n")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsID, "Get a list of policy id. If no user or ctx restriction, return all policy id")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsUser, "Get a list of user. If no ctx restriction, return all user")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsContext, "Get a list of context. If no user restriction, return all context")+
-				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object"))
+				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object")+
+				fSf("\n")+
+				fSf("POST   %-55s-> %s\n", fullIP+route.GetEnforced, "Send json, return its enforced result. If its policy does not exist, return empty"))
 	})
 
 	// -------------------------------------------------------------------------- //
@@ -327,6 +332,74 @@ func HostHTTPAsync() {
 		}
 		return c.JSON(http.StatusOK, db.MapUC2lsObject("", ""))
 	})
+
+	// -------------------------------------------------------------------------- //
+
+	path = route.GetEnforced
+	e.POST(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+
+		name, user, ctx, rw := "", "", "", ""
+		if Ok, Name, User, Ctx, Rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); Ok {
+			name, user, ctx, rw = Name, User, Ctx, Rw
+		} else if Ok, User, Ctx, Rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); Ok {
+			user, ctx, rw = User, Ctx, Rw
+		} else {
+			return c.JSON(http.StatusBadRequest, result{
+				Data:  nil,
+				Empty: nil,
+				Error: "at least, [user], [ctx] and [rw] must be provided",
+			})
+		}
+
+		// get uploaded json and object
+		json, object := "", name
+		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil {
+			json = string(bytes)
+			if isJSON(json) {
+				if object == "" {
+					object = jsonRoot(json)
+				}
+			} else {
+				return c.JSON(http.StatusBadRequest, result{
+					Data:  nil,
+					Empty: nil,
+					Error: "POST Body Content is invalid JSON",
+				})
+			}
+		} else {
+			return c.JSON(http.StatusBadRequest, result{
+				Data:  nil,
+				Empty: nil,
+				Error: "Error occurred when reading POST Body Content",
+			})
+		}
+
+		if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
+			if policy, ok := db.Policy(pid); ok {
+
+				// ret := mask.DoMask(json, policy)
+
+				// Trace [mask.DoMask]
+				results := jaegertracing.TraceFunction(c, mask.DoMask, json, policy)
+				ret := results[0].Interface().(string)
+
+				return c.JSON(http.StatusOK, result{
+					Data:  &ret,
+					Empty: False,
+					Error: "",
+				})
+			}
+		}
+		return c.JSON(http.StatusNotFound, result{
+			Data:  EmptyStr,
+			Empty: True,
+			Error: fSf("No policies for uploaded JSON @ user-[%s] context-[%s] read/write-[%s] object-[%s]", user, ctx, rw, object),
+		})
+	})
+
+	// -------------------------------------------------------------------------- //
 
 	e.Start(fSf(":%d", port))
 }

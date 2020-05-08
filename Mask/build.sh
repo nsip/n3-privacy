@@ -24,5 +24,5 @@ mv $OUT ./build/Mac/
 cp ./config.toml ./build/Mac/
 
 GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
-mv $OUT ./build/Linux64/                # for testing
+mv $OUT ./build/Linux64/                
 cp ./config.toml ./build/Linux64/

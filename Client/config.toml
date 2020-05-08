@@ -10,7 +10,7 @@ LogFile = "./error.log"
   Service = "policy-service"              # Server internal [Route] use
 
 [Route]                                   # Shared with Client #
-  ROOT = "/"
+  HELP = "/"
   GetID = "/#s/#v/id"
   GetHash = "/#s/#v/hash"
   Get = "/#s/#v/policy"
@@ -20,6 +20,7 @@ LogFile = "./error.log"
   LsUser = "/#s/#v/list/user"
   LsContext = "/#s/#v/list/context"
   LsObject = "/#s/#v/list/object"
+  GetEnforced = "/#s/#v/enforce"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #

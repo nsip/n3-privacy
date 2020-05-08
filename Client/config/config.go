@@ -25,16 +25,17 @@ type Config struct {
 		Service string
 	}
 	Route struct {
-		ROOT      string
-		GetID     string
-		GetHash   string
-		Get       string
-		Update    string
-		Delete    string
-		LsID      string
-		LsUser    string
-		LsContext string
-		LsObject  string
+		HELP        string
+		GetID       string
+		GetHash     string
+		Get         string
+		Update      string
+		Delete      string
+		LsID        string
+		LsUser      string
+		LsContext   string
+		LsObject    string
+		GetEnforced string
 	}
 	// Client
 	Server struct {
