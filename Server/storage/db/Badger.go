@@ -20,8 +20,8 @@ func openBadgerDB(dbPath string, lsDBName ...string) (lsDB []*badger.DB) {
 	lsDB = make([]*badger.DB, len(lsDBName))
 	for i, name := range lsDBName {
 		db, err := badger.Open(badger.DefaultOptions(dbPath + name))
-		lsDB[i] = db
 		failOnErr("%v", err)
+		lsDB[i] = db
 	}
 	return
 }
