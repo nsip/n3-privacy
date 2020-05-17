@@ -10,13 +10,15 @@
 
 ## Getting Started
 
-1. Goto /Mask, run `build.sh`, make jm executable.
+1. One-Step. Run `build.sh`, automatically generate all executables.
 
-2. Goto /Server, run `build.sh`, make server executable and a copy of Client config is pushed to Client folder automatically.
+   [jm] in ./Mask/build/your-os/
+   
+   [server] in ./Server/build/your-os/
+   
+   [client] in ./Client/build/your-os/
 
-3. Goto /Client, run `build.sh`, make client executable.
-
-   IMPORTANT: Building Server must be prior to Building Client.
+   IMPORTANT: If manually build each sub-project, building Server must be prior to building Client.
 
 ## How To Use
 
@@ -32,6 +34,6 @@
 
    `wget -O config.toml IP:Port/client-config` to get its configure.
 
-3. For `/clean.sh`, if `rmdb` as first argument is provided, policy-database will be removed!
+3. For `/clean.sh`, if `rmdb` provided as first argument, policy-database would be removed !!
 
 
