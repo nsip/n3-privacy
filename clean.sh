@@ -3,7 +3,7 @@
 set -e
 ORIGINALPATH=`pwd`
 
-cd ./Mask && ./clean.sh && cd $ORIGINALPATH && echo "Mask clean" 
+cd ./Enforcer && ./clean.sh && cd $ORIGINALPATH && echo "Enforcer clean" 
 cd ./Server && ./clean.sh $1 && cd $ORIGINALPATH && echo "Server clean" 
 cd ./Client && ./clean.sh && cd $ORIGINALPATH && echo "Client clean" 
 

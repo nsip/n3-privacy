@@ -7,11 +7,11 @@ import (
 	eg "github.com/cdutwhu/json-util/n3errs"
 )
 
-// DoMask :
-func DoMask(data, mask string) (ret string) {
+// Execute :
+func Execute(data, policy string) (ret string) {
 	data = fmtJSON(data, 2)
-	mask = fmtJSON(mask, 2)
-	jkvM := newJKV(mask, "root", false)
+	policy = fmtJSON(policy, 2)
+	jkvP := newJKV(policy, "root", false)
 
 	if maybeJSONArr(data) {
 		jsonArr := splitJSONArr(data, 2)
@@ -22,10 +22,10 @@ func DoMask(data, mask string) (ret string) {
 			go func(i int, json string) {
 				defer wg.Done()
 				jkvD := newJKV(json, "root", false)
-				maskroot, _ := jkvD.Unfold(0, jkvM)
-				jkvMR := newJKV(maskroot, "", false)
-				jkvMR.Wrapped = jkvD.Wrapped
-				jsonList[i] = jkvMR.UnwrapDefault().JSON
+				all, _ := jkvD.Unfold(0, jkvP)
+				jkvEnforced := newJKV(all, "", false)
+				jkvEnforced.Wrapped = jkvD.Wrapped
+				jsonList[i] = jkvEnforced.UnwrapDefault().JSON
 			}(i, json)
 		}
 		wg.Wait()
@@ -33,26 +33,26 @@ func DoMask(data, mask string) (ret string) {
 
 	} else {
 		jkvD := newJKV(data, "root", false)
-		maskroot, _ := jkvD.Unfold(0, jkvM)
-		jkvMR := newJKV(maskroot, "", false)
-		jkvMR.Wrapped = jkvD.Wrapped
-		json := jkvMR.UnwrapDefault().JSON
+		all, _ := jkvD.Unfold(0, jkvP)
+		jkvEnforced := newJKV(all, "", false)
+		jkvEnforced.Wrapped = jkvD.Wrapped
+		json := jkvEnforced.UnwrapDefault().JSON
 		ret = json
 	}
 
 	return ret
 }
 
-// FileMask :
-func FileMask(inFilePath, maskFilePath, output string) {
+// FileExe :
+func FileExe(inFilePath, policyFilePath, output string) {
 	defer trackTime(time.Now())
 
 	data := fmtJSONFile(inFilePath, 2)
-	mask := fmtJSONFile(maskFilePath, 2)
+	policy := fmtJSONFile(policyFilePath, 2)
 	failOnErrWhen(data == "", "%v: check input file path", eg.FILE_EMPTY)
-	failOnErrWhen(mask == "", "%v: check mask file path", eg.FILE_EMPTY)
+	failOnErrWhen(policy == "", "%v: check policy file path", eg.FILE_EMPTY)
 
 	if output != "" {
-		mustWriteFile(output, []byte(DoMask(data, mask)))
+		mustWriteFile(output, []byte(Execute(data, policy)))
 	}
 }

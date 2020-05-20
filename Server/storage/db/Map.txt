@@ -2,8 +2,8 @@ package db
 
 // memMap :
 type memMap struct {
-	mIDMask map[string]string
-	mIDHash map[string]string
+	mIDPolicy map[string]string
+	mIDHash   map[string]string
 }
 
 // NewDBByMap :
@@ -17,7 +17,7 @@ func (db *memMap) loadIDList() int {
 }
 
 func (db *memMap) init() *memMap {
-	db.mIDMask = make(map[string]string)
+	db.mIDPolicy = make(map[string]string)
 	db.mIDHash = make(map[string]string)
 	// load listID from database
 	db.loadIDList()
@@ -46,7 +46,7 @@ func (db *memMap) UpdatePolicy(policy, name, user, ctx, rw string) (id string, e
 	}
 
 	id = genPolicyID(policy, user, ctx, rw)
-	db.mIDMask[id] = policy
+	db.mIDPolicy[id] = policy
 	db.mIDHash[id] = hash(policy)
 
 	if !xin(id, listID) {
@@ -65,14 +65,14 @@ func (db *memMap) PolicyHash(id string) (string, bool) {
 }
 
 func (db *memMap) Policy(id string) (string, bool) {
-	if mask, ok := db.mIDMask[id]; ok {
-		return mask, ok
+	if policy, ok := db.mIDPolicy[id]; ok {
+		return policy, ok
 	}
 	return "", false
 }
 
 func (db *memMap) DeletePolicy(id string) error {
-	delete(db.mIDMask, id)
+	delete(db.mIDPolicy, id)
 	delete(db.mIDHash, id)
 
 	// listID handle...

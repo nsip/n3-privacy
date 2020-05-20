@@ -10,7 +10,7 @@ go get
 
 GOARCH=amd64
 LDFLAGS="-s -w"
-OUT=jm
+OUT=enforcer
 
 rm -rf ./build
 mkdir -p ./build/Linux64 ./build/Win64 ./build/Mac ./build/LinuxArm

@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
-	mask "github.com/nsip/n3-privacy/Mask/process"
+	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
@@ -53,10 +53,10 @@ func HostHTTPAsync() {
 
 		return c.String(
 			http.StatusOK,
-			fSf("wget %-55s-> %s\n", fullIP+"/mask-linux64", "Get Mask(Linux64)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/mask-mac", "Get Mask(Mac)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/mask-win64", "Get Mask(Windows64)")+
-				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/mask-config", "Get Mask config")+
+			fSf("wget %-55s-> %s\n", fullIP+"/enforcer-linux64", "Get Enforcer(Linux64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-mac", "Get Enforcer(Mac)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-win64", "Get Enforcer(Windows64)")+
+				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/enforcer-config", "Get Enforcer config")+
 				fSf("\n")+
 				fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
 				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
@@ -80,14 +80,14 @@ func HostHTTPAsync() {
 	// -------------------------------------------------------------------------- //
 
 	mRouteRes := map[string]string{
-		"/mask-linux64":   file.MaskLinux64,
-		"/mask-mac":       file.MaskMac,
-		"/mask-win64":     file.MaskWin64,
-		"/mask-config":    file.MaskConfig,
-		"/client-linux64": file.ClientLinux64,
-		"/client-mac":     file.ClientMac,
-		"/client-win64":   file.ClientWin64,
-		"/client-config":  file.ClientConfig,
+		"/enforcer-linux64": file.EnforcerLinux64,
+		"/enforcer-mac":     file.EnforcerMac,
+		"/enforcer-win64":   file.EnforcerWin64,
+		"/enforcer-config":  file.EnforcerConfig,
+		"/client-linux64":   file.ClientLinux64,
+		"/client-mac":       file.ClientMac,
+		"/client-win64":     file.ClientWin64,
+		"/client-config":    file.ClientConfig,
 	}
 
 	routeFun := func(rt, res string) func(c echo.Context) error {
@@ -379,10 +379,10 @@ func HostHTTPAsync() {
 		if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
 			if policy, ok := db.Policy(pid); ok {
 
-				// ret := mask.DoMask(json, policy)
+				// ret := enf.Execute(json, policy)
 
-				// Trace [mask.DoMask]
-				results := jaegertracing.TraceFunction(c, mask.DoMask, json, policy)
+				// Trace [enf.Execute]
+				results := jaegertracing.TraceFunction(c, enf.Execute, json, policy)
 				ret := results[0].Interface().(string)
 
 				return c.JSON(http.StatusOK, result{

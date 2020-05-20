@@ -32,10 +32,10 @@ LogFile = "./error.log"
   ClientMac = "../../../Client/build/Mac/client"
   ClientWin64 = "../../../Client/build/Win64/client.exe"
   ClientConfig = "../../../Client/build/Linux64/config.toml"
-  MaskLinux64 = "../../../Mask/build/Linux64/jm"
-  MaskMac = "../../../Mask/build/Mac/jm"
-  MaskWin64 = "../../../Mask/build/Win64/jm.exe"
-  MaskConfig = "../../../Mask/build/Linux64/config.toml"
+  EnforcerLinux64 = "../../../Enforcer/build/Linux64/enforcer"
+  EnforcerMac = "../../../Enforcer/build/Mac/enforcer"
+  EnforcerWin64 = "../../../Enforcer/build/Win64/enforcer.exe"
+  EnforcerConfig = "../../../Enforcer/build/Linux64/config.toml"
 
 # ************************ Client ************************ #
 # *********** Client User ONLY Modify This Part ********** #

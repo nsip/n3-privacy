@@ -1,0 +1,2 @@
+Path = "/home/qing/go/src/github.com/nsip/n3-privacy/Enforcer/config.toml"
+LogFile = "./error.log"

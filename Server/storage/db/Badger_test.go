@@ -10,7 +10,7 @@ import (
 func TestUpdatePolicy(t *testing.T) {
 	glb.Init()
 	db := NewDBByBadger().(*badgerDB)
-	p, e := ioutil.ReadFile("../../../Mask/samples/xapiMask1.json")
+	p, e := ioutil.ReadFile("../../../Enforcer/samples/xapiPolicy1.json")
 	failOnErr("%v", e)
 	id, obj, e := db.UpdatePolicy(string(p), "", "user", "ctx", "r")
 	fPln(id, obj, e)

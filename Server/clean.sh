@@ -10,5 +10,7 @@ if [ $# -gt 0 ]; then
     rm -rf /var/tmp/n3-privacy/meta/
     rm -rf /var/tmp/n3-privacy/badger/
     echo "database is deleted"
+  else
+    echo "[$1] is invalid argument, ignored"
   fi
 fi
