@@ -1,30 +1,18 @@
 package config
 
 import (
-	"fmt"
 	"os"
-	"reflect"
-	"strings"
+	"path/filepath"
+	"time"
 
 	"github.com/burntsushi/toml"
 )
 
-var (
-	fSf         = fmt.Sprintf
-	fPln        = fmt.Println
-	sReplaceAll = strings.ReplaceAll
-)
-
 // Config is toml
 type Config struct {
-	Path       string
-	LogFile    string
-	WebService struct {
-		Port    int
-		Version string
-		Service string
-	}
-	Route struct {
+	Path    string
+	LogFile string
+	Route   struct {
 		HELP        string
 		GetID       string
 		GetHash     string
@@ -41,6 +29,7 @@ type Config struct {
 	Server struct {
 		Protocol string
 		IP       string
+		Port     int
 	}
 	Access struct {
 		Timeout int64
@@ -51,8 +40,7 @@ type Config struct {
 func NewCfg(configs ...string) *Config {
 	for _, f := range configs {
 		if _, e := os.Stat(f); e == nil {
-			cfg := &Config{Path: f}
-			return cfg.set()
+			return (&Config{Path: f}).set()
 		}
 	}
 	return nil
@@ -60,24 +48,29 @@ func NewCfg(configs ...string) *Config {
 
 // set is
 func (cfg *Config) set() *Config {
-	path := cfg.Path /* make a copy of original path for restoring */
-	toml.DecodeFile(cfg.Path, cfg)
-	cfg.Path = path
-	ver := fSf("%s", cfg.WebService.Version)
-	svr := fSf("%s", cfg.WebService.Service)
-	return cfg.modCfg(map[string]string{"#v": ver, "#s": svr}) // *** replace version & service-name *** //
+	f := cfg.Path /* make a copy of original for restoring */
+	if _, e := toml.DecodeFile(f, cfg); e == nil {
+		// modify some to save
+		cfg.Path = f
+		if abs, e := filepath.Abs(f); e == nil {
+			cfg.Path = abs
+		}
+
+		// save
+		cfg.save()
+
+		ICfg, e := cfgRepl(cfg, map[string]interface{}{
+			"[DATE]": time.Now().Format("2006-01-02"),
+		})
+		failOnErr("%v", e)
+		return ICfg.(*Config)
+	}
+	return nil
 }
 
-func (cfg *Config) modCfg(mRepl map[string]string) *Config {
-	if mRepl == nil || len(mRepl) == 0 {
-		return cfg
+func (cfg *Config) save() {
+	if f, e := os.OpenFile(cfg.Path, os.O_WRONLY|os.O_TRUNC, os.ModePerm); e == nil {
+		defer f.Close()
+		toml.NewEncoder(f).Encode(cfg)
 	}
-	nField := reflect.ValueOf(cfg.Route).NumField()
-	for i := 0; i < nField; i++ {
-		for key, value := range mRepl {
-			replaced := sReplaceAll(reflect.ValueOf(cfg.Route).Field(i).Interface().(string), key, value)
-			reflect.ValueOf(&cfg.Route).Elem().Field(i).SetString(replaced)
-		}
-	}
-	return cfg
 }

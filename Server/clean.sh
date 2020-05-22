@@ -4,6 +4,7 @@ rm -f *.log
 rm -rf ./build
 rm -rf ./data
 rm -rf ./storage/data
+rm -f ./config/*.toml
 
 if [ $# -gt 0 ]; then
   if [ $1 = "rmdb" ]; then

@@ -1,33 +1,23 @@
-Path = ""
-LogFile = "./error.log"
+Path = "/home/qmiao/go/src/github.com/nsip/n3-privacy/Client/config.toml"
+LogFile = "./2020-05-23.log"
 
-# ************************ Server ************************ #
-# ********** Client User DO NOT Modify This Part ********* #
-
-[WebService]                              # Shared with Client #
-  Port = 1323
-  Version = "0.1.0"                       # Server internal [Route] use
-  Service = "policy-service"              # Server internal [Route] use
-
-[Route]                                   # Shared with Client #
+[Route]
   HELP = "/"
-  GetID = "/#s/#v/id"
-  GetHash = "/#s/#v/hash"
-  Get = "/#s/#v/policy"
-  Update = "/#s/#v/update"
-  Delete = "/#s/#v/delete"
-  LsID = "/#s/#v/list/policyid"
-  LsUser = "/#s/#v/list/user"
-  LsContext = "/#s/#v/list/context"
-  LsObject = "/#s/#v/list/object"
-  GetEnforced = "/#s/#v/enforce"
-
-# ************************ Client ************************ #
-# *********** Client User ONLY Modify This Part ********** #
+  GetID = "/policy-service/0.1.0/id"
+  GetHash = "/policy-service/0.1.0/hash"
+  Get = "/policy-service/0.1.0/policy"
+  Update = "/policy-service/0.1.0/update"
+  Delete = "/policy-service/0.1.0/delete"
+  LsID = "/policy-service/0.1.0/list/policyid"
+  LsUser = "/policy-service/0.1.0/list/user"
+  LsContext = "/policy-service/0.1.0/list/context"
+  LsObject = "/policy-service/0.1.0/list/object"
+  GetEnforced = "/policy-service/0.1.0/enforce"
 
 [Server]
-  Protocol = "http" 
-  IP = "127.0.0.1"
+  Protocol = "http"
+  IP = "192.168.31.233"
+  Port = 1323
 
 [Access]
   Timeout = 3

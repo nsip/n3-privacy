@@ -1,31 +1,31 @@
 Path = ""
-LogFile = "./error.log"
+LogFile = "./[DATE].log"
 
 # ************************ Server ************************ #
-# ********** Client User DO NOT Modify This Part ********* #
+# ********** Client DO NOT Modify This Part ********* #
 
 [Storage]
   DataBase = "badger" # "map" / "badger" / ...
   MetaPath = "/var/tmp/n3-privacy/meta/"
   BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
 
-[WebService]                              # Shared with Client #
-  Port = 1323
-  Version = "0.1.0"                       # Server internal [Route] use
-  Service = "policy-service"              # Server internal [Route] use
+[WebService]                              
+  Port = 1323                             # Shared with Client - [Server] - Port #
+  Service = "policy-service"              # Server [Route] use
+  Version = "0.1.0"                       # Server [Route] use
 
 [Route]                                   # Shared with Client #
   HELP = "/"
-  GetID = "/#s/#v/id"
-  GetHash = "/#s/#v/hash"
-  Get = "/#s/#v/policy"
-  Update = "/#s/#v/update"
-  Delete = "/#s/#v/delete"
-  LsID = "/#s/#v/list/policyid"
-  LsUser = "/#s/#v/list/user"
-  LsContext = "/#s/#v/list/context"
-  LsObject = "/#s/#v/list/object"
-  GetEnforced = "/#s/#v/enforce"
+  GetID = "/[s]/[v]/id"
+  GetHash = "/[s]/[v]/hash"
+  Get = "/[s]/[v]/policy"
+  Update = "/[s]/[v]/update"
+  Delete = "/[s]/[v]/delete"
+  LsID = "/[s]/[v]/list/policyid"
+  LsUser = "/[s]/[v]/list/user"
+  LsContext = "/[s]/[v]/list/context"
+  LsObject = "/[s]/[v]/list/object"
+  GetEnforced = "/[s]/[v]/enforce"
 
 [File]
   ClientLinux64 = "../../../Client/build/Linux64/client"
@@ -38,11 +38,12 @@ LogFile = "./error.log"
   EnforcerConfig = "../../../Enforcer/build/Linux64/config.toml"
 
 # ************************ Client ************************ #
-# *********** Client User ONLY Modify This Part ********** #
+# *********** Client ONLY Modify This Part ********** #
 
 [Server]
   Protocol = "http" 
-  IP = "127.0.0.1"
+  IP = "[IP]"
+  Port = "[PORT]"
 
 [Access]
   Timeout = 3

@@ -39,3 +39,4 @@ cp config.toml $OUTPATH
 # go test -timeout 5s github.com/nsip/n3-privacy/Server -run TestCreateClientCfg
 go test -timeout 5s -run TestCreateClientCfg
 mv ./config_client.toml ../Client/config.toml
+rm ./config-client.toml

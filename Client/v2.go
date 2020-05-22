@@ -18,7 +18,7 @@ func v2(cfgOK bool) {
 	failOnErrWhen(!cfgOK, "%v", eg.CFG_INIT_ERR)
 
 	cfg := glb.Cfg
-	protocol, ip, port, timeout, logfile := cfg.Server.Protocol, cfg.Server.IP, cfg.WebService.Port, cfg.Access.Timeout, cfg.LogFile
+	protocol, ip, port, timeout, logfile := cfg.Server.Protocol, cfg.Server.IP, cfg.Server.Port, cfg.Access.Timeout, cfg.LogFile
 
 	setLog(logfile)
 

@@ -39,14 +39,14 @@ func HostHTTPAsync() {
 	route := cfg.Route
 	file := cfg.File
 
-	setLog(cfg.LogFile)
-
 	initMutex()
 	initDB()
 
+	defer e.Start(fSf(":%d", port))
+
 	// *************************************** List all API, FILE *************************************** //
 
-	path := "/"
+	path := route.HELP
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
@@ -399,7 +399,4 @@ func HostHTTPAsync() {
 		})
 	})
 
-	// -------------------------------------------------------------------------- //
-
-	e.Start(fSf(":%d", port))
 }

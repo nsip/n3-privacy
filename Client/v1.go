@@ -64,7 +64,7 @@ No "error" or "empty" fields.
 		ip = glb.Cfg.Server.IP
 	}
 	if port = *portPtr; port == 0 {
-		port = glb.Cfg.WebService.Port
+		port = glb.Cfg.Server.Port
 	}
 
 	failOnErrWhen(!initMapFnURL(protocol, ip, port), "%v: MapFnURL", eg.INTERNAL_INIT_ERR)
