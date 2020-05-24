@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"sync"
 
-	cmn "github.com/cdutwhu/json-util/common"
-	ext "github.com/cdutwhu/json-util/external"
+	cmn "github.com/cdutwhu/n3-util/common"
+	ext "github.com/cdutwhu/n3-util/external"
 	glb "github.com/nsip/n3-privacy/Server/global"
 	"github.com/nsip/n3-privacy/Server/storage"
 )

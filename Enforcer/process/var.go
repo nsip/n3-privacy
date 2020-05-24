@@ -3,9 +3,9 @@ package process
 import (
 	"fmt"
 
-	cmn "github.com/cdutwhu/json-util/common"
-	jkv "github.com/cdutwhu/json-util/jkv"
-	n3json "github.com/cdutwhu/json-util/n3json"
+	cmn "github.com/cdutwhu/n3-util/common"
+	jkv "github.com/cdutwhu/n3-util/jkv"
+	n3json "github.com/cdutwhu/n3-util/n3json"
 )
 
 var (

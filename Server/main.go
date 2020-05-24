@@ -1,7 +1,7 @@
 package main
 
 import (
-	eg "github.com/cdutwhu/json-util/n3errs"
+	eg "github.com/cdutwhu/n3-util/n3errs"
 	g "github.com/nsip/n3-privacy/Server/global"
 	api "github.com/nsip/n3-privacy/Server/webapi"
 )

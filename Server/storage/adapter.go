@@ -1,7 +1,7 @@
 package storage
 
 import (
-	eg "github.com/cdutwhu/json-util/n3errs"
+	eg "github.com/cdutwhu/n3-util/n3errs"
 	"github.com/nsip/n3-privacy/Server/storage/db"
 )
 

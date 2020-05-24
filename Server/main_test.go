@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	toml "github.com/cdutwhu/json-util/n3toml"
+	toml "github.com/cdutwhu/n3-util/n3toml"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 )
 

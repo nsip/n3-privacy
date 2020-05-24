@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strings"
 
-	cmn "github.com/cdutwhu/json-util/common"
-	"github.com/cdutwhu/json-util/jkv"
-	eg "github.com/cdutwhu/json-util/n3errs"
-	"github.com/cdutwhu/json-util/n3json"
+	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/n3-util/jkv"
+	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3json"
 )
 
 var (

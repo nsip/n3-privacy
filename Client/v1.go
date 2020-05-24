@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	eg "github.com/cdutwhu/json-util/n3errs"
+	eg "github.com/cdutwhu/n3-util/n3errs"
 	glb "github.com/nsip/n3-privacy/Client/global"
 )
 

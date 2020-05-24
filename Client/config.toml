@@ -1,5 +1,5 @@
-Path = "/home/qmiao/go/src/github.com/nsip/n3-privacy/Client/config.toml"
-LogFile = "./2020-05-23.log"
+Path = "/home/qmiao/go/src/github.com/nsip/n3-privacy/Server/config-client.toml"
+LogFile = "./2020-05-25.log"
 
 [Route]
   HELP = "/"
@@ -16,7 +16,7 @@ LogFile = "./2020-05-23.log"
 
 [Server]
   Protocol = "http"
-  IP = "192.168.31.233"
+  IP = "192.168.31.168"
   Port = 1323
 
 [Access]

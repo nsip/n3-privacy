@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	cmn "github.com/cdutwhu/json-util/common"
+	cmn "github.com/cdutwhu/n3-util/common"
 )
 
 var (
