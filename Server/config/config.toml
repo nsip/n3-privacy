@@ -1,5 +1,6 @@
 Path = ""
 LogFile = "./[DATE].log"
+ServiceName = "N3-PRIVACY"
 
 # ************************ Server ************************ #
 # ********** Client DO NOT Modify This Part ********* #

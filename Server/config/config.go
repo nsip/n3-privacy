@@ -11,8 +11,9 @@ import (
 
 // Config is toml
 type Config struct {
-	Path    string
-	LogFile string
+	Path        string
+	LogFile     string
+	ServiceName string
 
 	Storage struct {
 		DataBase     string

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 rm -f *.log
-rm -rf ./build
-rm -rf ./data
+rm -rf ./build ./Client ./data
 rm -rf ./storage/data
-rm -f ./config/*.toml
+rm -f ./config/copy.toml
+rm -f *.toml
 
 if [ $# -gt 0 ]; then
   if [ $1 = "rmdb" ]; then

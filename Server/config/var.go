@@ -15,8 +15,10 @@ var (
 	sHasSuffix  = strings.HasSuffix
 	sIndex      = strings.Index
 	sContains   = strings.Contains
+	sSplit      = strings.Split
 
-	failOnErr = cmn.FailOnErr
-	localIP   = cmn.LocalIP
-	cfgRepl   = cmn.CfgRepl
+	failOnErr     = cmn.FailOnErr
+	failOnErrWhen = cmn.FailOnErrWhen
+	localIP       = cmn.LocalIP
+	cfgRepl       = cmn.CfgRepl
 )

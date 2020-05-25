@@ -18,25 +18,22 @@ OUT=server
 OUTPATH=./build/Win64/
 GOOS="windows" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT.exe
 mv $OUT.exe $OUTPATH
-cp config.toml $OUTPATH
+cp ./config/config.toml $OUTPATH
 
 OUTPATH=./build/Mac/
 GOOS="darwin" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH
-cp config.toml $OUTPATH
+cp ./config/config.toml $OUTPATH
 
 OUTPATH=./build/Linux64/
 GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH              # for testing
-cp config.toml $OUTPATH
+cp ./config/config.toml $OUTPATH
 
 GOARCH=arm
 OUTPATH=./build/LinuxArm/
 GOOS="linux" GOARCH="$GOARCH" GOARM=7 go build -ldflags="$LDFLAGS" -o $OUT
 mv $OUT $OUTPATH
-cp config.toml $OUTPATH
+cp ./config/config.toml $OUTPATH
 
-# go test -timeout 5s github.com/nsip/n3-privacy/Server -run TestCreateClientCfg
-go test -timeout 5s -run TestCreateClientCfg
-mv ./config_client.toml ../Client/config.toml
-rm ./config-client.toml
+go test -v -count 1 -timeout 5s github.com/nsip/n3-privacy/Server/config -run TestGenClientCfg -args "WebService" "Storage" "File"
