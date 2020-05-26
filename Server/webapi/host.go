@@ -11,11 +11,13 @@ import (
 	"github.com/labstack/echo/middleware"
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	glb "github.com/nsip/n3-privacy/Server/global"
+	"github.com/nsip/n3-privacy/Server/storage"
 )
 
 // HostHTTPAsync : Host a HTTP Server for providing policy json
 func HostHTTPAsync() {
 	e := echo.New()
+	defer e.Close()
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -38,9 +40,10 @@ func HostHTTPAsync() {
 	fullIP := localIP() + fSf(":%d", port)
 	route := cfg.Route
 	file := cfg.File
+	database := cfg.Storage.DataBase
 
-	initMutex()
-	initDB()
+	db := storage.NewDB(database)
+	mMtx := initMutex()
 
 	defer e.Start(fSf(":%d", port))
 

@@ -19,6 +19,8 @@ func main() {
 	fPln(logWhen(true, "Working on Database: [%s]", cfg.Storage.DataBase))
 
 	os.Setenv("JAEGER_SERVICE_NAME", servicename)
+	os.Setenv("JAEGER_SAMPLER_TYPE", "const")
+	os.Setenv("JAEGER_SAMPLER_PARAM", "1")
 
 	done := make(chan string)
 	go api.HostHTTPAsync()

@@ -33,7 +33,7 @@ func TestGenClientCfg(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
-	fPln(flag.Args(), "to be removed")
+	fPln(flag.Args(), "will be removed")
 	toml.RmFileAttrL1(temp, "../../Client/config/config.toml", flag.Args()...)
 	os.Remove(temp)
 }
