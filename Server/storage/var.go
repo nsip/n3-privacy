@@ -26,5 +26,6 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	failOnErr = cmn.FailOnErr
+	failOnErr     = cmn.FailOnErr
+	failOnErrWhen = cmn.FailOnErrWhen
 )

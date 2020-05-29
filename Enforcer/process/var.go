@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	fPf = fmt.Printf
+	fPf  = fmt.Printf
+	fPln = fmt.Println
 
 	failOnErrWhen = cmn.FailOnErrWhen
 	trackTime     = cmn.TrackTime

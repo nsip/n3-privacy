@@ -11,7 +11,7 @@ import (
 func Execute(data, policy string) (ret string) {
 	data = fmtJSON(data, 2)
 	policy = fmtJSON(policy, 2)
-	jkvP := newJKV(policy, "root", false)
+	jkvP := newJKV(policy, "", false)
 
 	if maybeJSONArr(data) {
 		jsonArr := splitJSONArr(data, 2)
@@ -21,7 +21,7 @@ func Execute(data, policy string) (ret string) {
 		for i, json := range jsonArr {
 			go func(i int, json string) {
 				defer wg.Done()
-				jkvD := newJKV(json, "root", false)
+				jkvD := newJKV(json, "root", true)
 				all, _ := jkvD.Unfold(0, jkvP)
 				jkvEnforced := newJKV(all, "", false)
 				jkvEnforced.Wrapped = jkvD.Wrapped
@@ -32,7 +32,7 @@ func Execute(data, policy string) (ret string) {
 		ret = makeJSONArr(jsonList...)
 
 	} else {
-		jkvD := newJKV(data, "root", false)
+		jkvD := newJKV(data, "root", true)
 		all, _ := jkvD.Unfold(0, jkvP)
 		jkvEnforced := newJKV(all, "", false)
 		jkvEnforced.Wrapped = jkvD.Wrapped
@@ -52,7 +52,10 @@ func FileExe(inFilePath, policyFilePath, output string) {
 	failOnErrWhen(data == "", "%v: check input file path", eg.FILE_EMPTY)
 	failOnErrWhen(policy == "", "%v: check policy file path", eg.FILE_EMPTY)
 
+	ret := Execute(data, policy)
 	if output != "" {
-		mustWriteFile(output, []byte(Execute(data, policy)))
+		mustWriteFile(output, []byte(ret))
+	} else {
+		fPln(ret)
 	}
 }

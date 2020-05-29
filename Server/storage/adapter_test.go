@@ -4,19 +4,22 @@ import (
 	"fmt"
 	"testing"
 
-	glb "github.com/nsip/n3-privacy/Server/global"
+	eg "github.com/cdutwhu/n3-util/n3errs"
+	cfg "github.com/nsip/n3-privacy/Server/config"
 )
 
+const config = "../config/config.toml"
+
 func TestAdapter(t *testing.T) {
-	glb.Init()
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDB("badger")
 	fmt.Println(db)
-	db = NewDB("map")
-	fmt.Println(db)
+	// db = NewDB("map")
+	// fmt.Println(db)
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	glb.Init()
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDB("badger")
 
 	// user := "qmiao"

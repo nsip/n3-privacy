@@ -21,4 +21,5 @@ var (
 	failOnErrWhen = cmn.FailOnErrWhen
 	localIP       = cmn.LocalIP
 	cfgRepl       = cmn.CfgRepl
+	struct2Env    = cmn.Struct2Env
 )

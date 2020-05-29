@@ -10,7 +10,7 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	cfg := NewCfg("./config.toml")
+	cfg := newCfg("./config.toml")
 	fPln(cfg.Path)
 	fPln(cfg.LogFile)
 	fPln(cfg.ServiceName)
@@ -23,10 +23,11 @@ func TestLoad(t *testing.T) {
 	cfg.SaveAs("./copy")
 }
 
+// ****************************** //
 // Create a copy of config for Client. Excluding some attributes.
 // Once building, move it to Client config Directory.
 func TestGenClientCfg(t *testing.T) {
-	cfg := NewCfg("./config.toml")
+	cfg := newCfg("./config.toml")
 	failOnErrWhen(cfg == nil, "%v", eg.CFG_INIT_ERR)
 	temp := "./temp.toml"
 	cfg.SaveAs(temp)
@@ -34,6 +35,6 @@ func TestGenClientCfg(t *testing.T) {
 		flag.Parse()
 	}
 	fPln(flag.Args(), "will be removed")
-	toml.RmFileAttrL1(temp, "../../Client/config/config.toml", flag.Args()...)
+	toml.RmFileAttrL1(temp, "../go-client/config.toml", flag.Args()...)
 	os.Remove(temp)
 }

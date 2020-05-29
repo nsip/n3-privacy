@@ -28,17 +28,17 @@ type Config struct {
 	}
 
 	Route struct {
-		HELP        string
-		GetID       string
-		GetHash     string
-		Get         string
-		Update      string
-		Delete      string
-		LsID        string
-		LsUser      string
-		LsContext   string
-		LsObject    string
-		GetEnforced string
+		HELP      string
+		GetID     string
+		GetHash   string
+		Get       string
+		Update    string
+		Delete    string
+		LsID      string
+		LsUser    string
+		LsContext string
+		LsObject  string
+		Enforce   string
 	}
 
 	File struct {
@@ -63,8 +63,8 @@ type Config struct {
 	}
 }
 
-// NewCfg :
-func NewCfg(configs ...string) *Config {
+// newCfg :
+func newCfg(configs ...string) *Config {
 	for _, f := range configs {
 		if _, e := os.Stat(f); e == nil {
 			return (&Config{Path: f}).set()
@@ -113,5 +113,16 @@ func (cfg *Config) SaveAs(filename string) {
 		filename += ".toml"
 	}
 	failOnErr("%v", ioutil.WriteFile(filename, bytes, 0666))
-	NewCfg(filename).save()
+	newCfg(filename).save()
+}
+
+// InitEnvVarFromTOML : initialize the global variables
+func InitEnvVarFromTOML(key string, configs ...string) bool {
+	configs = append(configs, "./config.toml")
+	Cfg := newCfg(configs...)
+	if Cfg == nil {
+		return false
+	}
+	struct2Env(key, Cfg)
+	return true
 }

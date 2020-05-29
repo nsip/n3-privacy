@@ -4,7 +4,7 @@ import (
 	"os"
 
 	badger "github.com/dgraph-io/badger"
-	glb "github.com/nsip/n3-privacy/Server/global"
+	cfg "github.com/nsip/n3-privacy/Server/config"
 )
 
 type badgerDB struct {
@@ -152,7 +152,8 @@ func (db *badgerDB) loadIDList() int {
 
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
-	path := glb.Cfg.Storage.BadgerDBPath
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	path := Cfg.Storage.BadgerDBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
@@ -189,7 +190,7 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, ctx, rw string) (id, obj st
 		return "", "", err
 	}
 	id, obj = genPolicyID(policy, name, user, ctx, rw)
-	encPolicy := string(encrypt([]byte(policy), glb.EncPwd))
+	encPolicy := string(encrypt([]byte(policy), encPwd))
 	err = updateBadgerDB(
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
 		[]string{id, id, hash(user)[:lenOfUID], hash(ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
@@ -222,7 +223,7 @@ func (db *badgerDB) PolicyHash(id string) (string, bool) {
 
 func (db *badgerDB) Policy(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
-		if policy, err := decrypt([]byte(values[0]), glb.EncPwd); err == nil {
+		if policy, err := decrypt([]byte(values[0]), encPwd); err == nil {
 			return string(policy), true
 		}
 	}

@@ -13,4 +13,5 @@ var (
 	localIP       = cmn.LocalIP
 	setLog        = cmn.SetLog
 	logWhen       = cmn.LogWhen
+	env2Struct    = cmn.Env2Struct
 )

@@ -1,7 +1,10 @@
 package process
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFileExe(t *testing.T) {
-	FileExe("../samples/xapi.json", "../samples/xapiPolicy.json", "./out.json")
+	save := ""
+	FileExe("../samples/xapi1.json", "../samples/xapiPolicyP.json", save)
 }

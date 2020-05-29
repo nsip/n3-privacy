@@ -30,12 +30,14 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	xin       = cmn.XIn
-	failOnErr = cmn.FailOnErr
-	toSet     = cmn.ToSet
-	indent    = cmn.Indent
-	encrypt   = cmn.Encrypt
-	decrypt   = cmn.Decrypt
+	xin           = cmn.XIn
+	failOnErr     = cmn.FailOnErr
+	toSet         = cmn.ToSet
+	indent        = cmn.Indent
+	encrypt       = cmn.Encrypt
+	decrypt       = cmn.Decrypt
+	env2Struct    = cmn.Env2Struct
+	failOnErrWhen = cmn.FailOnErrWhen
 
 	fmtJSON      = n3json.Fmt
 	fmtJSONFile  = n3json.FmtFile
@@ -54,6 +56,8 @@ var (
 	lenOfCTX  = lenOfHash / 4 // length of Context-Hash-ID Occupied
 	listID    = []string{}    // Policy ID List in running time
 )
+
+const encPwd = "password"
 
 const (
 	linker = "#"

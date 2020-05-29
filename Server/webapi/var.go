@@ -6,7 +6,6 @@ import (
 
 	cmn "github.com/cdutwhu/n3-util/common"
 	ext "github.com/cdutwhu/n3-util/external"
-	glb "github.com/nsip/n3-privacy/Server/global"
 )
 
 var (
@@ -27,13 +26,14 @@ var (
 	url4Values    = cmn.URL4Values
 	urlValues     = cmn.URLValues
 	mapFromStruct = cmn.MapFromStruct
+	env2Struct    = cmn.Env2Struct
 
 	prepare = ext.Prepare
 )
 
-func initMutex() map[string]*sync.Mutex {
+func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	for _, v := range mapFromStruct(glb.Cfg.Route) {
+	for _, v := range mapFromStruct(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

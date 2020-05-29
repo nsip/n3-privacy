@@ -1,5 +1,5 @@
 Path = ""
-LogFile = "./[DATE].log"
+LogFile = "./N3-PRIVACY-[DATE].log"
 ServiceName = "N3-PRIVACY"
 
 # ************************ Server ************************ #
@@ -26,7 +26,7 @@ ServiceName = "N3-PRIVACY"
   LsUser = "/[s]/[v]/list/user"
   LsContext = "/[s]/[v]/list/context"
   LsObject = "/[s]/[v]/list/object"
-  GetEnforced = "/[s]/[v]/enforce"
+  Enforce = "/[s]/[v]/enforce"
 
 [File]
   ClientLinux64 = "../../../Client/build/Linux64/client"

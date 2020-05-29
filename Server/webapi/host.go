@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
-	glb "github.com/nsip/n3-privacy/Server/global"
+	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/nsip/n3-privacy/Server/storage"
 )
 
@@ -35,15 +35,14 @@ func HostHTTPAsync() {
 		AllowCredentials: true,
 	}))
 
-	cfg := glb.Cfg
-	port := cfg.WebService.Port
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
-	route := cfg.Route
-	file := cfg.File
-	database := cfg.Storage.DataBase
-
+	route := Cfg.Route
+	file := Cfg.File
+	database := Cfg.Storage.DataBase
 	db := storage.NewDB(database)
-	mMtx := initMutex()
+	mMtx := initMutex(route)
 
 	defer e.Start(fSf(":%d", port))
 
@@ -77,7 +76,7 @@ func HostHTTPAsync() {
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsContext, "Get a list of context. If no user restriction, return all context")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.LsObject, "Get a list of object. If no user or ctx restriction, return all object")+
 				fSf("\n")+
-				fSf("POST   %-55s-> %s\n", fullIP+route.GetEnforced, "Send json, return its enforced result. If its policy does not exist, return empty"))
+				fSf("POST   %-55s-> %s\n", fullIP+route.Enforce, "Send json, return its enforced result. If its policy does not exist, return empty"))
 	})
 
 	// -------------------------------------------------------------------------- //
@@ -230,11 +229,11 @@ func HostHTTPAsync() {
 		}
 
 		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && isJSON(string(bytes)) {
-			if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
+			if _, obj, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
 				fPln(db.PolicyCount(), ": exist in db")
 				// return c.String(http.StatusOK, id+" - "+obj)
 				return c.JSON(http.StatusOK, result{
-					Data:  &id,
+					Data:  &obj,
 					Empty: nil,
 					Error: "",
 				})
@@ -338,7 +337,7 @@ func HostHTTPAsync() {
 
 	// -------------------------------------------------------------------------- //
 
-	path = route.GetEnforced
+	path = route.Enforce
 	e.POST(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
