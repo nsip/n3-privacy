@@ -16,6 +16,7 @@ var (
 	sJoin       = strings.Join
 	sReplaceAll = strings.ReplaceAll
 
+	xin           = cmn.XIn
 	setLog        = cmn.SetLog
 	resetLog      = cmn.ResetLog
 	failOnErr     = cmn.FailOnErr
@@ -25,15 +26,6 @@ var (
 	isJSON        = cmn.IsJSON
 	cfgRepl       = cmn.CfgRepl
 	struct2Env    = cmn.Struct2Env
+	struct2Map    = cmn.Struct2Map
+	structFields  = cmn.StructFields
 )
-
-// Args is arguments for "Route"
-type Args struct {
-	ID     string
-	User   string
-	Ctx    string
-	Object string
-	RW     string
-	Policy []byte
-	Data   []byte
-}

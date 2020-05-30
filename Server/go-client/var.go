@@ -24,7 +24,7 @@ var (
 	warnOnErrWhen = cmn.WarnOnErrWhen
 	isJSON        = cmn.IsJSON
 	struct2Env    = cmn.Struct2Env
-	mapFromStruct = cmn.MapFromStruct
+	struct2Map    = cmn.Struct2Map
 	mapKeys       = cmn.MapKeys
 )
 
@@ -41,7 +41,7 @@ type Args struct {
 
 func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]string, []string) {
 	mFnURL := make(map[string]string)
-	for k, v := range mapFromStruct(route) {
+	for k, v := range struct2Map(route) {
 		mFnURL[k] = fSf("%s://%s:%d%s", protocol, ip, port, v)
 	}
 	return mFnURL, mapKeys(mFnURL).([]string)

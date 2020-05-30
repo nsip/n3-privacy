@@ -1,17 +1,24 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"os"
 
+	eg "github.com/cdutwhu/n3-util/n3errs"
 	clt "github.com/nsip/n3-privacy/Server/go-client"
 )
 
 func main() {
+	fns := structFields(clt.Config{}.Route)
+	failOnErrWhen(len(os.Args) < 2, "%v: need %v", eg.PARAM_INVALID, fns)
 
-	fn := os.Args[1]
-	args := os.Args[2]
+	fn, args := os.Args[1], ""
+	if !xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"}) {
+		failOnErrWhen(len(os.Args) < 3, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
+		args = os.Args[2]
+	}
 
 	cmd := flag.NewFlagSet(args, flag.ExitOnError)
 	id := cmd.String("id", "", "policy ID")
@@ -20,24 +27,20 @@ func main() {
 	object := cmd.String("o", "", "object")
 	rw := cmd.String("rw", "", "read/write")
 	policyPtr := cmd.String("p", "", "the path of policy to be uploaded")
-	// wholeDump := cmd.Bool("w", false, "output all attributes content from response")
 	dataPtr := cmd.String("d", "", "the path of json to be uploaded")
-	cmd.Parse(os.Args[3:])
+	wholeDump := cmd.Bool("w", false, "output all attributes content from response")
+	cmd.Parse(os.Args[2:])
 
 	policy, err := ioutil.ReadFile(*policyPtr)
-	failOnErr("%v", err)
-
+	failOnErrWhen(fn == "Update", "%v: %s", err, *policyPtr)
 	data, err := ioutil.ReadFile(*dataPtr)
-	failOnErr("%v", err)
+	failOnErrWhen(fn == "Enforce", "%v: %s", err, *dataPtr)
 
-	// mngMode := false
-	// // case "LsID", "LsContext", "LsUser", "LsObject": mngMode = true
-
-	clt.DO(
+	str, err := clt.DO(
 		"cfg-clt-privacy.toml",
 		fn,
 		clt.Args{
-			ID:     *id, // 1615307cc4bf38ffcad912dea96fec4024700fd9r
+			ID:     *id,
 			Policy: policy,
 			User:   *user,
 			Ctx:    *ctx,
@@ -46,48 +49,20 @@ func main() {
 			Data:   data,
 		},
 	)
+	failOnErr("%v", err)
 
-	// data, err = ioutil.ReadAll(resp.Body)
-	// failOnErr("%v", err)
+	if xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"}) {
+		fPln(str)
+		return
+	}
 
-	// const SepLn = "-----------------------------"
-
-	// if *fullDump {
-	// 	fPf("accessing... %s\n%s\n", url, SepLn)
-	// }
-
-	// if data != nil {
-	// 	if os.Args[1] == "HELP" {
-	// 		fPt(string(data))
-	// 	} else {
-	// 		m := make(map[string]interface{})
-	// 		failOnErr("json.Unmarshal ... %v", json.Unmarshal(data, &m))
-	// 		if !mngMode {
-	// 			if *fullDump {
-	// 				if m["empty"] != nil && m["empty"] != "" {
-	// 					fPf("Empty? %v\n%s\n", m["empty"], SepLn)
-	// 				}
-	// 				if m["error"] != nil && m["error"] != "" {
-	// 					fPf("ERROR: %v\n%s\n", m["error"], SepLn)
-	// 				}
-	// 			}
-	// 			if m["data"] != nil && m["data"] != "" {
-	// 				fPf("%s\n", m["data"])
-	// 			}
-	// 		} else {
-	// 			key := ""
-	// 			switch {
-	// 			case *user != "" && *ctx != "":
-	// 				key = fSf("%s@%s", *user, *ctx)
-	// 			case *user != "":
-	// 				key = *user
-	// 			case *ctx != "":
-	// 				key = *ctx
-	// 			default:
-	// 				key = "all"
-	// 			}
-	// 			fPf("%s\n", m[key])
-	// 		}
-	// 	}
-	// }
+	m := make(map[string]interface{})
+	failOnErr("json.Unmarshal ... %v", json.Unmarshal([]byte(str), &m))
+	if *wholeDump {
+		fPf("Empty? %v\n%s\n", m["empty"], "-----------------------------")
+		fPf("ERROR: %v\n%s\n", m["error"], "-----------------------------")
+	}
+	if m["data"] != nil && m["data"] != "" {
+		fPf("%s\n", m["data"])
+	}
 }

@@ -25,7 +25,7 @@ var (
 	url3Values    = cmn.URL3Values
 	url4Values    = cmn.URL4Values
 	urlValues     = cmn.URLValues
-	mapFromStruct = cmn.MapFromStruct
+	struct2Map    = cmn.Struct2Map
 	env2Struct    = cmn.Env2Struct
 
 	prepare = ext.Prepare
@@ -33,7 +33,7 @@ var (
 
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	for _, v := range mapFromStruct(route) {
+	for _, v := range struct2Map(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

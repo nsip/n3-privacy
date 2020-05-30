@@ -55,14 +55,14 @@ func HostHTTPAsync() {
 
 		return c.String(
 			http.StatusOK,
-			fSf("wget %-55s-> %s\n", fullIP+"/enforcer-linux64", "Get Enforcer(Linux64)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-mac", "Get Enforcer(Mac)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-win64", "Get Enforcer(Windows64)")+
+			fSf("wget %-55s-> %s\n", fullIP+"/enforcer-linux64", "Get Enforcer(linux64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-mac", "Get Enforcer(mac)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-win64", "Get Enforcer(windows64)")+
 				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/enforcer-config", "Get Enforcer config")+
 				fSf("\n")+
-				fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(linux64)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(mac)")+
+				fSf("wget %-55s-> %s\n", fullIP+"/client-win64", "Get Client(windows64)")+
 				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/client-config", "Get Client Config")+
 				fSf("\n")+
 				fSf("GET    %-55s-> %s\n", fullIP+route.GetID, "Get policy's ID. If no policy, return empty")+
@@ -224,7 +224,7 @@ func HostHTTPAsync() {
 			return c.JSON(http.StatusBadRequest, result{
 				Data:  nil,
 				Empty: nil,
-				Error: "at least, [user], [ctx] and [rw] must be provided",
+				Error: "[user], [ctx], [rw] are required",
 			})
 		}
 
@@ -249,36 +249,6 @@ func HostHTTPAsync() {
 			Empty: nil,
 			Error: "Policy is NOT in Request BODY, or NOT valid JSON",
 		})
-
-		// if ok, name, user, ctx, rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); ok {
-		// 	if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && isJSON(string(bytes)) {
-		// 		if id, _, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
-		// 			fPln(db.PolicyCount(), ": exist in db")
-		// 			// return c.String(http.StatusOK, id+" - "+obj)
-		// 			return c.JSON(http.StatusOK, result{
-		// 				Data:  &id,
-		// 				Empty: nil,
-		// 				Error: "",
-		// 			})
-		// 		}
-		// 		return c.JSON(http.StatusInternalServerError, result{
-		// 			Data:  nil,
-		// 			Empty: nil,
-		// 			Error: "Update DB error",
-		// 		})
-		// 	}
-		// 	return c.JSON(http.StatusBadRequest, result{
-		// 		Data:  nil,
-		// 		Empty: nil,
-		// 		Error: "Policy is NOT in Request BODY, or NOT valid JSON",
-		// 	})
-		// }
-
-		// return c.JSON(http.StatusBadRequest, result{
-		// 	Data:  nil,
-		// 	Empty: nil,
-		// 	Error: "[user], [ctx] and [rw] must be provided",
-		// })
 	})
 
 	// ---------------------------------------------------- Optional ---------------------------------------------------- //

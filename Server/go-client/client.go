@@ -13,7 +13,7 @@ import (
 func DO(configfile, fn string, args Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML("Cfg-Clt-PRI", configfile), "%v", eg.CFG_INIT_ERR)
 
-	Cfg := env2Struct("Cfg-Clt-PRI", &config{}).(*config)
+	Cfg := env2Struct("Cfg-Clt-PRI", &Config{}).(*Config)
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
