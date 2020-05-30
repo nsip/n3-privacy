@@ -12,15 +12,14 @@ import (
 
 func main() {
 	fns := structFields(clt.Config{}.Route)
-	failOnErrWhen(len(os.Args) < 2, "%v: need %v", eg.PARAM_INVALID, fns)
+	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", eg.CLI_SUBCMD_ERR, fns)
 
-	fn, args := os.Args[1], ""
+	cltcfg, fn := os.Args[1], os.Args[2]
 	if !xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"}) {
-		failOnErrWhen(len(os.Args) < 3, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
-		args = os.Args[2]
+		failOnErrWhen(len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
 	}
 
-	cmd := flag.NewFlagSet(args, flag.ExitOnError)
+	cmd := flag.NewFlagSet(fn, flag.ExitOnError)
 	id := cmd.String("id", "", "policy ID")
 	user := cmd.String("u", "", "user")
 	ctx := cmd.String("c", "", "context")
@@ -29,7 +28,7 @@ func main() {
 	policyPtr := cmd.String("p", "", "the path of policy to be uploaded")
 	dataPtr := cmd.String("d", "", "the path of json to be uploaded")
 	wholeDump := cmd.Bool("w", false, "output all attributes content from response")
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(os.Args[3:])
 
 	policy, err := ioutil.ReadFile(*policyPtr)
 	failOnErrWhen(fn == "Update", "%v: %s", err, *policyPtr)
@@ -37,7 +36,7 @@ func main() {
 	failOnErrWhen(fn == "Enforce", "%v: %s", err, *dataPtr)
 
 	str, err := clt.DO(
-		"cfg-clt-privacy.toml",
+		cltcfg,
 		fn,
 		clt.Args{
 			ID:     *id,
@@ -62,7 +61,5 @@ func main() {
 		fPf("Empty? %v\n%s\n", m["empty"], "-----------------------------")
 		fPf("ERROR: %v\n%s\n", m["error"], "-----------------------------")
 	}
-	if m["data"] != nil && m["data"] != "" {
-		fPf("%s\n", m["data"])
-	}
+	fPf("%s\n", m["data"])
 }

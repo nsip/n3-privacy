@@ -21,7 +21,7 @@ func DO(configfile, fn string, args Args) (string, error) {
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, Cfg.Route)
 	url, ok := mFnURL[fn]
-	if err := warnOnErrWhen(!ok, "%v: Need ["+sJoin(fields, " ")+"]", eg.PARAM_NOT_SUPPORTED); err != nil {
+	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -48,7 +48,7 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	var (
 		Resp    *http.Response
 		Err     error
-		retData []byte
+		RetData []byte
 	)
 
 	id, user, ctx, object, rw, policy, data := args.ID, args.User, args.Ctx, args.Object, args.RW, args.Policy, args.Data
@@ -150,7 +150,7 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	}
 	defer Resp.Body.Close()
 
-	if retData, Err = ioutil.ReadAll(Resp.Body); Err != nil {
+	if RetData, Err = ioutil.ReadAll(Resp.Body); Err != nil {
 		goto ERR_RET
 	}
 
@@ -161,7 +161,7 @@ ERR_RET:
 		return
 	}
 
-	chStr <- string(retData)
+	chStr <- string(RetData)
 	chErr <- eg.NO_ERROR
 	return
 }
