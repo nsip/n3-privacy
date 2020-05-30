@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"testing"
@@ -7,6 +7,6 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	cfg := newCfg("./config.toml")
+	cfg := NewCfg("./cfg-clt-privacy.toml")
 	spew.Dump(cfg)
 }

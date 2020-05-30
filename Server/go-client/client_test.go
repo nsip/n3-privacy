@@ -24,7 +24,8 @@ func TestDO(t *testing.T) {
 			RW:     "r",
 			Object: "object",
 			Data:   data,
-		})
+		},
+	)
 	fPln(str)
 	fPln(err)
 }

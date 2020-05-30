@@ -7,19 +7,12 @@ import (
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	toml "github.com/cdutwhu/n3-util/n3toml"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestLoad(t *testing.T) {
 	cfg := newCfg("./config.toml")
-	fPln(cfg.Path)
-	fPln(cfg.LogFile)
-	fPln(cfg.ServiceName)
-	fPln(cfg.WebService)
-	fPln(cfg.Route)
-	fPln(cfg.Storage)
-	fPln(cfg.File)
-	fPln(cfg.Server)
-	fPln(cfg.Access)
+	spew.Dump(cfg)
 	cfg.SaveAs("./copy")
 }
 

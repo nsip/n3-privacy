@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"os"
@@ -13,19 +13,18 @@ type Config struct {
 	Path    string
 	LogFile string
 	Route   struct {
-		HELP        string
-		GetID       string
-		GetHash     string
-		Get         string
-		Update      string
-		Delete      string
-		LsID        string
-		LsUser      string
-		LsContext   string
-		LsObject    string
-		GetEnforced string
+		HELP      string
+		GetID     string
+		GetHash   string
+		Get       string
+		Update    string
+		Delete    string
+		LsID      string
+		LsUser    string
+		LsContext string
+		LsObject  string
+		Enforce   string
 	}
-	// Client
 	Server struct {
 		Protocol string
 		IP       string
@@ -73,4 +72,15 @@ func (cfg *Config) save() {
 		defer f.Close()
 		toml.NewEncoder(f).Encode(cfg)
 	}
+}
+
+// initEnvVarFromTOML : initialize the global variables
+func initEnvVarFromTOML(key string, configs ...string) bool {
+	configs = append(configs, "./config.toml")
+	Cfg := NewCfg(configs...)
+	if Cfg == nil {
+		return false
+	}
+	struct2Env(key, Cfg)
+	return true
 }
