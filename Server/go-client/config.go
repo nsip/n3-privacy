@@ -25,7 +25,6 @@ type config struct {
 		LsObject  string
 		Enforce   string
 	}
-	// Client
 	Server struct {
 		Protocol string
 		IP       string
@@ -77,7 +76,7 @@ func (cfg *config) save() {
 
 // initEnvVarFromTOML : initialize the global variables
 func initEnvVarFromTOML(key string, configs ...string) bool {
-	configs = append(configs, "./config.toml", "../config.toml", "../../config.toml", "./config/config.toml")
+	configs = append(configs, "./config.toml")
 	Cfg := newCfg(configs...)
 	if Cfg == nil {
 		return false

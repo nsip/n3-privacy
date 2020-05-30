@@ -35,8 +35,8 @@ type Args struct {
 	Ctx    string
 	Object string
 	RW     string
-	Policy string
-	File   string
+	Policy []byte
+	Data   []byte
 }
 
 func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]string, []string) {

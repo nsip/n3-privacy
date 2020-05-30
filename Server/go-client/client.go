@@ -46,12 +46,12 @@ func DO(configfile, fn string, args Args) (string, error) {
 func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 
 	var (
-		Resp *http.Response
-		Err  error
-		Data []byte
+		Resp    *http.Response
+		Err     error
+		retData []byte
 	)
 
-	id, user, ctx, object, rw, policy, file := args.ID, args.User, args.Ctx, args.Object, args.RW, args.Policy, args.File
+	id, user, ctx, object, rw, policy, data := args.ID, args.User, args.Ctx, args.Object, args.RW, args.Policy, args.Data
 
 	switch fn {
 	case "HELP":
@@ -80,18 +80,15 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 		}
 
 	case "Update":
-		if user == "" || ctx == "" || rw == "" || policy == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [RW] [Policy] all are required", eg.PARAM_INVALID)
+		if user == "" || ctx == "" || rw == "" {
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if Data, Err = ioutil.ReadFile(policy); Err != nil {
-			goto ERR_RET
-		}
-		if Err = warnOnErrWhen(!isJSON(string(Data)), "%v: policy", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(policy)), "%v: policy", eg.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)
-		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(Data)); Err != nil {
+		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(policy)); Err != nil {
 			goto ERR_RET
 		}
 
@@ -111,18 +108,15 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 		}
 
 	case "Enforce":
-		if user == "" || ctx == "" || rw == "" || file == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [RW] [File] all are required", eg.PARAM_INVALID)
+		if user == "" || ctx == "" || rw == "" {
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if Data, Err = ioutil.ReadFile(file); Err != nil {
-			goto ERR_RET
-		}
-		if Err = warnOnErrWhen(!isJSON(string(Data)), "%v: file", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(data)), "%v: input data", eg.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)
-		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(Data)); Err != nil {
+		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(data)); Err != nil {
 			goto ERR_RET
 		}
 
@@ -156,7 +150,7 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	}
 	defer Resp.Body.Close()
 
-	if Data, Err = ioutil.ReadAll(Resp.Body); Err != nil {
+	if retData, Err = ioutil.ReadAll(Resp.Body); Err != nil {
 		goto ERR_RET
 	}
 
@@ -167,7 +161,7 @@ ERR_RET:
 		return
 	}
 
-	chStr <- string(Data)
+	chStr <- string(retData)
 	chErr <- eg.NO_ERROR
 	return
 }
