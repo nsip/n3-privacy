@@ -116,21 +116,21 @@ func HostHTTPAsync() {
 		if ok, user, ctx, object, rw := url4Values(c.QueryParams(), 0, "user", "ctx", "object", "rw"); ok {
 			if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
 				return c.JSON(http.StatusOK, result{
-					Data:  &pid,
-					Empty: False,
-					Error: nil,
+					Data:  pid,
+					Empty: false,
+					Error: "",
 				})
 			}
 			return c.JSON(http.StatusNotFound, result{
-				Data:  EmptyStr,
-				Empty: True,
-				Error: nil,
+				Data:  "",
+				Empty: true,
+				Error: "",
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
-			Data:  nil,
-			Empty: nil,
-			Error: warnOnErr("%v: [user] [ctx] [object] [rw] all are required", eg.PARAM_INVALID),
+			Data:  "",
+			Empty: true,
+			Error: fSf("[user] [ctx] [object] [rw] all are required"),
 		})
 	})
 
@@ -141,21 +141,21 @@ func HostHTTPAsync() {
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if hashstr, ok := db.PolicyHash(id); ok {
 				return c.JSON(http.StatusOK, result{
-					Data:  &hashstr,
-					Empty: False,
-					Error: nil,
+					Data:  hashstr,
+					Empty: false,
+					Error: "",
 				})
 			}
 			return c.JSON(http.StatusNotFound, result{
-				Data:  EmptyStr,
-				Empty: True,
-				Error: nil,
+				Data:  "",
+				Empty: true,
+				Error: "",
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
-			Data:  nil,
-			Empty: nil,
-			Error: warnOnErr("%v: policy [id] is required", eg.PARAM_INVALID),
+			Data:  "",
+			Empty: true,
+			Error: fSf("policy [id] is required"),
 		})
 	})
 
@@ -166,21 +166,21 @@ func HostHTTPAsync() {
 		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
 			if policy, ok := db.Policy(id); ok {
 				return c.JSON(http.StatusOK, result{
-					Data:  &policy,
-					Empty: False,
-					Error: nil,
+					Data:  policy,
+					Empty: false,
+					Error: "",
 				})
 			}
 			return c.JSON(http.StatusNotFound, result{
-				Data:  EmptyStr,
-				Empty: True,
-				Error: nil,
+				Data:  "",
+				Empty: true,
+				Error: "",
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
-			Data:  nil,
-			Empty: nil,
-			Error: warnOnErr("%v: policy [id] is required", eg.PARAM_INVALID),
+			Data:  "",
+			Empty: true,
+			Error: fSf("policy [id] is required"),
 		})
 	})
 
@@ -192,21 +192,21 @@ func HostHTTPAsync() {
 			if db.DeletePolicy(id) == nil {
 				fPln(db.PolicyCount(), ": exist in db")
 				return c.JSON(http.StatusOK, result{
-					Data:  &id,
-					Empty: nil,
-					Error: nil,
+					Data:  id,
+					Empty: false,
+					Error: "",
 				})
 			}
 			return c.JSON(http.StatusInternalServerError, result{
-				Data:  nil,
-				Empty: nil,
-				Error: warnOnErr("%v: Policy Delete Error", eg.INTERNAL),
+				Data:  "",
+				Empty: true,
+				Error: fSf("Policy Delete Error"),
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
-			Data:  nil,
-			Empty: nil,
-			Error: warnOnErr("%v: policy [id] is required", eg.PARAM_INVALID),
+			Data:  "",
+			Empty: true,
+			Error: fSf("policy [id] is required"),
 		})
 	})
 
@@ -222,9 +222,9 @@ func HostHTTPAsync() {
 			user, ctx, rw = User, Ctx, Rw
 		} else {
 			return c.JSON(http.StatusBadRequest, result{
-				Data:  nil,
-				Empty: nil,
-				Error: warnOnErr("%v: [user] [ctx] [rw] are required", eg.PARAM_INVALID),
+				Data:  "",
+				Empty: true,
+				Error: fSf("[user] [ctx] [rw] are required"),
 			})
 		}
 
@@ -233,21 +233,21 @@ func HostHTTPAsync() {
 				fPln(db.PolicyCount(), ": exist in db")
 				// return c.String(http.StatusOK, id+" - "+obj)
 				return c.JSON(http.StatusOK, result{
-					Data:  &obj,
-					Empty: nil,
-					Error: nil,
+					Data:  obj,
+					Empty: false,
+					Error: "",
 				})
 			}
 			return c.JSON(http.StatusInternalServerError, result{
-				Data:  nil,
-				Empty: nil,
-				Error: warnOnErr("%v: Update DB error", eg.INTERNAL),
+				Data:  "",
+				Empty: true,
+				Error: fSf("Update DB error"),
 			})
 		}
 		return c.JSON(http.StatusBadRequest, result{
-			Data:  nil,
-			Empty: nil,
-			Error: warnOnErr("%v: Policy is NOT in Request BODY, or invalid JSON", eg.PARAM_INVALID),
+			Data:  "",
+			Empty: true,
+			Error: fSf("Policy is NOT in Request BODY, or invalid JSON"),
 		})
 	})
 
@@ -319,9 +319,9 @@ func HostHTTPAsync() {
 			user, ctx, rw = User, Ctx, Rw
 		} else {
 			return c.JSON(http.StatusBadRequest, result{
-				Data:  nil,
-				Empty: nil,
-				Error: warnOnErr("%v: [user] [ctx] [rw] are required", eg.PARAM_INVALID),
+				Data:  "",
+				Empty: true,
+				Error: fSf("[user] [ctx] [rw] are required"),
 			})
 		}
 
@@ -335,16 +335,16 @@ func HostHTTPAsync() {
 				}
 			} else {
 				return c.JSON(http.StatusBadRequest, result{
-					Data:  nil,
-					Empty: nil,
-					Error: warnOnErr("%v: POST Body Content is invalid JSON", eg.PARAM_INVALID),
+					Data:  "",
+					Empty: true,
+					Error: fSf("POST Body Content is invalid JSON"),
 				})
 			}
 		} else {
 			return c.JSON(http.StatusBadRequest, result{
-				Data:  nil,
-				Empty: nil,
-				Error: warnOnErr("%v: Error occurred when reading POST Body Content", eg.PARAM_INVALID),
+				Data:  "",
+				Empty: true,
+				Error: fSf("Error occurred when reading POST Body Content"),
 			})
 		}
 
@@ -358,17 +358,16 @@ func HostHTTPAsync() {
 				ret := results[0].Interface().(string)
 
 				return c.JSON(http.StatusOK, result{
-					Data:  &ret,
-					Empty: False,
-					Error: nil,
+					Data:  ret,
+					Empty: false,
+					Error: "",
 				})
 			}
 		}
 		return c.JSON(http.StatusNotFound, result{
-			Data:  EmptyStr,
-			Empty: True,
-			Error: warnOnErr("%v: No policies@ user-[%s] context-[%s] read/write-[%s] object-[%s]", eg.FILE_NOT_FOUND, user, ctx, rw, object),
+			Data:  "",
+			Empty: true,
+			Error: fSf("No policies@ user-[%s] context-[%s] read/write-[%s] object-[%s]", user, ctx, rw, object),
 		})
 	})
-
 }
