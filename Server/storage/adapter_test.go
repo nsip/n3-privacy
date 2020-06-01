@@ -1,26 +1,27 @@
 package storage
 
 import (
-	"fmt"
 	"testing"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 )
 
-const config = "../config/config.toml"
+const Config = "../config/config.toml"
 
 func TestAdapter(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDB("badger")
-	fmt.Println(db)
+	fPln(db)
+
 	// db = NewDB("map")
 	// fmt.Println(db)
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDB("badger")
+	fPln(db)
 
 	// user := "qmiao"
 	// ctx := "ctx123"

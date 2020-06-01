@@ -113,8 +113,12 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, user, ctx, object, rw := url4Values(c.QueryParams(), 0, "user", "ctx", "object", "rw"); ok {
-			if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, user, n3ctx, object, rw := url4Values(qryParams, 0, "user", "ctx", "object", "rw"); ok {
+			if pid := db.PolicyIDTr(ctx, user, n3ctx, rw, object); pid != "" {
 				return c.JSON(http.StatusOK, result{
 					Data:  pid,
 					Empty: false,
@@ -138,8 +142,12 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
-			if hashstr, ok := db.PolicyHash(id); ok {
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, id := url1Value(qryParams, 0, "id"); ok {
+			if hashstr, ok := db.PolicyHashTr(ctx, id); ok {
 				return c.JSON(http.StatusOK, result{
 					Data:  hashstr,
 					Empty: false,
@@ -163,8 +171,12 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
-			if policy, ok := db.Policy(id); ok {
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, id := url1Value(qryParams, 0, "id"); ok {
+			if policy, ok := db.PolicyTr(ctx, id); ok {
 				return c.JSON(http.StatusOK, result{
 					Data:  policy,
 					Empty: false,
@@ -188,9 +200,13 @@ func HostHTTPAsync() {
 	e.DELETE(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, id := url1Value(c.QueryParams(), 0, "id"); ok {
-			if db.DeletePolicy(id) == nil {
-				fPln(db.PolicyCount(), ": exist in db")
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, id := url1Value(qryParams, 0, "id"); ok {
+			if db.DeletePolicyTr(ctx, id) == nil {
+				// fPln(db.PolicyCount(), ": exist in db")
 				return c.JSON(http.StatusOK, result{
 					Data:  id,
 					Empty: false,
@@ -215,11 +231,15 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		name, user, ctx, rw := "", "", "", ""
-		if Ok, Name, User, Ctx, Rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); Ok {
-			name, user, ctx, rw = Name, User, Ctx, Rw
-		} else if Ok, User, Ctx, Rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); Ok {
-			user, ctx, rw = User, Ctx, Rw
+		qryParams := c.QueryParams()
+		req := c.Request()
+		ctx := req.Context()
+
+		name, user, n3ctx, rw := "", "", "", ""
+		if Ok, Name, User, n3Ctx, Rw := url4Values(qryParams, 0, "name", "user", "ctx", "rw"); Ok {
+			name, user, n3ctx, rw = Name, User, n3Ctx, Rw
+		} else if Ok, User, n3Ctx, Rw := url3Values(qryParams, 0, "user", "ctx", "rw"); Ok {
+			user, n3ctx, rw = User, n3Ctx, Rw
 		} else {
 			return c.JSON(http.StatusBadRequest, result{
 				Data:  "",
@@ -228,9 +248,9 @@ func HostHTTPAsync() {
 			})
 		}
 
-		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil && isJSON(string(bytes)) {
-			if _, obj, err := db.UpdatePolicy(string(bytes), name, user, ctx, rw); err == nil {
-				fPln(db.PolicyCount(), ": exist in db")
+		if bytes, err := ioutil.ReadAll(req.Body); err == nil && isJSON(string(bytes)) {
+			if _, obj, err := db.UpdatePolicyTr(ctx, string(bytes), name, user, n3ctx, rw); err == nil {
+				// fPln(db.PolicyCount(), ": exist in db")
 				// return c.String(http.StatusOK, id+" - "+obj)
 				return c.JSON(http.StatusOK, result{
 					Data:  obj,
@@ -257,52 +277,68 @@ func HostHTTPAsync() {
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ctx))
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, user, n3ctx := url2Values(qryParams, 0, "user", "ctx"); ok {
+			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, user, n3ctx))
 		}
-		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ""))
+		if ok, user := url1Value(qryParams, 0, "user"); ok {
+			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, user, ""))
 		}
-		if ok, ctx := url1Value(c.QueryParams(), 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPID("", ctx))
+		if ok, n3ctx := url1Value(qryParams, 0, "ctx"); ok {
+			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, "", n3ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapRW2lsPID("", ""))
+		return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, "", ""))
 	})
 
 	path = route.LsUser
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, lsValues := urlValues(c.QueryParams(), "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapCtx2lsUser(lsValues[0]...))
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, lsValues := urlValues(qryParams, "ctx"); ok {
+			return c.JSON(http.StatusOK, db.MapCtx2lsUserTr(ctx, lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapCtx2lsUser())
+		return c.JSON(http.StatusOK, db.MapCtx2lsUserTr(ctx))
 	})
 
 	path = route.LsContext
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, lsValues := urlValues(c.QueryParams(), "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUser2lsCtx(lsValues[0]...))
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, lsValues := urlValues(qryParams, "user"); ok {
+			return c.JSON(http.StatusOK, db.MapUser2lsCtxTr(ctx, lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapUser2lsCtx())
+		return c.JSON(http.StatusOK, db.MapUser2lsCtxTr(ctx))
 	})
 
 	path = route.LsObject
 	e.GET(path, func(c echo.Context) error {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
-		if ok, user, ctx := url2Values(c.QueryParams(), 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ctx))
+
+		qryParams := c.QueryParams()
+		ctx := c.Request().Context()
+
+		if ok, user, n3ctx := url2Values(qryParams, 0, "user", "ctx"); ok {
+			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, user, n3ctx))
 		}
-		if ok, user := url1Value(c.QueryParams(), 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ""))
+		if ok, user := url1Value(qryParams, 0, "user"); ok {
+			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, user, ""))
 		}
-		if ok, ctx := url1Value(c.QueryParams(), 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObject("", ctx))
+		if ok, n3ctx := url1Value(qryParams, 0, "ctx"); ok {
+			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, "", n3ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapUC2lsObject("", ""))
+		return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, "", ""))
 	})
 
 	// -------------------------------------------------------------------------- //
@@ -312,11 +348,15 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		name, user, ctx, rw := "", "", "", ""
-		if Ok, Name, User, Ctx, Rw := url4Values(c.QueryParams(), 0, "name", "user", "ctx", "rw"); Ok {
-			name, user, ctx, rw = Name, User, Ctx, Rw
-		} else if Ok, User, Ctx, Rw := url3Values(c.QueryParams(), 0, "user", "ctx", "rw"); Ok {
-			user, ctx, rw = User, Ctx, Rw
+		qryParams := c.QueryParams()
+		req := c.Request()
+		ctx := req.Context()
+
+		name, user, n3ctx, rw := "", "", "", ""
+		if Ok, Name, User, n3Ctx, Rw := url4Values(qryParams, 0, "name", "user", "ctx", "rw"); Ok {
+			name, user, n3ctx, rw = Name, User, n3Ctx, Rw
+		} else if Ok, User, n3Ctx, Rw := url3Values(qryParams, 0, "user", "ctx", "rw"); Ok {
+			user, n3ctx, rw = User, n3Ctx, Rw
 		} else {
 			return c.JSON(http.StatusBadRequest, result{
 				Data:  "",
@@ -327,7 +367,7 @@ func HostHTTPAsync() {
 
 		// get uploaded json and object
 		json, object := "", name
-		if bytes, err := ioutil.ReadAll(c.Request().Body); err == nil {
+		if bytes, err := ioutil.ReadAll(req.Body); err == nil {
 			json = string(bytes)
 			if isJSON(json) {
 				if object == "" {
@@ -348,8 +388,8 @@ func HostHTTPAsync() {
 			})
 		}
 
-		if pid := db.PolicyID(user, ctx, rw, object); pid != "" {
-			if policy, ok := db.Policy(pid); ok {
+		if pid := db.PolicyIDTr(ctx, user, n3ctx, rw, object); pid != "" {
+			if policy, ok := db.PolicyTr(ctx, pid); ok {
 
 				// ret := enf.Execute(json, policy)
 
@@ -367,7 +407,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusNotFound, result{
 			Data:  "",
 			Empty: true,
-			Error: fSf("No policies@ user-[%s] context-[%s] read/write-[%s] object-[%s]", user, ctx, rw, object),
+			Error: fSf("No policies@ user-[%s] context-[%s] read/write-[%s] object-[%s]", user, n3ctx, rw, object),
 		})
 	})
 }

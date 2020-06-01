@@ -9,6 +9,8 @@ import (
 	"github.com/cdutwhu/n3-util/jkv"
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	"github.com/cdutwhu/n3-util/n3json"
+	badger "github.com/dgraph-io/badger"
+	"github.com/opentracing/opentracing-go"
 )
 
 var (
@@ -44,20 +46,31 @@ var (
 	maybeJSONArr = n3json.MaybeArr
 	splitJSONArr = n3json.SplitArr
 	makeJSONArr  = n3json.MakeArr
-	newJKV       = jkv.NewJKV
+
+	newJKV = jkv.NewJKV
 )
 
 var (
-	hash      = cmn.SHA1Str // 32 [40] 64
-	lenOfHash = len(hash("1"))
-	lenOfOID  = lenOfHash / 4 // length of Object-Hash-ID Occupied
-	lenOfFID  = lenOfHash / 4 // length of Fields-Hash-ID Occupied
-	lenOfUID  = lenOfHash / 4 // length of UserID-Hash-ID Occupied
-	lenOfCTX  = lenOfHash / 4 // length of Context-Hash-ID Occupied
-	listID    = []string{}    // Policy ID List in running time
+	hash      = cmn.SHA1Str    // 32 [40] 64
+	lenOfHash = len(hash("1")) //
+	lenOfOID  = lenOfHash / 4  // length of Object-Hash-ID Occupied
+	lenOfFID  = lenOfHash / 4  // length of Fields-Hash-ID Occupied
+	lenOfUID  = lenOfHash / 4  // length of UserID-Hash-ID Occupied
+	lenOfCTX  = lenOfHash / 4  // length of Context-Hash-ID Occupied
+	listID    = []string{}     // Policy ID List in running time
 )
 
-const encPwd = "password"
+type badgerDB struct {
+	mIDPolicy *badger.DB
+	mIDHash   *badger.DB
+	err       error
+	mIDUser   *badger.DB
+	mIDCtx    *badger.DB
+	mIDObject *badger.DB
+	// -------------- //
+	tracer opentracing.Tracer
+	encPwd string
+}
 
 const (
 	linker = "#"
@@ -129,7 +142,6 @@ func validate(policy string) (string, error) {
 	if !cmn.IsJSON(policy) {
 		return "", eg.JSON_INVALID
 	}
-	// return pp.FmtJSONStr(policy), nil
 	return fmtJSON(policy, 2), nil
 }
 
