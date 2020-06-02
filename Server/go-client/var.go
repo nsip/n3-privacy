@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go/config"
 )
 
 var (
@@ -28,6 +30,10 @@ var (
 	mapKeys       = cmn.MapKeys
 )
 
+const (
+	envVarName = "CfgClt-PRI"
+)
+
 // Args is arguments for "Route"
 type Args struct {
 	ID     string
@@ -45,4 +51,16 @@ func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]
 		mFnURL[k] = fSf("%s://%s:%d%s", protocol, ip, port, v)
 	}
 	return mFnURL, mapKeys(mFnURL).([]string)
+}
+
+func initTracer(serviceName string) opentracing.Tracer {
+	cfg, err := config.FromEnv()
+	failOnErr("%v: ", err)
+	cfg.ServiceName = serviceName
+	cfg.Sampler.Type = "const"
+	cfg.Sampler.Param = 1
+
+	tracer, _, err := cfg.NewTracer()
+	failOnErr("%v: ", err)
+	return tracer
 }

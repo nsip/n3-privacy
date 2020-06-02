@@ -2,18 +2,38 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/opentracing/opentracing-go"
+	tags "github.com/opentracing/opentracing-go/ext"
 )
+
+// DOwithTrace :
+func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string, error) {
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	Cfg := env2Struct(envVarName, &Config{}).(*Config)
+	serviceName := Cfg.ServiceName
+
+	if span := opentracing.SpanFromContext(ctx); span != nil {
+		tracer := initTracer(serviceName)
+		span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
+		tags.SpanKindRPCClient.Set(span)
+		tags.PeerService.Set(span, serviceName)
+		span.SetTag(fn, args)
+		defer span.Finish()
+		ctx = opentracing.ContextWithSpan(ctx, span)
+	}
+	return DO(configfile, fn, args)
+}
 
 // DO : fn ["HELP", ...]
 func DO(configfile, fn string, args Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML("Cfg-Clt-PRI", configfile), "%v", eg.CFG_INIT_ERR)
-
-	Cfg := env2Struct("Cfg-Clt-PRI", &Config{}).(*Config)
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
