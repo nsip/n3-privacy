@@ -58,7 +58,6 @@ func HostHTTPAsync() {
 			fSf("wget %-55s-> %s\n", fullIP+"/enforcer-linux64", "Get Enforcer(linux64)")+
 				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-mac", "Get Enforcer(mac)")+
 				fSf("wget %-55s-> %s\n", fullIP+"/enforcer-win64", "Get Enforcer(windows64)")+
-				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/enforcer-config", "Get Enforcer config")+
 				fSf("\n")+
 				fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(linux64)")+
 				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(mac)")+
