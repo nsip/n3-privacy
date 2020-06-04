@@ -10,6 +10,7 @@ import (
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
+	"github.com/uber/jaeger-client-go/config"
 )
 
 // DOwithTrace :
@@ -19,6 +20,17 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 	serviceName := Cfg.ServiceName
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
+		initTracer := func(serviceName string) opentracing.Tracer {
+			cfg, err := config.FromEnv()
+			failOnErr("%v: ", err)
+			cfg.ServiceName = serviceName
+			cfg.Sampler.Type = "const"
+			cfg.Sampler.Param = 1
+			tracer, _, err := cfg.NewTracer()
+			failOnErr("%v: ", err)
+			return tracer
+		}
+
 		tracer := initTracer(serviceName)
 		span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
 		tags.SpanKindRPCClient.Set(span)

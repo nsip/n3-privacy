@@ -48,7 +48,6 @@ func NewDB(dbType string, tracing bool) interface{} {
 			cfg.ServiceName = serviceName
 			cfg.Sampler.Type = "const"
 			cfg.Sampler.Param = 1
-
 			tracer, _, err := cfg.NewTracer()
 			failOnErr("%v: ", err)
 			return tracer
