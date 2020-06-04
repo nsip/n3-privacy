@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -67,9 +68,10 @@ type badgerDB struct {
 	mIDUser   *badger.DB
 	mIDCtx    *badger.DB
 	mIDObject *badger.DB
+	encPwd    string
 	// -------------- //
-	tracer opentracing.Tracer
-	encPwd string
+	tracer  opentracing.Tracer
+	context context.Context
 }
 
 const (

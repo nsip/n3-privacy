@@ -35,14 +35,27 @@ func HostHTTPAsync() {
 		AllowCredentials: true,
 	}))
 
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
-	port := Cfg.WebService.Port
-	fullIP := localIP() + fSf(":%d", port)
-	route := Cfg.Route
-	file := Cfg.File
-	database := Cfg.Storage.DataBase
-	db := storage.NewDB(database)
-	mMtx := initMutex(route)
+	var (
+		Cfg      = env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+		port     = Cfg.WebService.Port
+		fullIP   = localIP() + fSf(":%d", port)
+		route    = Cfg.Route
+		file     = Cfg.File
+		database = Cfg.Storage.DataBase
+		tracing  = Cfg.Storage.Tracing
+		mMtx     = initMutex(route)
+		db       = storage.NewDB(database, tracing).(storage.DBTr) // DBTr covers DB
+	)
+
+	// Tracing: Middleware for DB-tracing
+	if tracing {
+		e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				db.SetContext(c.Request().Context())
+				return next(c)
+			}
+		})
+	}
 
 	defer e.Start(fSf(":%d", port))
 
@@ -114,10 +127,8 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, user, n3ctx, object, rw := url4Values(qryParams, 0, "user", "ctx", "object", "rw"); ok {
-			if pid := db.PolicyIDTr(ctx, user, n3ctx, rw, object); pid != "" {
+			if pid := db.PolicyID(user, n3ctx, rw, object); pid != "" {
 				return c.JSON(http.StatusOK, result{
 					Data:  pid,
 					Empty: false,
@@ -143,10 +154,8 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, id := url1Value(qryParams, 0, "id"); ok {
-			if hashstr, ok := db.PolicyHashTr(ctx, id); ok {
+			if hashstr, ok := db.PolicyHash(id); ok {
 				return c.JSON(http.StatusOK, result{
 					Data:  hashstr,
 					Empty: false,
@@ -172,10 +181,8 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, id := url1Value(qryParams, 0, "id"); ok {
-			if policy, ok := db.PolicyTr(ctx, id); ok {
+			if policy, ok := db.Policy(id); ok {
 				return c.JSON(http.StatusOK, result{
 					Data:  policy,
 					Empty: false,
@@ -201,10 +208,8 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, id := url1Value(qryParams, 0, "id"); ok {
-			if db.DeletePolicyTr(ctx, id) == nil {
+			if db.DeletePolicy(id) == nil {
 				// fPln(db.PolicyCount(), ": exist in db")
 				return c.JSON(http.StatusOK, result{
 					Data:  id,
@@ -232,8 +237,6 @@ func HostHTTPAsync() {
 
 		qryParams := c.QueryParams()
 		req := c.Request()
-		ctx := req.Context()
-
 		name, user, n3ctx, rw := "", "", "", ""
 		if Ok, Name, User, n3Ctx, Rw := url4Values(qryParams, 0, "name", "user", "ctx", "rw"); Ok {
 			name, user, n3ctx, rw = Name, User, n3Ctx, Rw
@@ -248,7 +251,7 @@ func HostHTTPAsync() {
 		}
 
 		if bytes, err := ioutil.ReadAll(req.Body); err == nil && isJSON(string(bytes)) {
-			if _, obj, err := db.UpdatePolicyTr(ctx, string(bytes), name, user, n3ctx, rw); err == nil {
+			if _, obj, err := db.UpdatePolicy(string(bytes), name, user, n3ctx, rw); err == nil {
 				// fPln(db.PolicyCount(), ": exist in db")
 				// return c.String(http.StatusOK, id+" - "+obj)
 				return c.JSON(http.StatusOK, result{
@@ -278,18 +281,16 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, user, n3ctx := url2Values(qryParams, 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, user, n3ctx))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, n3ctx))
 		}
 		if ok, user := url1Value(qryParams, 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, user, ""))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID(user, ""))
 		}
 		if ok, n3ctx := url1Value(qryParams, 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, "", n3ctx))
+			return c.JSON(http.StatusOK, db.MapRW2lsPID("", n3ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapRW2lsPIDTr(ctx, "", ""))
+		return c.JSON(http.StatusOK, db.MapRW2lsPID("", ""))
 	})
 
 	path = route.LsUser
@@ -298,12 +299,10 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, lsValues := urlValues(qryParams, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapCtx2lsUserTr(ctx, lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapCtx2lsUser(lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapCtx2lsUserTr(ctx))
+		return c.JSON(http.StatusOK, db.MapCtx2lsUser())
 	})
 
 	path = route.LsContext
@@ -312,12 +311,10 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, lsValues := urlValues(qryParams, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUser2lsCtxTr(ctx, lsValues[0]...))
+			return c.JSON(http.StatusOK, db.MapUser2lsCtx(lsValues[0]...))
 		}
-		return c.JSON(http.StatusOK, db.MapUser2lsCtxTr(ctx))
+		return c.JSON(http.StatusOK, db.MapUser2lsCtx())
 	})
 
 	path = route.LsObject
@@ -326,18 +323,16 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		qryParams := c.QueryParams()
-		ctx := c.Request().Context()
-
 		if ok, user, n3ctx := url2Values(qryParams, 0, "user", "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, user, n3ctx))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, n3ctx))
 		}
 		if ok, user := url1Value(qryParams, 0, "user"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, user, ""))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject(user, ""))
 		}
 		if ok, n3ctx := url1Value(qryParams, 0, "ctx"); ok {
-			return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, "", n3ctx))
+			return c.JSON(http.StatusOK, db.MapUC2lsObject("", n3ctx))
 		}
-		return c.JSON(http.StatusOK, db.MapUC2lsObjectTr(ctx, "", ""))
+		return c.JSON(http.StatusOK, db.MapUC2lsObject("", ""))
 	})
 
 	// -------------------------------------------------------------------------- //
@@ -349,8 +344,6 @@ func HostHTTPAsync() {
 
 		qryParams := c.QueryParams()
 		req := c.Request()
-		ctx := req.Context()
-
 		name, user, n3ctx, rw := "", "", "", ""
 		if Ok, Name, User, n3Ctx, Rw := url4Values(qryParams, 0, "name", "user", "ctx", "rw"); Ok {
 			name, user, n3ctx, rw = Name, User, n3Ctx, Rw
@@ -387,8 +380,8 @@ func HostHTTPAsync() {
 			})
 		}
 
-		if pid := db.PolicyIDTr(ctx, user, n3ctx, rw, object); pid != "" {
-			if policy, ok := db.PolicyTr(ctx, pid); ok {
+		if pid := db.PolicyID(user, n3ctx, rw, object); pid != "" {
+			if policy, ok := db.Policy(pid); ok {
 
 				// ret := enf.Execute(json, policy)
 

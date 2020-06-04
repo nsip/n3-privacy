@@ -7,8 +7,8 @@ ServiceName = "N3-PRIVACY"
 
 [Storage]
   DataBase = "badger" # "map" / "badger" / ...
-  MetaPath = "/var/tmp/n3-privacy/meta/"
   BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
+  Tracing = false
 
 [WebService]                              
   Port = 1323                             # Shared with Client - [Server] - Port #

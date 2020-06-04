@@ -17,8 +17,8 @@ type Config struct {
 
 	Storage struct {
 		DataBase     string
-		MetaPath     string
 		BadgerDBPath string
+		Tracing      bool
 	}
 
 	WebService struct {

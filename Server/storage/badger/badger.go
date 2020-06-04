@@ -54,26 +54,22 @@ func (db *badgerDB) close() {
 
 // ----------------------- Export ----------------------- //
 
-// PolicyCount : tr
-func (db *badgerDB) PolicyCount() int {
+func (db *badgerDB) policyCount() int {
 	return len(listID)
 }
 
-// PolicyID : tr
-func (db *badgerDB) PolicyID(user, n3ctx, rw, object string) string {
+func (db *badgerDB) policyID(user, n3ctx, rw, object string) string {
 	if lsID := getPolicyID(user, n3ctx, rw, object); len(lsID) > 0 {
 		return lsID[0]
 	}
 	return ""
 }
 
-// PolicyIDs : tr
-func (db *badgerDB) PolicyIDs(user, n3ctx, rw string, objects ...string) []string {
+func (db *badgerDB) policyIDs(user, n3ctx, rw string, objects ...string) []string {
 	return getPolicyID(user, n3ctx, rw, objects...)
 }
 
-// UpdatePolicy : tr
-func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj string, err error) {
+func (db *badgerDB) updatePolicy(policy, name, user, n3ctx, rw string) (id, obj string, err error) {
 	if policy, err = validate(policy); err != nil {
 		return "", "", err
 	}
@@ -90,8 +86,7 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj 
 	return id, obj, err
 }
 
-// DeletePolicy : tr
-func (db *badgerDB) DeletePolicy(id string) (err error) {
+func (db *badgerDB) deletePolicy(id string) (err error) {
 	if err = updateBadgerDB([]*badger.DB{db.mIDHash, db.mIDPolicy}, []string{id, id}); err == nil {
 		for i, ID := range listID {
 			if ID == id {
@@ -103,16 +98,14 @@ func (db *badgerDB) DeletePolicy(id string) (err error) {
 	return err
 }
 
-// PolicyHash : tr
-func (db *badgerDB) PolicyHash(id string) (string, bool) {
+func (db *badgerDB) policyHash(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDHash}, []string{id}); err == nil {
 		return values[0], true
 	}
 	return "", false
 }
 
-// Policy : tr
-func (db *badgerDB) Policy(id string) (string, bool) {
+func (db *badgerDB) policy(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
 		if policy, err := decrypt([]byte(values[0]), db.encPwd); err == nil {
 			return string(policy), true
@@ -257,8 +250,7 @@ func (db *badgerDB) listObject(user, n3ctx string) []string {
 
 // ------------------------------------------------- //
 
-// MapRW2lsPID : tr
-func (db *badgerDB) MapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][]string {
+func (db *badgerDB) mapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][]string {
 	rt := make(map[string][]string)
 	key := fSf("%s@%s", user, n3ctx)
 	for i, IDs := range db.listPolicyID(user, n3ctx, lsRW...) {
@@ -279,8 +271,7 @@ func (db *badgerDB) MapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][
 	return rt
 }
 
-// MapCtx2lsUser : tr
-func (db *badgerDB) MapCtx2lsUser(lsCtx ...string) map[string][]string {
+func (db *badgerDB) mapCtx2lsUser(lsCtx ...string) map[string][]string {
 	rt := make(map[string][]string)
 	for i, users := range db.listUser(lsCtx...) {
 		if len(lsCtx) == 0 {
@@ -292,8 +283,7 @@ func (db *badgerDB) MapCtx2lsUser(lsCtx ...string) map[string][]string {
 	return rt
 }
 
-// MapUser2lsCtx : tr
-func (db *badgerDB) MapUser2lsCtx(users ...string) map[string][]string {
+func (db *badgerDB) mapUser2lsCtx(users ...string) map[string][]string {
 	rt := make(map[string][]string)
 	for i, lsCtx := range db.listCtx(users...) {
 		if len(users) == 0 {
@@ -305,8 +295,7 @@ func (db *badgerDB) MapUser2lsCtx(users ...string) map[string][]string {
 	return rt
 }
 
-// MapUC2lsObject : tr
-func (db *badgerDB) MapUC2lsObject(user, n3ctx string) map[string][]string {
+func (db *badgerDB) mapUC2lsObject(user, n3ctx string) map[string][]string {
 	key := user + "@" + n3ctx
 	switch {
 	case user == "" && n3ctx == "":

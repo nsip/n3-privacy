@@ -12,149 +12,180 @@ func (db *badgerDB) SetTracer(tracer opentracing.Tracer) {
 	db.tracer = tracer
 }
 
+// SetContext :
+func (db *badgerDB) SetContext(context context.Context) {
+	db.context = context
+}
+
+func (db *badgerDB) GetContext() context.Context {
+	return db.context
+}
+
 // ---------------------- //
 
-// PolicyCountTr :
-func (db *badgerDB) PolicyCountTr(ctx context.Context) int {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("PolicyCount", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("PolicyCount", "")
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// PolicyCount :
+func (db *badgerDB) PolicyCount() int {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("PolicyCount", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("PolicyCount", "")
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.PolicyCount()
+	return db.policyCount()
 }
 
-// PolicyIDTr :
-func (db *badgerDB) PolicyIDTr(ctx context.Context, user, n3ctx, rw, object string) string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("PolicyID", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("PolicyID", fSf("[%s] [%s] [%s] [%s]", user, n3ctx, rw, object))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// PolicyID :
+func (db *badgerDB) PolicyID(user, n3ctx, rw, object string) string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("PolicyID", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("PolicyID", fSf("[%s] [%s] [%s] [%s]", user, n3ctx, rw, object))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.PolicyID(user, n3ctx, rw, object)
+	return db.policyID(user, n3ctx, rw, object)
 }
 
-// PolicyIDsTr :
-func (db *badgerDB) PolicyIDsTr(ctx context.Context, user, n3ctx, rw string, objects ...string) []string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("PolicyIDs", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("PolicyIDs", fSf("[%s] [%s] [%s] [%v]", user, n3ctx, rw, objects))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// PolicyIDs :
+func (db *badgerDB) PolicyIDs(user, n3ctx, rw string, objects ...string) []string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("PolicyIDs", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("PolicyIDs", fSf("[%s] [%s] [%s] [%v]", user, n3ctx, rw, objects))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.PolicyIDs(user, n3ctx, rw, objects...)
+	return db.policyIDs(user, n3ctx, rw, objects...)
 }
 
-// UpdatePolicyTr :
-func (db *badgerDB) UpdatePolicyTr(ctx context.Context, policy, name, user, n3ctx, rw string) (id, obj string, err error) {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("UpdatePolicy", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("UpdatePolicy", fSf("[%s] [%s] [%s] [%s] [%s]", policy, name, user, n3ctx, rw))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// UpdatePolicy :
+func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj string, err error) {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("UpdatePolicy", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("UpdatePolicy", fSf("[%s] [%s] [%s] [%s] [%s]", policy, name, user, n3ctx, rw))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.UpdatePolicy(policy, name, user, n3ctx, rw)
+	return db.updatePolicy(policy, name, user, n3ctx, rw)
 }
 
-// DeletePolicyTr :
-func (db *badgerDB) DeletePolicyTr(ctx context.Context, id string) (err error) {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("DeletePolicy", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("DeletePolicy", id)
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// DeletePolicy :
+func (db *badgerDB) DeletePolicy(id string) (err error) {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("DeletePolicy", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("DeletePolicy", id)
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.DeletePolicy(id)
+	return db.deletePolicy(id)
 }
 
-// PolicyHashTr :
-func (db *badgerDB) PolicyHashTr(ctx context.Context, id string) (string, bool) {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("PolicyHash", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("PolicyHash", id)
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// PolicyHash :
+func (db *badgerDB) PolicyHash(id string) (string, bool) {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("PolicyHash", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("PolicyHash", id)
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.PolicyHash(id)
+	return db.policyHash(id)
 }
 
-// PolicyTr :
-func (db *badgerDB) PolicyTr(ctx context.Context, id string) (string, bool) {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("Policy", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("Policy", id)
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// Policy :
+func (db *badgerDB) Policy(id string) (string, bool) {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("Policy", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("Policy", id)
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.Policy(id)
+	return db.policy(id)
 }
 
 // ------------------------------------------- //
 
-// MapRW2lsPIDTr :
-func (db *badgerDB) MapRW2lsPIDTr(ctx context.Context, user, n3ctx string, lsRW ...string) map[string][]string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("MapRW2lsPID", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("MapRW2lsPID", fSf("[%s] [%s] [%v]", user, n3ctx, lsRW))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// MapRW2lsPID :
+func (db *badgerDB) MapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][]string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("MapRW2lsPID", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("MapRW2lsPID", fSf("[%s] [%s] [%v]", user, n3ctx, lsRW))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.MapRW2lsPID(user, n3ctx, lsRW...)
+	return db.mapRW2lsPID(user, n3ctx, lsRW...)
 }
 
-// MapCtx2lsUserTr :
-func (db *badgerDB) MapCtx2lsUserTr(ctx context.Context, lsCtx ...string) map[string][]string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("MapCtx2lsUser", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("MapCtx2lsUser", fSf("[%v]", lsCtx))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// MapCtx2lsUser :
+func (db *badgerDB) MapCtx2lsUser(lsCtx ...string) map[string][]string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("MapCtx2lsUser", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("MapCtx2lsUser", fSf("[%v]", lsCtx))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.MapCtx2lsUser(lsCtx...)
+	return db.mapCtx2lsUser(lsCtx...)
 }
 
-// MapUser2lsCtxTr :
-func (db *badgerDB) MapUser2lsCtxTr(ctx context.Context, users ...string) map[string][]string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("MapUser2lsCtx", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("MapUser2lsCtx", fSf("[%v]", users))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// MapUser2lsCtx :
+func (db *badgerDB) MapUser2lsCtx(users ...string) map[string][]string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("MapUser2lsCtx", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("MapUser2lsCtx", fSf("[%v]", users))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.MapUser2lsCtx(users...)
+	return db.mapUser2lsCtx(users...)
 }
 
-// MapUC2lsObjectTr :
-func (db *badgerDB) MapUC2lsObjectTr(ctx context.Context, user, n3ctx string) map[string][]string {
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		span := db.tracer.StartSpan("MapUC2lsObject", opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, "badgerDB")
-		span.SetTag("MapUC2lsObject", fSf("[%s] [%s]", user, n3ctx))
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+// MapUC2lsObject :
+func (db *badgerDB) MapUC2lsObject(user, n3ctx string) map[string][]string {
+	if ctx := db.GetContext(); ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			span := db.tracer.StartSpan("MapUC2lsObject", opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, "badgerDB")
+			span.SetTag("MapUC2lsObject", fSf("[%s] [%s]", user, n3ctx))
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
-	return db.MapUC2lsObject(user, n3ctx)
+	return db.mapUC2lsObject(user, n3ctx)
 }
