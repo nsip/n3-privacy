@@ -15,9 +15,10 @@ func main() {
 	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", eg.CLI_SUBCMD_ERR, fns)
 
 	cltcfg, fn := os.Args[1], os.Args[2]
-	if !xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"}) {
-		failOnErrWhen(len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
-	}
+
+	ok, err := xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"})
+	failOnErr("%v", err)
+	failOnErrWhen(!ok && len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
 
 	cmd := flag.NewFlagSet(fn, flag.ExitOnError)
 	id := cmd.String("id", "", "policy ID")
@@ -50,7 +51,8 @@ func main() {
 	)
 	failOnErr("%v", err)
 
-	if xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"}) {
+	ok, err = xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"})
+	if failOnErr("%v", err); ok {
 		fPln(str)
 		return
 	}

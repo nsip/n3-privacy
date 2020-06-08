@@ -32,7 +32,6 @@ type DBTr interface {
 	DB
 	// Tracer
 	SetTracer(tracer opentracing.Tracer)
-	// Context
 	SetContext(ctx context.Context)
 	GetContext() context.Context
 }
@@ -56,7 +55,7 @@ func NewDB(dbType string, tracing bool) interface{} {
 	}
 
 	switch dbType {
-	case "badger":
+	case "badger", "BADGER":
 		if tracing {
 			n3db := db.NewDBByBadger().(DBTr)
 			n3db.SetEncPwd(dbType)
@@ -66,10 +65,6 @@ func NewDB(dbType string, tracing bool) interface{} {
 		n3db := db.NewDBByBadger().(DB)
 		n3db.SetEncPwd(dbType)
 		return n3db
-
-	case "map":
-		failOnErr("%v: [%s]", eg.NOT_IMPLEMENTED, dbType)
-		return nil
 
 	default:
 		failOnErr("%v: [%s]", eg.PARAM_NOT_SUPPORTED, dbType)

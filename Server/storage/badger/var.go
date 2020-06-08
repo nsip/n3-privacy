@@ -41,6 +41,9 @@ var (
 	decrypt       = cmn.Decrypt
 	env2Struct    = cmn.Env2Struct
 	failOnErrWhen = cmn.FailOnErrWhen
+	logger        = cmn.Log
+	setLog        = cmn.SetLog
+	tryInvoke     = cmn.TryInvoke
 
 	fmtJSON      = n3json.Fmt
 	fmtJSONFile  = n3json.FmtFile
@@ -58,7 +61,10 @@ var (
 	lenOfFID  = lenOfHash / 4  // length of Fields-Hash-ID Occupied
 	lenOfUID  = lenOfHash / 4  // length of UserID-Hash-ID Occupied
 	lenOfCTX  = lenOfHash / 4  // length of Context-Hash-ID Occupied
-	listID    = []string{}     // Policy ID List in running time
+)
+
+var (
+	listID = []string{} // Policy ID List in running time
 )
 
 type badgerDB struct {

@@ -11,7 +11,9 @@ import (
 func main() {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", eg.CFG_INIT_ERR)
 
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	ICfg, err := env2Struct("Cfg", &cfg.Config{})
+	failOnErr("%v", err)
+	Cfg := ICfg.(*cfg.Config)
 	ws, logfile, servicename := Cfg.WebService, Cfg.LogFile, Cfg.ServiceName
 
 	setLog(logfile)

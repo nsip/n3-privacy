@@ -34,7 +34,9 @@ func (db *badgerDB) loadIDList() int {
 
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	ICfg, err := env2Struct("Cfg", &cfg.Config{})
+	failOnErr("%v", err)
+	Cfg := ICfg.(*cfg.Config)
 	path := Cfg.Storage.BadgerDBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
 		os.MkdirAll(path, os.ModePerm)
@@ -54,22 +56,30 @@ func (db *badgerDB) close() {
 
 // ----------------------- Export ----------------------- //
 
-func (db *badgerDB) policyCount() int {
+func (db *badgerDB) PolicyCount() int {
+	tryInvoke(db, "useTracing", "PolicyCount", "badgerDB", "PolicyCount", "")
+
 	return len(listID)
 }
 
-func (db *badgerDB) policyID(user, n3ctx, rw, object string) string {
+func (db *badgerDB) PolicyID(user, n3ctx, rw, object string) string {
+	tryInvoke(db, "useTracing", "PolicyID", "badgerDB", "PolicyID", fSf("[%s] [%s] [%s] [%s]", user, n3ctx, rw, object))
+
 	if lsID := getPolicyID(user, n3ctx, rw, object); len(lsID) > 0 {
 		return lsID[0]
 	}
 	return ""
 }
 
-func (db *badgerDB) policyIDs(user, n3ctx, rw string, objects ...string) []string {
+func (db *badgerDB) PolicyIDs(user, n3ctx, rw string, objects ...string) []string {
+	tryInvoke(db, "useTracing", "PolicyIDs", "badgerDB", "PolicyIDs", fSf("[%s] [%s] [%s] [%v]", user, n3ctx, rw, objects))
+
 	return getPolicyID(user, n3ctx, rw, objects...)
 }
 
-func (db *badgerDB) updatePolicy(policy, name, user, n3ctx, rw string) (id, obj string, err error) {
+func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj string, err error) {
+	tryInvoke(db, "useTracing", "UpdatePolicy", "badgerDB", "UpdatePolicy", fSf("[%s] [%s] [%s] [%s] [%s]", policy, name, user, n3ctx, rw))
+
 	if policy, err = validate(policy); err != nil {
 		return "", "", err
 	}
@@ -79,14 +89,18 @@ func (db *badgerDB) updatePolicy(policy, name, user, n3ctx, rw string) (id, obj 
 		[]*badger.DB{db.mIDPolicy, db.mIDHash, db.mIDUser, db.mIDCtx, db.mIDObject},
 		[]string{id, id, hash(user)[:lenOfUID], hash(n3ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
 		[]string{encPolicy, hash(policy), user, n3ctx, obj})
-	if err == nil && !xin(id, listID) {
-		listID = append(listID, id)
+	if err == nil {
+		if ok, _ := xin(id, listID); !ok {
+			listID = append(listID, id)
+		}
 	}
 	// logMeta(policy, n3ctx, rw)
 	return id, obj, err
 }
 
-func (db *badgerDB) deletePolicy(id string) (err error) {
+func (db *badgerDB) DeletePolicy(id string) (err error) {
+	tryInvoke(db, "useTracing", "DeletePolicy", "badgerDB", "DeletePolicy", id)
+
 	if err = updateBadgerDB([]*badger.DB{db.mIDHash, db.mIDPolicy}, []string{id, id}); err == nil {
 		for i, ID := range listID {
 			if ID == id {
@@ -98,14 +112,18 @@ func (db *badgerDB) deletePolicy(id string) (err error) {
 	return err
 }
 
-func (db *badgerDB) policyHash(id string) (string, bool) {
+func (db *badgerDB) PolicyHash(id string) (string, bool) {
+	tryInvoke(db, "useTracing", "PolicyHash", "badgerDB", "PolicyHash", id)
+
 	if values, err := getBadgerDB([]*badger.DB{db.mIDHash}, []string{id}); err == nil {
 		return values[0], true
 	}
 	return "", false
 }
 
-func (db *badgerDB) policy(id string) (string, bool) {
+func (db *badgerDB) Policy(id string) (string, bool) {
+	tryInvoke(db, "useTracing", "Policy", "badgerDB", "Policy", id)
+
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
 		if policy, err := decrypt([]byte(values[0]), db.encPwd); err == nil {
 			return string(policy), true
@@ -250,7 +268,9 @@ func (db *badgerDB) listObject(user, n3ctx string) []string {
 
 // ------------------------------------------------- //
 
-func (db *badgerDB) mapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][]string {
+func (db *badgerDB) MapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][]string {
+	tryInvoke(db, "useTracing", "MapRW2lsPID", "badgerDB", "MapRW2lsPID", fSf("[%s] [%s] [%v]", user, n3ctx, lsRW))
+
 	rt := make(map[string][]string)
 	key := fSf("%s@%s", user, n3ctx)
 	for i, IDs := range db.listPolicyID(user, n3ctx, lsRW...) {
@@ -271,7 +291,9 @@ func (db *badgerDB) mapRW2lsPID(user, n3ctx string, lsRW ...string) map[string][
 	return rt
 }
 
-func (db *badgerDB) mapCtx2lsUser(lsCtx ...string) map[string][]string {
+func (db *badgerDB) MapCtx2lsUser(lsCtx ...string) map[string][]string {
+	tryInvoke(db, "useTracing", "MapCtx2lsUser", "badgerDB", "MapCtx2lsUser", fSf("[%v]", lsCtx))
+
 	rt := make(map[string][]string)
 	for i, users := range db.listUser(lsCtx...) {
 		if len(lsCtx) == 0 {
@@ -283,7 +305,9 @@ func (db *badgerDB) mapCtx2lsUser(lsCtx ...string) map[string][]string {
 	return rt
 }
 
-func (db *badgerDB) mapUser2lsCtx(users ...string) map[string][]string {
+func (db *badgerDB) MapUser2lsCtx(users ...string) map[string][]string {
+	tryInvoke(db, "useTracing", "MapUser2lsCtx", "badgerDB", "MapUser2lsCtx", fSf("[%v]", users))
+
 	rt := make(map[string][]string)
 	for i, lsCtx := range db.listCtx(users...) {
 		if len(users) == 0 {
@@ -295,7 +319,9 @@ func (db *badgerDB) mapUser2lsCtx(users ...string) map[string][]string {
 	return rt
 }
 
-func (db *badgerDB) mapUC2lsObject(user, n3ctx string) map[string][]string {
+func (db *badgerDB) MapUC2lsObject(user, n3ctx string) map[string][]string {
+	tryInvoke(db, "useTracing", "MapUC2lsObject", "badgerDB", "MapUC2lsObject", fSf("[%s] [%s]", user, n3ctx))
+
 	key := user + "@" + n3ctx
 	switch {
 	case user == "" && n3ctx == "":

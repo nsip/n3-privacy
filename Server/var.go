@@ -9,6 +9,7 @@ import (
 var (
 	fPln = fmt.Println
 
+	failOnErr     = cmn.FailOnErr
 	failOnErrWhen = cmn.FailOnErrWhen
 	localIP       = cmn.LocalIP
 	setLog        = cmn.SetLog

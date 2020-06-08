@@ -16,6 +16,7 @@ var (
 	localIP       = cmn.LocalIP
 	isJSON        = cmn.IsJSON
 	jsonRoot      = cmn.JSONRoot
+	failOnErr     = cmn.FailOnErr
 	failOnErrWhen = cmn.FailOnErrWhen
 	warnOnErr     = cmn.WarnOnErr
 	warnOnErrWhen = cmn.WarnOnErrWhen
@@ -33,7 +34,9 @@ var (
 
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	for _, v := range struct2Map(route) {
+	m, err := struct2Map(route)
+	failOnErr("%v", err)
+	for _, v := range m {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

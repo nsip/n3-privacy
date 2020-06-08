@@ -13,7 +13,7 @@ const Config = "../../config/config.toml"
 func TestUpdatePolicy(t *testing.T) {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
-	p, e := ioutil.ReadFile("../../../Enforcer/samples/xapiPolicy1.json")
+	p, e := ioutil.ReadFile("../../../Enforcer/samples/xapiPolicy.json")
 	failOnErr("%v", e)
 	id, obj, e := db.UpdatePolicy(string(p), "object", "user", "n3ctx", "r")
 	fPln(id, obj, e)
@@ -23,7 +23,7 @@ func TestDeletePolicy(t *testing.T) {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	// db.DeletePolicy("92c8797efc18b369ed0a12dea96fec4024700fd9r")
-	for _, pid := range db.PolicyIDs("user", "n3ctx", "r", "object", "root") {
+	for _, pid := range db.PolicyIDs("user", "n3ctx", "r", "object") {
 		db.DeletePolicy(pid)
 	}
 }
