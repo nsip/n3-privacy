@@ -13,7 +13,8 @@ func TestDO(t *testing.T) {
 	data, err := ioutil.ReadFile("./data/file.json")
 	failOnErr("%v", err)
 
-	str, err := DO(
+	str, err := DOwithTrace(
+		nil,
 		"./config.toml",
 		"Enforce", // HELP GetID GetHash Get Update Delete Enforce LsID LsContext LsUser LsObject
 		Args{

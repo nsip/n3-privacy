@@ -21,9 +21,9 @@ func (db *badgerDB) GetContext() context.Context {
 	return db.context
 }
 
-// ---------------------- //
+func (db *badgerDB) UseTracing(operName, spanValue, tagKey, tagValue string) {
+	fPln(" ------- db tracing ------- ")
 
-func (db *badgerDB) useTracing(operName, spanValue, tagKey, tagValue string) {
 	if ctx := db.GetContext(); ctx != nil {
 		if span := opentracing.SpanFromContext(ctx); span != nil {
 			span := db.tracer.StartSpan(operName, opentracing.ChildOf(span.Context()))

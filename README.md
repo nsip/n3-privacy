@@ -36,4 +36,6 @@
 
 3. For `/clean.sh`, if `rmdb` provided as first argument, policy-database would be removed !!
 
+## Docker Test
 
+1. docker run -it --net="host" --name=privacy n3-privacy:test /bin/bash

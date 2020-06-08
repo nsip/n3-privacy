@@ -21,25 +21,27 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 	Cfg := ICfg.(*Config)
 	serviceName := Cfg.ServiceName
 
-	if span := opentracing.SpanFromContext(ctx); span != nil {
-		initTracer := func(serviceName string) opentracing.Tracer {
-			cfg, err := config.FromEnv()
-			failOnErr("%v: ", err)
-			cfg.ServiceName = serviceName
-			cfg.Sampler.Type = "const"
-			cfg.Sampler.Param = 1
-			tracer, _, err := cfg.NewTracer()
-			failOnErr("%v: ", err)
-			return tracer
-		}
+	if ctx != nil {
+		if span := opentracing.SpanFromContext(ctx); span != nil {
+			initTracer := func(serviceName string) opentracing.Tracer {
+				cfg, err := config.FromEnv()
+				failOnErr("%v: ", err)
+				cfg.ServiceName = serviceName
+				cfg.Sampler.Type = "const"
+				cfg.Sampler.Param = 1
+				tracer, _, err := cfg.NewTracer()
+				failOnErr("%v: ", err)
+				return tracer
+			}
 
-		tracer := initTracer(serviceName)
-		span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
-		tags.SpanKindRPCClient.Set(span)
-		tags.PeerService.Set(span, serviceName)
-		span.SetTag(fn, args)
-		defer span.Finish()
-		ctx = opentracing.ContextWithSpan(ctx, span)
+			tracer := initTracer(serviceName)
+			span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
+			tags.SpanKindRPCClient.Set(span)
+			tags.PeerService.Set(span, serviceName)
+			span.SetTag(fn, args)
+			defer span.Finish()
+			ctx = opentracing.ContextWithSpan(ctx, span)
+		}
 	}
 	return DO(configfile, fn, args)
 }
