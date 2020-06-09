@@ -58,7 +58,7 @@ func DO(configfile, fn string, args Args) (string, error) {
 	timeout := Cfg.Access.Timeout
 	setLog(Cfg.LogFile)
 
-	mFnURL, fields := initMapFnURL(protocol, ip, port, Cfg.Route)
+	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
 	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err

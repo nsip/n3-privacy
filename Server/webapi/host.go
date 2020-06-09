@@ -45,7 +45,7 @@ func HostHTTPAsync() {
 		file     = Cfg.File
 		database = Cfg.Storage.DataBase
 		tracing  = Cfg.Storage.Tracing
-		mMtx     = initMutex(route)
+		mMtx     = initMutex(&route)
 		db       = storage.NewDB(database, tracing).(storage.DBTr) // DBTr covers DB
 	)
 

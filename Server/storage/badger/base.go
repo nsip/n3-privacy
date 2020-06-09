@@ -110,8 +110,3 @@ func getOneBadgerDB(db *badger.DB, keys []string) (values []string, err error) {
 	}
 	return
 }
-
-// NewDBByBadger :
-func NewDBByBadger() interface{} {
-	return (&badgerDB{}).init()
-}

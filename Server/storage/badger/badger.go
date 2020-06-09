@@ -1,12 +1,32 @@
 package db
 
 import (
+	"context"
 	"os"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	badger "github.com/dgraph-io/badger"
 	cfg "github.com/nsip/n3-privacy/Server/config"
+	"github.com/opentracing/opentracing-go"
 )
+
+type badgerDB struct {
+	mIDPolicy *badger.DB
+	mIDHash   *badger.DB
+	err       error
+	mIDUser   *badger.DB
+	mIDCtx    *badger.DB
+	mIDObject *badger.DB
+	encPwd    string
+	// -------------- //
+	tracer  opentracing.Tracer
+	context context.Context
+}
+
+// NewDBByBadger :
+func NewDBByBadger() interface{} {
+	return (&badgerDB{}).init()
+}
 
 // SetEncPwd :
 func (db *badgerDB) SetEncPwd(pwd string) {
