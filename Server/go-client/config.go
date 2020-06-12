@@ -1,7 +1,6 @@
-package config
+package client
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,20 +13,7 @@ type Config struct {
 	Path        string
 	LogFile     string
 	ServiceName string
-
-	Storage struct {
-		DataBase     string
-		BadgerDBPath string
-		Tracing      bool
-	}
-
-	WebService struct {
-		Port    int
-		Service string
-		Version string
-	}
-
-	Route struct {
+	Route       struct {
 		HELP      string
 		GetID     string
 		GetHash   string
@@ -40,26 +26,13 @@ type Config struct {
 		LsObject  string
 		Enforce   string
 	}
-
-	File struct {
-		ClientLinux64   string
-		ClientMac       string
-		ClientWin64     string
-		ClientConfig    string
-		EnforcerLinux64 string
-		EnforcerMac     string
-		EnforcerWin64   string
-		EnforcerConfig  string
-	}
-
 	Server struct {
 		Protocol string
 		IP       string
-		Port     interface{}
+		Port     int
 	}
-
 	Access struct {
-		Timeout int
+		Timeout int64
 	}
 }
 
@@ -77,20 +50,17 @@ func newCfg(configs ...string) *Config {
 func (cfg *Config) set() *Config {
 	f := cfg.Path /* make a copy of original for restoring */
 	if _, e := toml.DecodeFile(f, cfg); e == nil {
-		// modify path
+		// modify some to save
 		cfg.Path = f
 		if abs, e := filepath.Abs(f); e == nil {
 			cfg.Path = abs
 		}
 
-		// DO NOT SAVE
+		// save
+		cfg.save()
 
 		ICfg, e := cfgRepl(cfg, map[string]interface{}{
 			"[DATE]": time.Now().Format("2006-01-02"),
-			"[IP]":   localIP(),
-			"[PORT]": cfg.WebService.Port,
-			"[s]":    cfg.WebService.Service,
-			"[v]":    cfg.WebService.Version,
 		})
 		failOnErr("%v", e)
 		return ICfg.(*Config)
@@ -105,19 +75,8 @@ func (cfg *Config) save() {
 	}
 }
 
-// SaveAs :
-func (cfg *Config) SaveAs(filename string) {
-	bytes, err := ioutil.ReadFile(cfg.Path)
-	failOnErr("%v", err)
-	if !sHasSuffix(filename, ".toml") {
-		filename += ".toml"
-	}
-	failOnErr("%v", ioutil.WriteFile(filename, bytes, 0666))
-	newCfg(filename).save()
-}
-
-// InitEnvVarFromTOML : initialize the global variables
-func InitEnvVarFromTOML(key string, configs ...string) bool {
+// initEnvVarFromTOML : initialize the global variables
+func initEnvVarFromTOML(key string, configs ...string) bool {
 	configs = append(configs, "./config.toml")
 	Cfg := newCfg(configs...)
 	if Cfg == nil {

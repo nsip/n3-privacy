@@ -10,16 +10,32 @@
 
 ## Getting Started
 
-1. Goto /Mask, run 'build.sh', make executable.
+1. One-Step. Run `build.sh`, automatically generate all executables.
 
-2. Goto /Server, run 'build.sh', make executable and meanwhile push a copy of Client config to its folder.
+   [jm] in ./Enforcer/build/your-os/
+   
+   [server] in ./Server/build/your-os/
+   
+   [client] in ./Client/build/your-os/
 
-3. Goto /Client, run 'build.sh', make executable.
-
-4. Building Server should be prior to Building Client ! 
+   IMPORTANT: If manually build each sub-project, building Server must be prior to building Client.
 
 ## How To Use
 
 1. Browse "http(s)://ServerIP:Port/" to get info when Server is running. 
 
-2. Mask & Client executable should be fetched by "wget".
+2. Enforcer & Client executable should be fetched by `wget`.
+   
+   e.g. `wget IP:Port/enforcer-linux64` to get Enforcer executable on Linux64.
+
+   `wget -O config.toml IP:Port/enforcer-config` to get its configure.
+
+   e.g. `wget IP:Port/client-linux64` to get Client executable on Linux64.
+
+   `wget -O config.toml IP:Port/client-config` to get its configure.
+
+3. For `/clean.sh`, if `rmdb` provided as first argument, policy-database would be removed !!
+
+## Docker Test
+
+1. docker run -it --net="host" --name=privacy n3-privacy:test /bin/bash
