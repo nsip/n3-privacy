@@ -28,19 +28,22 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	isJSON        = cmn.IsJSON
-	xin           = cmn.XIn
-	failOnErr     = cmn.FailOnErr
-	toSet         = cmn.ToSet
-	indent        = cmn.Indent
-	encrypt       = cmn.Encrypt
-	decrypt       = cmn.Decrypt
-	env2Struct    = cmn.Env2Struct
-	failOnErrWhen = cmn.FailOnErrWhen
-	logger        = cmn.Log
-	setLog        = cmn.SetLog
-	tryInvoke     = cmn.TryInvoke
-	hash          = cmn.SHA1Str // 32 [40] 64
+	isJSON           = cmn.IsJSON
+	xin              = cmn.XIn
+	failOnErr        = cmn.FailOnErr
+	toSet            = cmn.ToSet
+	indent           = cmn.Indent
+	encrypt          = cmn.Encrypt
+	decrypt          = cmn.Decrypt
+	env2Struct       = cmn.Env2Struct
+	failOnErrWhen    = cmn.FailOnErrWhen
+	logger           = cmn.Log
+	setLog           = cmn.SetLog
+	tryInvoke        = cmn.TryInvoke
+	tryInvokeWithMW  = cmn.TryInvokeWithMW
+	mustInvokeWithMW = cmn.MustInvokeWithMW
+	invRst           = cmn.InvRst
+	hash             = cmn.SHA1Str // 32 [40] 64
 
 	fmtJSON      = n3json.Fmt
 	fmtJSONFile  = n3json.FmtFile

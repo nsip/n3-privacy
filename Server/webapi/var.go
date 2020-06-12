@@ -13,21 +13,23 @@ var (
 	fPf  = fmt.Printf
 	fPln = fmt.Println
 
-	localIP       = cmn.LocalIP
-	isJSON        = cmn.IsJSON
-	jsonRoot      = cmn.JSONRoot
-	failOnErr     = cmn.FailOnErr
-	failOnErrWhen = cmn.FailOnErrWhen
-	warnOnErr     = cmn.WarnOnErr
-	warnOnErrWhen = cmn.WarnOnErrWhen
-	setLog        = cmn.SetLog
-	url1Value     = cmn.URL1Value
-	url2Values    = cmn.URL2Values
-	url3Values    = cmn.URL3Values
-	url4Values    = cmn.URL4Values
-	urlValues     = cmn.URLValues
-	struct2Map    = cmn.Struct2Map
-	env2Struct    = cmn.Env2Struct
+	localIP          = cmn.LocalIP
+	isJSON           = cmn.IsJSON
+	jsonRoot         = cmn.JSONRoot
+	failOnErr        = cmn.FailOnErr
+	failOnErrWhen    = cmn.FailOnErrWhen
+	warnOnErr        = cmn.WarnOnErr
+	warnOnErrWhen    = cmn.WarnOnErrWhen
+	setLog           = cmn.SetLog
+	url1Value        = cmn.URL1Value
+	url2Values       = cmn.URL2Values
+	url3Values       = cmn.URL3Values
+	url4Values       = cmn.URL4Values
+	urlValues        = cmn.URLValues
+	struct2Map       = cmn.Struct2Map
+	env2Struct       = cmn.Env2Struct
+	mustInvokeWithMW = cmn.MustInvokeWithMW
+	toGeneralSlc     = cmn.ToGeneralSlc
 
 	prepare = ext.Prepare
 )
