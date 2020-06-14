@@ -49,7 +49,6 @@ type Config struct {
 		EnforcerLinux64 string
 		EnforcerMac     string
 		EnforcerWin64   string
-		EnforcerConfig  string
 	}
 
 	Server struct {

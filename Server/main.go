@@ -17,8 +17,8 @@ func main() {
 	ws, logfile, servicename := Cfg.WebService, Cfg.LogFile, Cfg.ServiceName
 
 	setLog(logfile)
-	fPln(logWhen(true, "[%s] Hosting on: [%v:%d], version [%v]", ws.Service, localIP(), ws.Port, ws.Version))
-	fPln(logWhen(true, "Working on Database: [%s]", Cfg.Storage.DataBase))
+	fPln(logger("[%s] Hosting on: [%v:%d], version [%v]", ws.Service, localIP(), ws.Port, ws.Version))
+	fPln(logger("Working on Database: [%s]", Cfg.Storage.DataBase))
 
 	os.Setenv("JAEGER_SERVICE_NAME", servicename)
 	os.Setenv("JAEGER_SAMPLER_TYPE", "const")

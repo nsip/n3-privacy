@@ -13,19 +13,19 @@
 1. One-Step. Run `build.sh`, automatically generate all executables.
 
    [jm] in ./Enforcer/build/your-os/
-   
+  
    [server] in ./Server/build/your-os/
-   
+  
    [client] in ./Client/build/your-os/
 
    IMPORTANT: If manually build each sub-project, building Server must be prior to building Client.
 
 ## How To Use
 
-1. Browse "http(s)://ServerIP:Port/" to get info when Server is running. 
+1. Browse "http(s)://ServerIP:Port/" to get info when Server is running.
 
 2. Enforcer & Client executable should be fetched by `wget`.
-   
+  
    e.g. `wget IP:Port/enforcer-linux64` to get Enforcer executable on Linux64.
 
    `wget -O config.toml IP:Port/enforcer-config` to get its configure.
@@ -38,4 +38,4 @@
 
 ## Docker Test
 
-1. docker run -it --net="host" --name=privacy n3-privacy:test /bin/bash
+1. docker run --net="host" --name=privacy n3-privacy:latest

@@ -99,7 +99,6 @@ func HostHTTPAsync() {
 		"/enforcer-linux64": file.EnforcerLinux64,
 		"/enforcer-mac":     file.EnforcerMac,
 		"/enforcer-win64":   file.EnforcerWin64,
-		"/enforcer-config":  file.EnforcerConfig,
 		"/client-linux64":   file.ClientLinux64,
 		"/client-mac":       file.ClientMac,
 		"/client-win64":     file.ClientWin64,
