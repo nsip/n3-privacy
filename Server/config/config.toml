@@ -29,20 +29,13 @@ ServiceName = "N3-PRIVACY"
   Enforce = "/[s]/[v]/enforce"
 
 [File]
-  ClientLinux64 = "../Client/client"
-  ClientMac = "../Client/client"
-  ClientWin64 = "../Client/client.exe"
-  ClientConfig = "../Client/cfg-clt-privacy.toml"
-  EnforcerLinux64 = "../Enforcer/enforcer"
-  EnforcerMac = "../Enforcer/enforcer"
-  EnforcerWin64 = "../Enforcer/enforcer.exe"
-  # ClientLinux64 = "../../../Client/build/linux64/client"
-  # ClientMac = "../../../Client/build/mac/client"
-  # ClientWin64 = "../../../Client/build/win64/client.exe"
-  # ClientConfig = "../../../Client/build/linux64/cfg-clt-privacy.toml"
-  # EnforcerLinux64 = "../../../Enforcer/build/linux64/enforcer"
-  # EnforcerMac = "../../../Enforcer/build/mac/enforcer"
-  # EnforcerWin64 = "../../../Enforcer/build/win64/enforcer.exe"
+  ClientLinux64 = "../../../Client/build/linux64/client"
+  ClientMac = "../../../Client/build/mac/client"
+  ClientWin64 = "../../../Client/build/win64/client.exe"
+  ClientConfig = "../../../Client/build/linux64/cfg-clt-privacy.toml"
+  EnforcerLinux64 = "../../../Enforcer/build/linux64/enforcer"
+  EnforcerMac = "../../../Enforcer/build/mac/enforcer"
+  EnforcerWin64 = "../../../Enforcer/build/win64/enforcer.exe"
 
 # ************************ Client ************************ #
 # *********** Client ONLY Modify This Part ********** #
