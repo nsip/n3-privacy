@@ -1,17 +1,7 @@
 FROM alpine
-
-RUN mkdir -p /Server
-COPY ./Server/build/linux64/server /Server
-COPY ./Server/build/linux64/config.toml /Server
-
-RUN mkdir -p /Enforcer
-COPY ./Enforcer/build/linux64/enforcer /Enforcer
-
-RUN mkdir -p /Client
-COPY ./Client/build/linux64/client /Client
-COPY ./Client/build/linux64/cfg-clt-privacy.toml /Client
-
-WORKDIR /Server
+RUN mkdir n3-privacy
+COPY ./n3-privacy /n3-privacy
+WORKDIR /n3-privacy/Server/build/linux64
 CMD ["./server"]
 
 # FROM scratch
@@ -20,3 +10,9 @@ CMD ["./server"]
 # CMD ["./server"]
 
 ### docker build --tag=n3-privacy .
+
+### docker tag IMAGE_ID cdutwhu/n3-privacy:latest
+### docker login
+### docker push cdutwhu/n3-privacy
+
+### find ./ -type d -not -path "*/\.*"
