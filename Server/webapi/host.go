@@ -6,9 +6,9 @@ import (
 	"os"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/jaegertracing"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4/middleware"
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/nsip/n3-privacy/Server/storage"

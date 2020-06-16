@@ -10,7 +10,11 @@
 
 ## Getting Started
 
-1. One-Step. Run `build.sh`, automatically generate all executables.
+0. If no go.mod, Run `go mod init github.com/nsip/n3-privacy`
+
+1. If no go.sum, Run `go get -u ./...`
+
+2. One-Step. Run `build.sh`, automatically generate all executables.
 
    [jm] in ./Enforcer/build/your-os/
   
