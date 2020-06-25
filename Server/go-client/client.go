@@ -14,7 +14,7 @@ import (
 )
 
 // DOwithTrace :
-func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string, error) {
+func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
 	ICfg, err := env2Struct(envVarName, &Config{})
 	failOnErr("%v", err)
@@ -36,10 +36,12 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 
 			tracer := initTracer(serviceName)
 			span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
+			defer span.Finish()
 			tags.SpanKindRPCClient.Set(span)
 			tags.PeerService.Set(span, serviceName)
 			span.SetTag(fn, args)
-			defer span.Finish()
+			span.LogEvent("Test log")
+			span.SetBaggageItem("Test baggage", "baggage")
 			ctx = opentracing.ContextWithSpan(ctx, span)
 		}
 	}
@@ -47,7 +49,7 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 }
 
 // DO : fn ["HELP", ...]
-func DO(configfile, fn string, args Args) (string, error) {
+func DO(configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
 	ICfg, err := env2Struct(envVarName, &Config{})
 	failOnErr("%v", err)
@@ -82,15 +84,25 @@ func DO(configfile, fn string, args Args) (string, error) {
 }
 
 // rest :
-func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
+func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	var (
 		Resp    *http.Response
 		Err     error
 		RetData []byte
+
+		id     string
+		user   string
+		ctx    string
+		object string
+		rw     string
+		policy []byte
+		data   []byte
 	)
 
-	id, user, ctx, object, rw, policy, data := args.ID, args.User, args.Ctx, args.Object, args.RW, args.Policy, args.Data
+	if args != nil {
+		id, user, ctx, object, rw, policy, data = args.ID, args.User, args.Ctx, args.Object, args.RW, args.Policy, args.Data
+	}
 
 	switch fn {
 	case "HELP":

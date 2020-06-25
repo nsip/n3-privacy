@@ -16,7 +16,7 @@
 
 2. One-Step. Run `build.sh`, automatically generate all executables.
 
-   [jm] in ./Enforcer/build/your-os/
+   [enforcer] in ./Enforcer/build/your-os/
   
    [server] in ./Server/build/your-os/
   

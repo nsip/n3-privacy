@@ -41,7 +41,7 @@ func main() {
 	str, err := clt.DO(
 		cltcfg,
 		fn,
-		clt.Args{
+		&clt.Args{
 			ID:     *id,
 			Policy: policy,
 			User:   *user,

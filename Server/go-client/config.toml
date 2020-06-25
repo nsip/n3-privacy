@@ -1,5 +1,5 @@
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/temp.toml"
-LogFile = "./N3-PRIVACY-2020-06-16.log"
+LogFile = "./N3-PRIVACY-2020-06-25.log"
 ServiceName = "N3-PRIVACY"
 
 [Route]

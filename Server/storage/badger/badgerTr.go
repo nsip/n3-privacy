@@ -27,10 +27,11 @@ func (db *badgerDB) UseTracing(operName, spanValue, tagKey, tagValue string) {
 	if ctx := db.GetContext(); ctx != nil {
 		if span := opentracing.SpanFromContext(ctx); span != nil {
 			span := db.tracer.StartSpan(operName, opentracing.ChildOf(span.Context()))
+			defer span.Finish()
 			tags.SpanKindRPCClient.Set(span)
 			tags.PeerService.Set(span, spanValue)
 			span.SetTag(tagKey, tagValue)
-			defer span.Finish()
+			span.LogEvent("db tracing")
 			ctx = opentracing.ContextWithSpan(ctx, span)
 		}
 	}
