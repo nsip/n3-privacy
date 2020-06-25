@@ -17,7 +17,7 @@ func TestDO(t *testing.T) {
 		nil,
 		"./config.toml",
 		"Update", // HELP GetID GetHash Get Update Delete Enforce LsID LsContext LsUser LsObject
-		Args{
+		&Args{
 			ID:     "1615307cc4bf38ffcad912dea96fec4024700fd9r", // 1615307cc4bf38ffcad912dea96fec4024700fd9r
 			Policy: policy,
 			User:   "user",
