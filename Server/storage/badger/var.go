@@ -42,7 +42,7 @@ var (
 	tryInvoke        = cmn.TryInvoke
 	tryInvokeWithMW  = cmn.TryInvokeWithMW
 	mustInvokeWithMW = cmn.MustInvokeWithMW
-	invRst           = cmn.InvRst
+	invokeRst        = cmn.InvokeRst
 	hash             = cmn.SHA1Str // 32 [40] 64
 
 	fmtJSON      = n3json.Fmt
