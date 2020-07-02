@@ -1,23 +1,39 @@
 package webapi
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/nsip/n3-privacy/Server/storage"
 )
 
+func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
+	<-sig
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	failOnErr("%v", e.Shutdown(ctx))
+	time.Sleep(20 * time.Millisecond)
+	done <- "Shutdown Successfully"
+}
+
 // HostHTTPAsync : Host a HTTP Server for providing policy json
-func HostHTTPAsync() {
+func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
+	defer func() { fPln(logger("HostHTTPAsync Exit")) }()
+
 	e := echo.New()
 	defer e.Close()
+
+	// waiting for shutdown
+	go shutdownAsync(e, sig, done)
 
 	// Middleware
 	e.Use(middleware.Logger())

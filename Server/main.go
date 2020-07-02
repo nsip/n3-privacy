@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/signal"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	cfg "github.com/nsip/n3-privacy/Server/config"
@@ -25,6 +26,8 @@ func main() {
 	os.Setenv("JAEGER_SAMPLER_PARAM", "1")
 
 	done := make(chan string)
-	go api.HostHTTPAsync()
-	<-done
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Kill, os.Interrupt)
+	go api.HostHTTPAsync(c, done)
+	fPln(logger(<-done))
 }

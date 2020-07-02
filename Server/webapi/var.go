@@ -21,6 +21,7 @@ var (
 	warnOnErr        = cmn.WarnOnErr
 	warnOnErrWhen    = cmn.WarnOnErrWhen
 	setLog           = cmn.SetLog
+	logger           = cmn.Log
 	url1Value        = cmn.URL1Value
 	url2Values       = cmn.URL2Values
 	url3Values       = cmn.URL3Values
