@@ -4,7 +4,7 @@
 
 1. JSON format. Be subset of Spec-defined object's attributes.
 
-2. BlackList Rule.
+2. BlockList Rule.
 
 3. DO NOT use "[]", "(B)", "(N)" as mask symbol for policy file attribute value.
 

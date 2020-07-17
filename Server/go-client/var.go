@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/judge"
+	"github.com/cdutwhu/gotil/rflx"
+	"github.com/cdutwhu/n3-util/cfg"
 )
 
 var (
@@ -14,19 +17,19 @@ var (
 	sReplace      = strings.Replace
 	sJoin         = strings.Join
 	sTrimRight    = strings.TrimRight
-	cfgRepl       = cmn.CfgRepl
-	failOnErr     = cmn.FailOnErr
-	failOnErrWhen = cmn.FailOnErrWhen
-	warnOnErr     = cmn.WarnOnErr
-	env2Struct    = cmn.Env2Struct
-	setLog        = cmn.SetLog
-	logWhen       = cmn.LogWhen
-	logger        = cmn.Log
-	warnOnErrWhen = cmn.WarnOnErrWhen
-	isJSON        = cmn.IsJSON
-	struct2Env    = cmn.Struct2Env
-	struct2Map    = cmn.Struct2Map
-	mapKeys       = cmn.MapKeys
+	cfgRepl       = cfg.Modify
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
+	warnOnErr     = fn.WarnOnErr
+	setLog        = fn.SetLog
+	logWhen       = fn.LoggerWhen
+	logger        = fn.Logger
+	warnOnErrWhen = fn.WarnOnErrWhen
+	isJSON        = judge.IsJSON
+	struct2Env    = rflx.Struct2Env
+	struct2Map    = rflx.Struct2Map
+	mapKeys       = rflx.MapKeys
+	env2Struct    = rflx.Env2Struct
 )
 
 const (
@@ -46,12 +49,8 @@ type Args struct {
 
 func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]string, []string) {
 	mFnURL := make(map[string]string)
-	m, err := struct2Map(route)
-	failOnErr("%v", err)
-	for k, v := range m {
+	for k, v := range struct2Map(route) {
 		mFnURL[k] = fSf("%s://%s:%d%s", protocol, ip, port, v)
 	}
-	Ikeys, err := mapKeys(mFnURL)
-	failOnErr("%v", err)
-	return mFnURL, Ikeys.([]string)
+	return mFnURL, mapKeys(mFnURL).([]string)
 }

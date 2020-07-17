@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/judge"
+	"github.com/cdutwhu/gotil/rflx"
+	"github.com/cdutwhu/n3-util/cfg"
 )
 
 var (
@@ -16,16 +19,15 @@ var (
 	sJoin       = strings.Join
 	sReplaceAll = strings.ReplaceAll
 
-	xin           = cmn.XIn
-	setLog        = cmn.SetLog
-	resetLog      = cmn.ResetLog
-	failOnErr     = cmn.FailOnErr
-	failOnErrWhen = cmn.FailOnErrWhen
-	warnOnErrWhen = cmn.WarnOnErrWhen
-	isFLog        = cmn.IsFLog
-	isJSON        = cmn.IsJSON
-	cfgRepl       = cmn.CfgRepl
-	struct2Env    = cmn.Struct2Env
-	struct2Map    = cmn.Struct2Map
-	structFields  = cmn.StructFields
+	setLog        = fn.SetLog
+	resetLog      = fn.ResetLog
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
+	warnOnErrWhen = fn.WarnOnErrWhen
+	isJSON        = judge.IsJSON
+	exist         = judge.Exist
+	cfgRepl       = cfg.Modify
+	struct2Env    = rflx.Struct2Env
+	struct2Map    = rflx.Struct2Map
+	structFields  = rflx.StructFields
 )

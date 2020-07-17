@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/endec"
+	"github.com/cdutwhu/gotil/judge"
+	"github.com/cdutwhu/gotil/rflx"
+	"github.com/cdutwhu/gotil/str"
 	"github.com/cdutwhu/n3-util/jkv"
 	"github.com/cdutwhu/n3-util/n3json"
 )
@@ -28,22 +32,23 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	isJSON           = cmn.IsJSON
-	xin              = cmn.XIn
-	failOnErr        = cmn.FailOnErr
-	toSet            = cmn.ToSet
-	indent           = cmn.Indent
-	encrypt          = cmn.Encrypt
-	decrypt          = cmn.Decrypt
-	env2Struct       = cmn.Env2Struct
-	failOnErrWhen    = cmn.FailOnErrWhen
-	logger           = cmn.Log
-	setLog           = cmn.SetLog
-	tryInvoke        = cmn.TryInvoke
-	tryInvokeWithMW  = cmn.TryInvokeWithMW
-	mustInvokeWithMW = cmn.MustInvokeWithMW
-	invokeRst        = cmn.InvokeRst
-	hash             = cmn.SHA1Str // 32 [40] 64
+	isJSON           = judge.IsJSON
+	exist            = judge.Exist
+	indent           = str.IndentTxt
+	encrypt          = endec.Encrypt
+	decrypt          = endec.Decrypt
+	hash             = endec.SHA1Str // 32 [40] 64
+	failOnErrWhen    = fn.FailOnErrWhen
+	logger           = fn.Logger
+	setLog           = fn.SetLog
+	failOnErr        = fn.FailOnErr
+	tryInvoke        = rflx.TryInvoke
+	tryInvokeWithMW  = rflx.TryInvokeWithMW
+	mustInvokeWithMW = rflx.MustInvokeWithMW
+	invokeRst        = rflx.InvokeRst
+	gslc             = rflx.ToGeneralSlc
+	toSet            = rflx.ToSet
+	env2Struct       = rflx.Env2Struct
 
 	fmtJSON      = n3json.Fmt
 	fmtJSONFile  = n3json.FmtFile

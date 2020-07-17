@@ -73,9 +73,7 @@ func (db *badgerDB) loadIDList() int {
 
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
-	ICfg, err := env2Struct("Cfg", &cfg.Config{})
-	failOnErr("%v", err)
-	Cfg := ICfg.(*cfg.Config)
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
 	path := Cfg.Storage.BadgerDBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
 		os.MkdirAll(path, os.ModePerm)
@@ -121,7 +119,7 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj 
 		[]string{id, id, hash(user)[:lenOfUID], hash(n3ctx)[:lenOfCTX], hash(obj)[:lenOfOID]},
 		[]string{encPolicy, hash(policy), user, n3ctx, obj})
 	if err == nil {
-		if ok, _ := xin(id, listID); !ok {
+		if !exist(id, gslc(listID)...) {
 			listID = append(listID, id)
 		}
 	}
@@ -150,9 +148,8 @@ func (db *badgerDB) PolicyHash(id string) (string, bool) {
 
 func (db *badgerDB) Policy(id string) (string, bool) {
 	if values, err := getBadgerDB([]*badger.DB{db.mIDPolicy}, []string{id}); err == nil {
-		if policy, err := decrypt([]byte(values[0]), db.encPwd); err == nil {
-			return string(policy), true
-		}
+		policy := decrypt([]byte(values[0]), db.encPwd)
+		return string(policy), true
 	}
 	return "", false
 }

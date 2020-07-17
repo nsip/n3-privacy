@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
 )
 
 var (
@@ -26,6 +26,6 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	failOnErr     = cmn.FailOnErr
-	failOnErrWhen = cmn.FailOnErrWhen
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
 )

@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"sync"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/judge"
+	"github.com/cdutwhu/gotil/net"
+	"github.com/cdutwhu/gotil/rflx"
 	ext "github.com/cdutwhu/n3-util/external"
+	"github.com/cdutwhu/n3-util/n3json"
+	"github.com/cdutwhu/n3-util/rest"
 )
 
 var (
@@ -13,33 +18,31 @@ var (
 	fPf  = fmt.Printf
 	fPln = fmt.Println
 
-	localIP          = cmn.LocalIP
-	isJSON           = cmn.IsJSON
-	jsonRoot         = cmn.JSONRoot
-	failOnErr        = cmn.FailOnErr
-	failOnErrWhen    = cmn.FailOnErrWhen
-	warnOnErr        = cmn.WarnOnErr
-	warnOnErrWhen    = cmn.WarnOnErrWhen
-	setLog           = cmn.SetLog
-	logger           = cmn.Log
-	url1Value        = cmn.URL1Value
-	url2Values       = cmn.URL2Values
-	url3Values       = cmn.URL3Values
-	url4Values       = cmn.URL4Values
-	urlValues        = cmn.URLValues
-	struct2Map       = cmn.Struct2Map
-	env2Struct       = cmn.Env2Struct
-	mustInvokeWithMW = cmn.MustInvokeWithMW
-	toGeneralSlc     = cmn.ToGeneralSlc
+	localIP          = net.LocalIP
+	isJSON           = judge.IsJSON
+	jsonRoot         = n3json.JSONRoot
+	failOnErr        = fn.FailOnErr
+	failOnErrWhen    = fn.FailOnErrWhen
+	warnOnErr        = fn.WarnOnErr
+	warnOnErrWhen    = fn.WarnOnErrWhen
+	setLog           = fn.SetLog
+	logger           = fn.Logger
+	url1Value        = rest.URL1Value
+	url2Values       = rest.URL2Values
+	url3Values       = rest.URL3Values
+	url4Values       = rest.URL4Values
+	urlValues        = rest.URLValues
+	struct2Map       = rflx.Struct2Map
+	env2Struct       = rflx.Env2Struct
+	mustInvokeWithMW = rflx.MustInvokeWithMW
+	toGeneralSlc     = rflx.ToGeneralSlc
 
 	prepare = ext.Prepare
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	m, err := struct2Map(route)
-	failOnErr("%v", err)
-	for _, v := range m {
+	for _, v := range struct2Map(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

@@ -12,14 +12,12 @@ import (
 
 func main() {
 	route := clt.Config{}.Route
-	fns, err := structFields(&route)
-	failOnErr("%v", err)
+	fns := structFields(&route)
 	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", eg.CLI_SUBCMD_ERR, fns)
 
 	cltcfg, fn := os.Args[1], os.Args[2]
 
-	ok, err := xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"})
-	failOnErr("%v", err)
+	ok := exist(fn, "HELP", "LsID", "LsContext", "LsUser", "LsObject")
 	failOnErrWhen(!ok && len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
 
 	cmd := flag.NewFlagSet(fn, flag.ExitOnError)
@@ -53,8 +51,7 @@ func main() {
 	)
 	failOnErr("%v", err)
 
-	ok, err = xin(fn, []string{"HELP", "LsID", "LsContext", "LsUser", "LsObject"})
-	if failOnErr("%v", err); ok {
+	if exist(fn, "HELP", "LsID", "LsContext", "LsUser", "LsObject") {
 		fPln(str)
 		return
 	}

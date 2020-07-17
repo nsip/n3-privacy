@@ -1,21 +1,18 @@
-Path = ""
+Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/config.toml"
 LogFile = "./N3-PRIVACY-[DATE].log"
 ServiceName = "N3-PRIVACY"
 
-# ************************ Server ************************ #
-# ********** Client DO NOT Modify This Part ********* #
-
 [Storage]
-  DataBase = "badger" # "map" / "badger" / ...
-  BadgerDBPath = "/var/tmp/n3-privacy/badger/" # "./data/badger/"
+  DataBase = "badger"
+  BadgerDBPath = "/var/tmp/n3-privacy/badger/"
   Tracing = true
 
-[WebService]                              
-  Port = 1323                             # Shared with Client - [Server] - Port #
-  Service = "policy-service"              # Server [Route] use
-  Version = "0.1.0"                       # Server [Route] use
+[WebService]
+  Port = 1323
+  Service = "policy-service"
+  Version = "v0.1.1"
 
-[Route]                                   # Shared with Client #
+[Route]
   HELP = "/"
   GetID = "/[s]/[v]/id"
   GetHash = "/[s]/[v]/hash"
@@ -37,11 +34,8 @@ ServiceName = "N3-PRIVACY"
   EnforcerMac = "../../../Enforcer/build/mac/enforcer"
   EnforcerWin64 = "../../../Enforcer/build/win64/enforcer.exe"
 
-# ************************ Client ************************ #
-# *********** Client ONLY Modify This Part ********** #
-
 [Server]
-  Protocol = "http" 
+  Protocol = "http"
   IP = "[IP]"
   Port = "[PORT]"
 
