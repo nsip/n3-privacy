@@ -7,6 +7,15 @@ import (
 
 func TestDO(t *testing.T) {
 
+	// str, err := DOwithTrace(
+	// 	nil,
+	// 	"./config.toml",
+	// 	"HELP",
+	// 	nil,
+	// )
+	// fPln(str)
+	// fPln(err)
+
 	policy, err := ioutil.ReadFile("./data/policy.json")
 	failOnErr("%v", err)
 
