@@ -37,7 +37,9 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 			defer span.Finish()
 			tags.SpanKindRPCClient.Set(span)
 			tags.PeerService.Set(span, serviceName)
-			span.SetTag(fn, *args)
+			if args != nil {
+				span.SetTag(fn, *args)
+			}
 			span.LogEvent("Test log")
 			span.SetBaggageItem("Test baggage", "baggage")
 			ctx = opentracing.ContextWithSpan(ctx, span)

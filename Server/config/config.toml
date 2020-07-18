@@ -10,7 +10,7 @@ ServiceName = "N3-PRIVACY"
 [WebService]
   Port = 1323
   Service = "policy-service"
-  Version = "v0.1.1"
+  Version = "v0.2.0"
 
 [Route]
   HELP = "/"
