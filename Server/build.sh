@@ -39,4 +39,4 @@ cp ./config/*.toml $OUTPATH
 # mv $OUT $OUTPATH
 # cp ./config/*.toml $OUTPATH
 
-go test -v -count 1 -timeout 5s github.com/nsip/n3-privacy/Server/config -run TestGenClientCfg -args "WebService" "Storage" "File"
+go test -v -count 1 -timeout 5s github.com/nsip/n3-privacy/Server/config -run TestGenClientCfg -args "WebService" "Storage" "File" "Loggly"

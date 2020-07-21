@@ -10,6 +10,7 @@ import (
 	"github.com/cdutwhu/gotil/rflx"
 	ext "github.com/cdutwhu/n3-util/external"
 	"github.com/cdutwhu/n3-util/n3json"
+	"github.com/cdutwhu/n3-util/n3log"
 	"github.com/cdutwhu/n3-util/rest"
 )
 
@@ -17,6 +18,7 @@ var (
 	fSf  = fmt.Sprintf
 	fPf  = fmt.Printf
 	fPln = fmt.Println
+	fPt  = fmt.Print
 
 	localIP          = net.LocalIP
 	isJSON           = judge.IsJSON
@@ -36,8 +38,8 @@ var (
 	env2Struct       = rflx.Env2Struct
 	mustInvokeWithMW = rflx.MustInvokeWithMW
 	toGeneralSlc     = rflx.ToGeneralSlc
-
-	prepare = ext.Prepare
+	prepare          = ext.Prepare
+	lrOut            = n3log.LrOut
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {

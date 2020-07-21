@@ -10,7 +10,7 @@ ServiceName = "N3-PRIVACY"
 [WebService]
   Port = 1323
   Service = "policy-service"
-  Version = "v0.2.1"
+  Version = "v0.2.2"
 
 [Route]
   HELP = "/"
@@ -41,3 +41,6 @@ ServiceName = "N3-PRIVACY"
 
 [Access]
   Timeout = 3
+
+[Loggly]
+  Token = "54290728-93e0-425a-a49c-c9e834288026"

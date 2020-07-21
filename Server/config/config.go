@@ -61,6 +61,10 @@ type Config struct {
 	Access struct {
 		Timeout int
 	}
+
+	Loggly struct {
+		Token string
+	}
 }
 
 var (

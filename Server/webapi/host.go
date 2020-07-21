@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
@@ -27,7 +29,11 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 
 // HostHTTPAsync : Host a HTTP Server for providing policy json
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
-	defer func() { fPln(logger("HostHTTPAsync Exit")) }()
+	defer func() {
+		msg := "HostHTTPAsync Exit"
+		fPt(logger(msg))
+		lrOut(logrus.Infof, msg) // --> LOGGLY
+	}()
 
 	e := echo.New()
 	defer e.Close()
