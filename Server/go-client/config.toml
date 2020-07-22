@@ -1,19 +1,20 @@
+Log = "/home/qmiao/.n3-privacy/log/2020-07-22.log"
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/temp.toml"
-LogFile = "./N3-PRIVACY-2020-07-21.log"
-ServiceName = "N3-PRIVACY"
+Service = "n3-privacy"
+Version = "v0.2.2"
 
 [Route]
+  Delete = "/n3-privacy/v0.2.2/delete"
+  Enforce = "/n3-privacy/v0.2.2/enforce"
+  Get = "/n3-privacy/v0.2.2/policy"
+  GetHash = "/n3-privacy/v0.2.2/hash"
+  GetID = "/n3-privacy/v0.2.2/id"
   HELP = "/"
-  GetID = "/policy-service/v0.2.2/id"
-  GetHash = "/policy-service/v0.2.2/hash"
-  Get = "/policy-service/v0.2.2/policy"
-  Update = "/policy-service/v0.2.2/update"
-  Delete = "/policy-service/v0.2.2/delete"
-  LsID = "/policy-service/v0.2.2/list/policyid"
-  LsUser = "/policy-service/v0.2.2/list/user"
-  LsContext = "/policy-service/v0.2.2/list/context"
-  LsObject = "/policy-service/v0.2.2/list/object"
-  Enforce = "/policy-service/v0.2.2/enforce"
+  LsContext = "/n3-privacy/v0.2.2/list/context"
+  LsID = "/n3-privacy/v0.2.2/list/policyid"
+  LsObject = "/n3-privacy/v0.2.2/list/object"
+  LsUser = "/n3-privacy/v0.2.2/list/user"
+  Update = "/n3-privacy/v0.2.2/update"
 
 [Server]
   Protocol = "http"
@@ -22,4 +23,3 @@ ServiceName = "N3-PRIVACY"
 
 [Access]
   Timeout = 3
-

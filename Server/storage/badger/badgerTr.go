@@ -22,8 +22,7 @@ func (db *badgerDB) GetContext() context.Context {
 }
 
 func (db *badgerDB) UseTracing(operName, spanValue, tagKey, tagValue string) {
-	fPln(" ------- db tracing ------- ")
-
+	fPln(" ------- db tracing 1 ------- ")
 	if ctx := db.GetContext(); ctx != nil {
 		if span := opentracing.SpanFromContext(ctx); span != nil {
 			span := db.tracer.StartSpan(operName, opentracing.ChildOf(span.Context()))
@@ -33,6 +32,7 @@ func (db *badgerDB) UseTracing(operName, spanValue, tagKey, tagValue string) {
 			span.SetTag(tagKey, tagValue)
 			span.LogEvent("db tracing")
 			ctx = opentracing.ContextWithSpan(ctx, span)
+			fPln(" ------- db tracing 2 ------- ")
 		}
 	}
 }

@@ -74,7 +74,7 @@ func (db *badgerDB) loadIDList() int {
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
 	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
-	path := Cfg.Storage.BadgerDBPath
+	path := Cfg.Storage.DBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
 		os.MkdirAll(path, os.ModePerm)
 	}

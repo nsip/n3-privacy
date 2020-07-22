@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
 	github.com/burntsushi/toml v0.3.1
-	github.com/cdutwhu/debog v0.1.3
+	github.com/cdutwhu/debog v0.2.1
 	github.com/cdutwhu/gotil v0.0.6
 	github.com/cdutwhu/n3-util v0.2.4
 	github.com/davecgh/go-spew v1.1.1

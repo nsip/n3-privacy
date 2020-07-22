@@ -40,7 +40,7 @@ var (
 	hash             = endec.SHA1Str // 32 [40] 64
 	failOnErrWhen    = fn.FailOnErrWhen
 	logger           = fn.Logger
-	setLog           = fn.SetLog
+	enableLog2F      = fn.EnableLog2F
 	failOnErr        = fn.FailOnErr
 	tryInvoke        = rflx.TryInvoke
 	tryInvokeWithMW  = rflx.TryInvokeWithMW

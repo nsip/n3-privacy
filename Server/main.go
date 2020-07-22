@@ -14,23 +14,24 @@ func main() {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", eg.CFG_INIT_ERR)
 
 	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
-	ws, logfile, servicename := Cfg.WebService, Cfg.LogFile, Cfg.ServiceName
+	ws, service, version := Cfg.WebService, Cfg.Service, Cfg.Version
 
-	// LOGGLY
+	// --- LOGGLY
 	enableLoggly(true)
 	setLogglyToken(Cfg.Loggly.Token)
 	lrInit()
+	// --- LOGGLY
 
-	setLog(logfile)
-	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", ws.Service, localIP(), ws.Port, ws.Version)
-	fPt(logger(msg))
+	// setLog(Cfg.Log)
+	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, version)
+	logger(msg)
 	lrOut(logrus.Infof, msg) // --> LOGGLY
 
-	msg = fSf("Working on Database: [%s]", Cfg.Storage.DataBase)
-	fPt(logger(msg))
+	msg = fSf("Working on Database: [%s]", Cfg.Storage.DB)
+	logger(msg)
 	lrOut(logrus.Infof, msg) // --> LOGGLY
 
-	os.Setenv("JAEGER_SERVICE_NAME", servicename)
+	os.Setenv("JAEGER_SERVICE_NAME", service)
 	os.Setenv("JAEGER_SAMPLER_TYPE", "const")
 	os.Setenv("JAEGER_SAMPLER_PARAM", "1")
 
@@ -39,6 +40,6 @@ func main() {
 	signal.Notify(c, os.Kill, os.Interrupt)
 	go api.HostHTTPAsync(c, done)
 	msg = <-done
-	fPt(logger(msg))
+	logger(msg)
 	lrOut(logrus.Infof, msg) // --> LOGGLY
 }

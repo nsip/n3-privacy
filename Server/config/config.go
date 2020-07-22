@@ -12,41 +12,44 @@ import (
 
 // Config is toml
 type Config struct {
-	Path        string
-	LogFile     string
-	ServiceName string
+	Log     string
+	Path    string
+	Service string
+	Version string
 
 	Storage struct {
-		DataBase     string
-		BadgerDBPath string
-		Tracing      bool
+		DB      string
+		DBPath  string
+		Tracing bool
+	}
+
+	Loggly struct {
+		Token string
 	}
 
 	WebService struct {
-		Port    int
-		Service string
-		Version string
+		Port int
 	}
 
 	Route struct {
-		HELP      string
-		GetID     string
-		GetHash   string
-		Get       string
-		Update    string
 		Delete    string
-		LsID      string
-		LsUser    string
-		LsContext string
-		LsObject  string
 		Enforce   string
+		Get       string
+		GetHash   string
+		GetID     string
+		HELP      string
+		LsContext string
+		LsID      string
+		LsObject  string
+		LsUser    string
+		Update    string
 	}
 
 	File struct {
+		ClientConfig    string
 		ClientLinux64   string
 		ClientMac       string
 		ClientWin64     string
-		ClientConfig    string
 		EnforcerLinux64 string
 		EnforcerMac     string
 		EnforcerWin64   string
@@ -60,10 +63,6 @@ type Config struct {
 
 	Access struct {
 		Timeout int
-	}
-
-	Loggly struct {
-		Token string
 	}
 }
 
@@ -95,17 +94,21 @@ func (cfg *Config) set() *Config {
 			cfg.Path = abs
 		}
 		if ver, e := gitver(); e == nil && ver != "" { /* successfully got git ver */
-			cfg.WebService.Version = ver
+			cfg.Version = ver
 		}
 		// save
 		cfg.save()
 
+		home, e := os.UserHomeDir()
+		failOnErr("%v", e)
 		return cfgRepl(cfg, map[string]interface{}{
+			"~":      home,
 			"[DATE]": time.Now().Format("2006-01-02"),
 			"[IP]":   localIP(),
-			"[PORT]": cfg.WebService.Port,
-			"[s]":    cfg.WebService.Service,
-			"[v]":    cfg.WebService.Version,
+			"[port]": cfg.WebService.Port,
+			"[db]":   cfg.Storage.DB,
+			"[s]":    cfg.Service,
+			"[v]":    cfg.Version,
 		}).(*Config)
 	}
 	return nil

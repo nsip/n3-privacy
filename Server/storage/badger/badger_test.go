@@ -22,8 +22,8 @@ func TestUpdatePolicy(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "UpdatePolicy", string(p), "object", "user", "n3ctx", "r")
-		fPln(rets, ok, e)
+		rets, ok := tryInvokeWithMW(db, "UpdatePolicy", string(p), "object", "user", "n3ctx", "r")
+		fPln(rets, ok)
 	}
 }
 
@@ -39,7 +39,7 @@ func TestDeletePolicy(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		if rets, ok, e := tryInvokeWithMW(db, "PolicyIDs", "user", "n3ctx", "r", "object"); e == nil && ok {
+		if rets, ok := tryInvokeWithMW(db, "PolicyIDs", "user", "n3ctx", "r", "object"); ok {
 			for _, pid := range rets {
 				mustInvokeWithMW(db, "DeletePolicy", pid)
 			}
@@ -56,8 +56,8 @@ func TestPolicyCount(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "PolicyCount")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "PolicyCount")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -72,8 +72,8 @@ func TestPolicyID(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "PolicyID", "user", "n3ctx", "r", "object")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "PolicyID", "user", "n3ctx", "r", "object")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -88,8 +88,8 @@ func TestPolicyIDs(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "PolicyIDs", "user", "n3ctx", "r")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "PolicyIDs", "user", "n3ctx", "r")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -104,8 +104,8 @@ func TestPolicyHash(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "PolicyHash", "1615307cc418b369ed0a12dea96fecf9f90f0abbr")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "PolicyHash", "1615307cc418b369ed0a12dea96fecf9f90f0abbr")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -120,8 +120,8 @@ func TestPolicy(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "Policy", "1615307cc418b369ed0a12dea96fecf9f90f0abbr")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "Policy", "1615307cc418b369ed0a12dea96fecf9f90f0abbr")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -164,8 +164,8 @@ func TestMapRW2lsPID(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "MapRW2lsPID", "user", "n3ctx")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "MapRW2lsPID", "user", "n3ctx")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -181,12 +181,12 @@ func TestMapCtx2lsUser(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "MapCtx2lsUser")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "MapCtx2lsUser")
+		if ok {
 			fPln(rets)
 		}
-		rets, ok, e = tryInvokeWithMW(db, "MapCtx2lsUser", "n3ctx")
-		if failOnErr("%v", e); ok {
+		rets, ok = tryInvokeWithMW(db, "MapCtx2lsUser", "n3ctx")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -202,12 +202,12 @@ func TestMapUser2lsCtx(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "MapUser2lsCtx")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "MapUser2lsCtx")
+		if ok {
 			fPln(rets)
 		}
-		rets, ok, e = tryInvokeWithMW(db, "MapUser2lsCtx", "user")
-		if failOnErr("%v", e); ok {
+		rets, ok = tryInvokeWithMW(db, "MapUser2lsCtx", "user")
+		if ok {
 			fPln(rets)
 		}
 	}
@@ -222,8 +222,8 @@ func TestMapUC2lsObject(t *testing.T) {
 	}
 	{
 		fPln("WM Calling")
-		rets, ok, e := tryInvokeWithMW(db, "MapUC2lsObject", "user", "n3ctx")
-		if failOnErr("%v", e); ok {
+		rets, ok := tryInvokeWithMW(db, "MapUC2lsObject", "user", "n3ctx")
+		if ok {
 			fPln(rets)
 		}
 	}

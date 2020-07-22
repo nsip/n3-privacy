@@ -1,35 +1,37 @@
+Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/config.toml"
-LogFile = "./N3-PRIVACY-[DATE].log"
-ServiceName = "N3-PRIVACY"
+Service = "n3-privacy"
+Version = "v0.2.2"
 
 [Storage]
-  DataBase = "badger"
-  BadgerDBPath = "/var/tmp/n3-privacy/badger/"
+  DB = "badger"
+  DBPath = "~/.[s]/db/[db]/"
   Tracing = true
+
+[Loggly]
+  Token = "54290728-93e0-425a-a49c-c9e834288026"
 
 [WebService]
   Port = 1323
-  Service = "policy-service"
-  Version = "v0.2.2"
 
 [Route]
-  HELP = "/"
-  GetID = "/[s]/[v]/id"
-  GetHash = "/[s]/[v]/hash"
-  Get = "/[s]/[v]/policy"
-  Update = "/[s]/[v]/update"
   Delete = "/[s]/[v]/delete"
-  LsID = "/[s]/[v]/list/policyid"
-  LsUser = "/[s]/[v]/list/user"
-  LsContext = "/[s]/[v]/list/context"
-  LsObject = "/[s]/[v]/list/object"
   Enforce = "/[s]/[v]/enforce"
+  Get = "/[s]/[v]/policy"
+  GetHash = "/[s]/[v]/hash"
+  GetID = "/[s]/[v]/id"
+  HELP = "/"
+  LsContext = "/[s]/[v]/list/context"
+  LsID = "/[s]/[v]/list/policyid"
+  LsObject = "/[s]/[v]/list/object"
+  LsUser = "/[s]/[v]/list/user"
+  Update = "/[s]/[v]/update"
 
 [File]
+  ClientConfig = "../../../Client/build/linux64/cfg-clt-privacy.toml"
   ClientLinux64 = "../../../Client/build/linux64/client"
   ClientMac = "../../../Client/build/mac/client"
   ClientWin64 = "../../../Client/build/win64/client.exe"
-  ClientConfig = "../../../Client/build/linux64/cfg-clt-privacy.toml"
   EnforcerLinux64 = "../../../Enforcer/build/linux64/enforcer"
   EnforcerMac = "../../../Enforcer/build/mac/enforcer"
   EnforcerWin64 = "../../../Enforcer/build/win64/enforcer.exe"
@@ -37,10 +39,7 @@ ServiceName = "N3-PRIVACY"
 [Server]
   Protocol = "http"
   IP = "[IP]"
-  Port = "[PORT]"
+  Port = "[port]"
 
 [Access]
   Timeout = 3
-
-[Loggly]
-  Token = "54290728-93e0-425a-a49c-c9e834288026"

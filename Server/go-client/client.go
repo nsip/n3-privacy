@@ -56,11 +56,11 @@ func DO(configfile, fn string, args *Args) (string, error) {
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
-	setLog(Cfg.LogFile)
+	enableLog2F(true, Cfg.LogFile)
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
-	if _, err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
+	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -71,8 +71,7 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	select {
 	case <-time.After(time.Duration(timeout) * time.Second):
-		_, err := warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
-		return "", err
+		return "", warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
 	case str := <-chStr:
 		err := <-chErr
 		if err == eg.NO_ERROR {
@@ -111,7 +110,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "GetID":
 		if user == "" || ctx == "" || object == "" || rw == "" {
-			_, Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] all are required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", user, ctx, object, rw)
@@ -121,7 +120,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "GetHash", "Get":
 		if id == "" {
-			_, Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?id=%s", id)
@@ -131,10 +130,10 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Update":
 		if user == "" || ctx == "" || rw == "" {
-			_, Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if _, Err = warnOnErrWhen(!isJSON(string(policy)), "%v: policy", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(policy)), "%v: policy", eg.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)
@@ -144,7 +143,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Delete":
 		if id == "" {
-			_, Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?id=%s", id)
@@ -159,10 +158,10 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Enforce":
 		if user == "" || ctx == "" || rw == "" {
-			_, Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if _, Err = warnOnErrWhen(!isJSON(string(data)), "%v: input data", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(data)), "%v: input data", eg.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)

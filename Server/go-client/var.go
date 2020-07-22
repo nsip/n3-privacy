@@ -21,7 +21,7 @@ var (
 	failOnErr     = fn.FailOnErr
 	failOnErrWhen = fn.FailOnErrWhen
 	warnOnErr     = fn.WarnOnErr
-	setLog        = fn.SetLog
+	enableLog2F   = fn.EnableLog2F
 	logWhen       = fn.LoggerWhen
 	logger        = fn.Logger
 	warnOnErrWhen = fn.WarnOnErrWhen

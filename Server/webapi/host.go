@@ -31,7 +31,7 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	defer func() {
 		msg := "HostHTTPAsync Exit"
-		fPt(logger(msg))
+		logger(msg)
 		lrOut(logrus.Infof, msg) // --> LOGGLY
 	}()
 
@@ -63,7 +63,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		fullIP   = localIP() + fSf(":%d", port)
 		route    = Cfg.Route
 		file     = Cfg.File
-		database = Cfg.Storage.DataBase
+		database = Cfg.Storage.DB
 		tracing  = Cfg.Storage.Tracing
 		mMtx     = initMutex(&route)
 		db       = storage.NewDB(database, tracing).(storage.DBTr) // DBTr covers DB
@@ -131,8 +131,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 				fPln(rt, res)
 				return c.File(res)
 			}
-			_, err = warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
-			return err
+			return warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
 		}
 	}
 

@@ -27,7 +27,7 @@ var (
 	failOnErrWhen    = fn.FailOnErrWhen
 	warnOnErr        = fn.WarnOnErr
 	warnOnErrWhen    = fn.WarnOnErrWhen
-	setLog           = fn.SetLog
+	enableLog2F      = fn.EnableLog2F
 	logger           = fn.Logger
 	url1Value        = rest.URL1Value
 	url2Values       = rest.URL2Values
