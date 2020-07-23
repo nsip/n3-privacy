@@ -22,7 +22,7 @@ func main() {
 	lrInit()
 	// --- LOGGLY
 
-	// setLog(Cfg.Log)
+	enableLog2F(true, Cfg.Log)
 	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, version)
 	logger(msg)
 	lrOut(logrus.Infof, msg) // --> LOGGLY

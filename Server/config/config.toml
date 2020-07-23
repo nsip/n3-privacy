@@ -1,7 +1,7 @@
 Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/config.toml"
 Service = "n3-privacy"
-Version = "v0.2.2"
+Version = "v0.2.3"
 
 [Storage]
   DB = "badger"

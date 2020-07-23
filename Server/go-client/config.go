@@ -10,10 +10,9 @@ import (
 
 // Config is toml
 type Config struct {
-	Path        string
-	LogFile     string
-	ServiceName string
-	Route       struct {
+	Path    string
+	Service string
+	Route   struct {
 		HELP      string
 		GetID     string
 		GetHash   string

@@ -17,14 +17,14 @@ import (
 func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
 	Cfg := env2Struct(envVarName, &Config{}).(*Config)
-	serviceName := Cfg.ServiceName
+	service := Cfg.Service
 
 	if ctx != nil {
 		if span := opentracing.SpanFromContext(ctx); span != nil {
-			initTracer := func(serviceName string) opentracing.Tracer {
+			initTracer := func(service string) opentracing.Tracer {
 				cfg, err := config.FromEnv()
 				failOnErr("%v: ", err)
-				cfg.ServiceName = serviceName
+				cfg.ServiceName = service
 				cfg.Sampler.Type = "const"
 				cfg.Sampler.Param = 1
 				tracer, _, err := cfg.NewTracer()
@@ -32,11 +32,11 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 				return tracer
 			}
 
-			tracer := initTracer(serviceName)
+			tracer := initTracer(service)
 			span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
 			defer span.Finish()
 			tags.SpanKindRPCClient.Set(span)
-			tags.PeerService.Set(span, serviceName)
+			tags.PeerService.Set(span, service)
 			if args != nil {
 				span.SetTag(fn, *args)
 			}
@@ -56,7 +56,6 @@ func DO(configfile, fn string, args *Args) (string, error) {
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
-	enableLog2F(true, Cfg.LogFile)
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
