@@ -14,7 +14,7 @@ func main() {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", eg.CFG_INIT_ERR)
 
 	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
-	ws, service, version := Cfg.WebService, Cfg.Service, Cfg.Version
+	ws, service := Cfg.WebService, Cfg.Service
 
 	// --- LOGGLY
 	enableLoggly(true)
@@ -23,7 +23,7 @@ func main() {
 	// --- LOGGLY
 
 	enableLog2F(true, Cfg.Log)
-	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, version)
+	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version)
 	logger(msg)
 	lrOut(logrus.Infof, msg) // --> LOGGLY
 

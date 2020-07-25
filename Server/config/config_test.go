@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cdutwhu/n3-util/n3cfg"
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	toml "github.com/cdutwhu/n3-util/n3toml"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -14,6 +14,13 @@ func TestLoad(t *testing.T) {
 	cfg := newCfg("./config.toml")
 	spew.Dump(cfg)
 	cfg.SaveAs("./copy")
+}
+
+// ****************************** //
+// Auto generate go struct file.
+// Once 'config.toml' modified, run this func to update 'config.go' for new 'config.toml'
+func TestAttrTypes(t *testing.T) {
+	n3cfg.GenStruct("./config.toml", "", "", "./config_auto.go")
 }
 
 // ****************************** //
@@ -28,6 +35,6 @@ func TestGenClientCfg(t *testing.T) {
 		flag.Parse()
 	}
 	fPln(flag.Args(), "were removed")
-	toml.RmFileAttrL1(temp, "../go-client/config.toml", flag.Args()...)
+	n3cfg.RmFileAttrL1(temp, "../goclient/config.toml", flag.Args()...)
 	os.Remove(temp)
 }

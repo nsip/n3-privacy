@@ -7,13 +7,12 @@ import (
 	"github.com/cdutwhu/debog/fn"
 	"github.com/cdutwhu/gotil/net"
 	"github.com/cdutwhu/gotil/rflx"
-	"github.com/cdutwhu/n3-util/cfg"
+	"github.com/cdutwhu/n3-util/n3cfg"
 )
 
 var (
-	fSf  = fmt.Sprintf
-	fPln = fmt.Println
-
+	fSf         = fmt.Sprintf
+	fPln        = fmt.Println
 	sReplaceAll = strings.ReplaceAll
 	sHasSuffix  = strings.HasSuffix
 	sIndex      = strings.Index
@@ -23,7 +22,7 @@ var (
 	failOnErr     = fn.FailOnErr
 	failOnErrWhen = fn.FailOnErrWhen
 	localIP       = net.LocalIP
-	cfgRepl       = cfg.Modify
-	gitver        = cfg.GitVer
+	cfgRepl       = n3cfg.Modify
+	gitver        = n3cfg.GitVer
 	struct2Env    = rflx.Struct2Env
 )

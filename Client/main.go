@@ -7,7 +7,7 @@ import (
 	"os"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	clt "github.com/nsip/n3-privacy/Server/go-client"
+	clt "github.com/nsip/n3-privacy/Server/goclient"
 )
 
 func main() {

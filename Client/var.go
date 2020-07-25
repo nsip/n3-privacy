@@ -7,7 +7,7 @@ import (
 	"github.com/cdutwhu/debog/fn"
 	"github.com/cdutwhu/gotil/judge"
 	"github.com/cdutwhu/gotil/rflx"
-	"github.com/cdutwhu/n3-util/cfg"
+	"github.com/cdutwhu/n3-util/n3cfg"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 	warnOnErrWhen = fn.WarnOnErrWhen
 	isJSON        = judge.IsJSON
 	exist         = judge.Exist
-	cfgRepl       = cfg.Modify
+	cfgRepl       = n3cfg.Modify
 	struct2Env    = rflx.Struct2Env
 	struct2Map    = rflx.Struct2Map
 	structFields  = rflx.StructFields

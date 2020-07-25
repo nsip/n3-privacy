@@ -1,39 +1,12 @@
-package client
+package goclient
 
 import (
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/burntsushi/toml"
+	"github.com/BurntSushi/toml"
 )
-
-// Config is toml
-type Config struct {
-	Path    string
-	Service string
-	Route   struct {
-		HELP      string
-		GetID     string
-		GetHash   string
-		Get       string
-		Update    string
-		Delete    string
-		LsID      string
-		LsUser    string
-		LsContext string
-		LsObject  string
-		Enforce   string
-	}
-	Server struct {
-		Protocol string
-		IP       string
-		Port     int
-	}
-	Access struct {
-		Timeout int64
-	}
-}
 
 // newCfg :
 func newCfg(configs ...string) *Config {

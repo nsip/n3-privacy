@@ -1,4 +1,4 @@
-package client
+package goclient
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/cdutwhu/debog/fn"
 	"github.com/cdutwhu/gotil/judge"
 	"github.com/cdutwhu/gotil/rflx"
-	"github.com/cdutwhu/n3-util/cfg"
+	"github.com/cdutwhu/n3-util/n3cfg"
 )
 
 var (
@@ -17,7 +17,7 @@ var (
 	sReplace      = strings.Replace
 	sJoin         = strings.Join
 	sTrimRight    = strings.TrimRight
-	cfgRepl       = cfg.Modify
+	cfgRepl       = n3cfg.Modify
 	failOnErr     = fn.FailOnErr
 	failOnErrWhen = fn.FailOnErrWhen
 	warnOnErr     = fn.WarnOnErr

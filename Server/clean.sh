@@ -5,6 +5,7 @@ rm -rf ./build ./Client ./data
 rm -rf ./storage/data
 rm -f ./config/copy.toml
 rm -f *.toml
+rm -f ./goclient/config.toml
 
 if [ $# -gt 0 ]; then
   if [ $1 = "rmdb" ]; then

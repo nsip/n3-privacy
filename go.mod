@@ -4,11 +4,10 @@ go 1.14
 
 require (
 	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
-	github.com/burntsushi/toml v0.3.1
+	github.com/BurntSushi/toml v0.3.1
 	github.com/cdutwhu/debog v0.2.1
 	github.com/cdutwhu/gotil v0.0.6
-	github.com/cdutwhu/n3-util v0.2.6
-	github.com/davecgh/go-spew v1.1.1
+	github.com/cdutwhu/n3-util v0.2.8
 	github.com/dgraph-io/badger v1.6.1
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -23,7 +22,7 @@ require (
 	go.uber.org/atomic v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
-	golang.org/x/sys v0.0.0-20200722175500-76b94024e4b6 // indirect
+	golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c // indirect
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )
