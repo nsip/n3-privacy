@@ -1,7 +1,5 @@
  #!/bin/bash
 
-VERSION="v0.1.0"
-
 set -e
 GOPATH=`go env GOPATH`
 ORIGINALPATH=`pwd`
@@ -12,7 +10,17 @@ OUT=server
 
 rm -rf ./build/
 
+PROJECTPATH="github.com/nsip/n3-privacy/Server"
+go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenSvrCfgStruct
+go test -v -timeout 2s $PROJECTPATH/config -run TestGenCltCfg -args "Version" "Log" "WebService" "Storage" "File" "Loggly"
+go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenCltCfgStruct
 go get
+
+OUTPATH=./build/linux64/
+mkdir -p $OUTPATH
+CGO_ENABLED=0 GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
+mv $OUT $OUTPATH
+cp ./config/*.toml $OUTPATH
 
 # OUTPATH=./build/win64/
 # mkdir -p $OUTPATH
@@ -26,17 +34,9 @@ go get
 # mv $OUT $OUTPATH
 # cp ./config/*.toml $OUTPATH
 
-OUTPATH=./build/linux64/
-mkdir -p $OUTPATH
-CGO_ENABLED=0 GOOS="linux" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUT
-mv $OUT $OUTPATH              # for testing
-cp ./config/*.toml $OUTPATH
-
 # GOARCH=arm
 # OUTPATH=./build/linuxarm/
 # mkdir -p $OUTPATH
 # CGO_ENABLED=0 GOOS="linux" GOARCH="$GOARCH" GOARM=7 go build -ldflags="$LDFLAGS" -o $OUT
 # mv $OUT $OUTPATH
 # cp ./config/*.toml $OUTPATH
-
-go test -v -count 1 -timeout 2s github.com/nsip/n3-privacy/Server/config -run TestGenClientCfg -args "Version" "Log" "WebService" "Storage" "File" "Loggly"

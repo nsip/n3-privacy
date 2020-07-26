@@ -3,7 +3,6 @@ package goclient
 import (
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -30,10 +29,7 @@ func (cfg *Config) set() *Config {
 
 		// save
 		cfg.save()
-
-		return cfgRepl(cfg, map[string]interface{}{
-			"[DATE]": time.Now().Format("2006-01-02"),
-		}).(*Config)
+		return cfg
 	}
 	return nil
 }

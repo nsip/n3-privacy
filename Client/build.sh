@@ -1,7 +1,5 @@
   #!/bin/bash
 
-VERSION="v0.1.0"
-
 set -e
 GOPATH=`go env GOPATH`
 ORIGINALPATH=`pwd`

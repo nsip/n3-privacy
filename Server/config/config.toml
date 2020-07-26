@@ -1,12 +1,12 @@
 Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/config.toml"
 Service = "n3-privacy"
-Version = "v0.2.4"
+Version = "v0.2.5"
 
 [Storage]
-  Tracing = true
   DB = "badger"
   DBPath = "~/.[s]/db/[db]/"
+  Tracing = true
 
 [Loggly]
   Token = "54290728-93e0-425a-a49c-c9e834288026"
@@ -15,31 +15,31 @@ Version = "v0.2.4"
   Port = 1323
 
 [Route]
-  LsContext = "/[s]/[v]/list/context"
+  GetID = "/[s]/[v]/id"
+  Get = "/[s]/[v]/policy"
+  Delete = "/[s]/[v]/delete"
+  Update = "/[s]/[v]/update"
+  GetHash = "/[s]/[v]/hash"
   LsID = "/[s]/[v]/list/policyid"
   LsObject = "/[s]/[v]/list/object"
-  LsUser = "/[s]/[v]/list/user"
-  Update = "/[s]/[v]/update"
-  GetID = "/[s]/[v]/id"
-  Enforce = "/[s]/[v]/enforce"
-  GetHash = "/[s]/[v]/hash"
-  Delete = "/[s]/[v]/delete"
-  Get = "/[s]/[v]/policy"
   HELP = "/"
+  LsUser = "/[s]/[v]/list/user"
+  Enforce = "/[s]/[v]/enforce"
+  LsContext = "/[s]/[v]/list/context"
 
 [File]
-  ClientLinux64 = "../../../Client/build/linux64/client"
   ClientMac = "../../../Client/build/mac/client"
   ClientWin64 = "../../../Client/build/win64/client.exe"
   EnforcerLinux64 = "../../../Enforcer/build/linux64/enforcer"
   EnforcerMac = "../../../Enforcer/build/mac/enforcer"
   EnforcerWin64 = "../../../Enforcer/build/win64/enforcer.exe"
   ClientConfig = "../../../Client/build/linux64/cfg-clt-privacy.toml"
+  ClientLinux64 = "../../../Client/build/linux64/client"
 
 [Server]
+  IP = "[IP]"
   Port = "[port]"
   Protocol = "http"
-  IP = "[IP]"
 
 [Access]
   Timeout = 3

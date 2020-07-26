@@ -38,13 +38,12 @@ type DBTr interface {
 
 // NewDB :
 func NewDB(dbType string, tracing bool) interface{} {
-
 	var tracer opentracing.Tracer
 	if tracing {
-		initTracer := func(serviceName string) opentracing.Tracer {
+		initTracer := func(service string) opentracing.Tracer {
 			cfg, err := config.FromEnv()
 			failOnErr("%v: ", err)
-			cfg.ServiceName = serviceName
+			cfg.ServiceName = service
 			cfg.Sampler.Type = "const"
 			cfg.Sampler.Param = 1
 			tracer, _, err := cfg.NewTracer()

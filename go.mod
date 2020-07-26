@@ -8,6 +8,7 @@ require (
 	github.com/cdutwhu/debog v0.2.1
 	github.com/cdutwhu/gotil v0.0.6
 	github.com/cdutwhu/n3-util v0.2.8
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dgraph-io/badger v1.6.1
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect

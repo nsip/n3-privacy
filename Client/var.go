@@ -11,11 +11,10 @@ import (
 )
 
 var (
-	fPt  = fmt.Print
-	fPf  = fmt.Printf
-	fPln = fmt.Println
-	fSf  = fmt.Sprintf
-
+	fPt         = fmt.Print
+	fPf         = fmt.Printf
+	fPln        = fmt.Println
+	fSf         = fmt.Sprintf
 	sJoin       = strings.Join
 	sReplaceAll = strings.ReplaceAll
 

@@ -3,9 +3,9 @@
 rm -f *.log
 rm -rf ./build ./Client ./data
 rm -rf ./storage/data
-rm -f ./config/copy.toml
 rm -f *.toml
-rm -f ./goclient/config.toml
+rm -f ./config/copy.toml ./config/config_auto.go
+rm -f ./goclient/config.toml ./goclient/config_auto.go
 
 if [ $# -gt 0 ]; then
   if [ $1 = "rmdb" ]; then
