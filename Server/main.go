@@ -4,14 +4,14 @@ import (
 	"os"
 	"os/signal"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	api "github.com/nsip/n3-privacy/Server/webapi"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 
 	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
 	ws, service := Cfg.WebService, Cfg.Service

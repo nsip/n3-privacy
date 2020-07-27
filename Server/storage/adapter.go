@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	db "github.com/nsip/n3-privacy/Server/storage/badger"
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go/config"
@@ -66,7 +66,7 @@ func NewDB(dbType string, tracing bool) interface{} {
 		return n3db
 
 	default:
-		failOnErr("%v: [%s]", eg.PARAM_NOT_SUPPORTED, dbType)
+		failOnErr("%v: [%s]", n3err.PARAM_NOT_SUPPORTED, dbType)
 		return nil
 	}
 }

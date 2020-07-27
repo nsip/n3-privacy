@@ -6,19 +6,19 @@ import (
 	"io/ioutil"
 	"os"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	clt "github.com/nsip/n3-privacy/Server/goclient"
 )
 
 func main() {
 	route := clt.Config{}.Route
 	fns := structFields(&route)
-	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", eg.CLI_SUBCMD_ERR, fns)
+	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", n3err.CLI_SUBCMD_ERR, fns)
 
 	cltcfg, fn := os.Args[1], os.Args[2]
 
 	ok := exist(fn, "HELP", "LsID", "LsContext", "LsUser", "LsObject")
-	failOnErrWhen(!ok && len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", eg.PARAM_INVALID, fns)
+	failOnErrWhen(!ok && len(os.Args) < 4, "%v: need %v [-id= -u= -c= -o= -rw= -p= -d= -w=]", n3err.PARAM_INVALID, fns)
 
 	cmd := flag.NewFlagSet(fn, flag.ExitOnError)
 	id := cmd.String("id", "", "policy ID")

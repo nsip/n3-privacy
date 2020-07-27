@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/cdutwhu/n3-util/n3cfg"
-	"github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -21,7 +21,7 @@ func TestLoad(t *testing.T) {
 // Once building, move it to Client config Directory.
 func TestGenCltCfg(t *testing.T) {
 	cfg := newCfg("./config.toml")
-	failOnErrWhen(cfg == nil, "%v", n3errs.CFG_INIT_ERR)
+	failOnErrWhen(cfg == nil, "%v", n3err.CFG_INIT_ERR)
 	temp := "./temp.toml"
 	cfg.SaveAs(temp)
 	if !flag.Parsed() {

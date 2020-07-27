@@ -4,14 +4,14 @@ import (
 	"io/ioutil"
 	"testing"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 )
 
 const Config = "../../config/config.toml"
 
 func TestUpdatePolicy(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	p, e := ioutil.ReadFile("../../../Enforcer/samples/xapiPolicy.json")
 	failOnErr("%v", e)
@@ -30,7 +30,7 @@ func TestUpdatePolicy(t *testing.T) {
 }
 
 func TestDeletePolicy(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	// db.DeletePolicy("92c8797efc18b369ed0a12dea96fec4024700fd9r")
 
@@ -54,7 +54,7 @@ func TestDeletePolicy(t *testing.T) {
 }
 
 func TestPolicyCount(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -70,7 +70,7 @@ func TestPolicyCount(t *testing.T) {
 }
 
 func TestPolicyID(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -86,7 +86,7 @@ func TestPolicyID(t *testing.T) {
 }
 
 func TestPolicyIDs(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -102,7 +102,7 @@ func TestPolicyIDs(t *testing.T) {
 }
 
 func TestPolicyHash(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -118,7 +118,7 @@ func TestPolicyHash(t *testing.T) {
 }
 
 func TestPolicy(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -136,25 +136,25 @@ func TestPolicy(t *testing.T) {
 // --------------------- //
 
 func TestListPolicyID(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.listPolicyID("user", "n3ctx", "r"))
 }
 
 func TestListUser(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.listUser("n3ctx"))
 }
 
 func TestListCtx(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.listCtx("user"))
 }
 
 func TestListObject(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 	fPln(db.listObject("user", "n3ctx"))
 }
@@ -162,7 +162,7 @@ func TestListObject(t *testing.T) {
 // --------------------- //
 
 func TestMapRW2lsPID(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -181,7 +181,7 @@ func TestMapRW2lsPID(t *testing.T) {
 }
 
 func TestMapCtx2lsUser(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -201,7 +201,7 @@ func TestMapCtx2lsUser(t *testing.T) {
 }
 
 func TestMapUser2lsCtx(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling
@@ -221,7 +221,7 @@ func TestMapUser2lsCtx(t *testing.T) {
 }
 
 func TestMapUC2lsObject(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
 	db := NewDBByBadger().(*badgerDB)
 
 	// Normal Calling

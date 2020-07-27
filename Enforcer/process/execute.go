@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 )
 
 // Execute :
@@ -49,8 +49,8 @@ func FileExe(inFilePath, policyFilePath, output string) {
 
 	data := fmtJSONFile(inFilePath, 2)
 	policy := fmtJSONFile(policyFilePath, 2)
-	failOnErrWhen(data == "", "%v: check input file path", eg.FILE_EMPTY)
-	failOnErrWhen(policy == "", "%v: check policy file path", eg.FILE_EMPTY)
+	failOnErrWhen(data == "", "%v: check input file path", n3err.FILE_EMPTY)
+	failOnErrWhen(policy == "", "%v: check policy file path", n3err.FILE_EMPTY)
 
 	ret := Execute(data, policy)
 	if output != "" {

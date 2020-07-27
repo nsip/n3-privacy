@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
 	"github.com/uber/jaeger-client-go/config"
@@ -15,7 +15,7 @@ import (
 
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
 	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	service := Cfg.Service
 
@@ -50,7 +50,7 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 
 // DO : fn ["HELP", ...]
 func DO(configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
 	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 
 	server := Cfg.Server
@@ -59,7 +59,7 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
-	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
+	if err := warnOnErrWhen(!ok, "%v: Need %v", n3err.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -70,10 +70,10 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	select {
 	case <-time.After(time.Duration(timeout) * time.Second):
-		return "", warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
+		return "", warnOnErr("%v: Didn't get response in %d(s)", n3err.NET_TIMEOUT, timeout)
 	case str := <-chStr:
 		err := <-chErr
-		if err == eg.NO_ERROR {
+		if err == n3err.NO_ERROR {
 			return str, nil
 		}
 		return str, err
@@ -109,7 +109,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "GetID":
 		if user == "" || ctx == "" || object == "" || rw == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] all are required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", user, ctx, object, rw)
@@ -119,7 +119,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "GetHash", "Get":
 		if id == "" {
-			Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [ID] is required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?id=%s", id)
@@ -129,10 +129,10 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Update":
 		if user == "" || ctx == "" || rw == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if Err = warnOnErrWhen(!isJSON(string(policy)), "%v: policy", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(policy)), "%v: policy", n3err.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)
@@ -142,7 +142,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Delete":
 		if id == "" {
-			Err = warnOnErr("%v: [ID] is required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [ID] is required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?id=%s", id)
@@ -157,10 +157,10 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "Enforce":
 		if user == "" || ctx == "" || rw == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", eg.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [RW] all are required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
-		if Err = warnOnErrWhen(!isJSON(string(data)), "%v: input data", eg.PARAM_INVALID_JSON); Err != nil {
+		if Err = warnOnErrWhen(!isJSON(string(data)), "%v: input data", n3err.PARAM_INVALID_JSON); Err != nil {
 			goto ERR_RET
 		}
 		url += fSf("?name=%s&user=%s&ctx=%s&rw=%s", object, user, ctx, rw)
@@ -188,12 +188,12 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 		}
 
 	default:
-		Err = eg.PARAM_NOT_SUPPORTED
+		Err = n3err.PARAM_NOT_SUPPORTED
 		goto ERR_RET
 	}
 
 	if Resp == nil {
-		Err = eg.NET_NO_RESPONSE
+		Err = n3err.NET_NO_RESPONSE
 		goto ERR_RET
 	}
 	defer Resp.Body.Close()
@@ -210,6 +210,6 @@ ERR_RET:
 	}
 
 	chStr <- string(RetData)
-	chErr <- eg.NO_ERROR
+	chErr <- n3err.NO_ERROR
 	return
 }

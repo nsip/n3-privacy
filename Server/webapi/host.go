@@ -9,7 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -131,7 +131,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 				fPln(rt, res)
 				return c.File(res)
 			}
-			return warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
+			return warnOnErr("%v: [%s]  get [%s]", n3err.FILE_NOT_FOUND, rt, res)
 		}
 	}
 

@@ -3,7 +3,7 @@ package db
 import (
 	"sort"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 )
 
 func genPolicyID(policy, name, user, ctx, rw string) (string, string) {
@@ -61,7 +61,7 @@ func cCodeByPID(pid string) string {
 
 func validate(policy string) (string, error) {
 	if !isJSON(policy) {
-		return "", eg.JSON_INVALID
+		return "", n3err.JSON_INVALID
 	}
 	return fmtJSON(policy, 2), nil
 }
