@@ -1,16 +1,17 @@
 package storage
 
 import (
-	"context"
-
 	"github.com/cdutwhu/n3-util/n3err"
+	"github.com/cdutwhu/n3-util/n3tracing"
 	db "github.com/nsip/n3-privacy/Server/storage/badger"
-	"github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go/config"
 )
 
 // DB :
 type DB interface {
+	//
+	n3tracing.ITrace
+
+	// DB functions
 	UpdatePolicy(policy, name, user, n3ctx, rw string) (string, string, error)
 	PolicyCount() int
 	PolicyID(user, n3ctx, rw, object string) string
@@ -27,46 +28,14 @@ type DB interface {
 	SetEncPwd(pwd string)
 }
 
-// DBTr :
-type DBTr interface {
-	DB
-	// Tracer
-	SetTracer(tracer opentracing.Tracer)
-	SetContext(ctx context.Context)
-	GetContext() context.Context
-}
-
 // NewDB :
-func NewDB(dbType string, tracing bool) interface{} {
-	var tracer opentracing.Tracer
-	if tracing {
-		initTracer := func(service string) opentracing.Tracer {
-			cfg, err := config.FromEnv()
-			failOnErr("%v: ", err)
-			cfg.ServiceName = service
-			cfg.Sampler.Type = "const"
-			cfg.Sampler.Param = 1
-			tracer, _, err := cfg.NewTracer()
-			failOnErr("%v: ", err)
-			return tracer
-		}
-		tracer = initTracer(dbType)
-	}
-
-	switch dbType {
-	case "badger", "BADGER":
-		if tracing {
-			n3db := db.NewDBByBadger().(DBTr)
-			n3db.SetEncPwd(dbType)
-			n3db.SetTracer(tracer)
-			return n3db
-		}
-		n3db := db.NewDBByBadger().(DB)
-		n3db.SetEncPwd(dbType)
-		return n3db
-
-	default:
-		failOnErr("%v: [%s]", n3err.PARAM_NOT_SUPPORTED, dbType)
-		return nil
-	}
+func NewDB(dbType string) DB {
+	failP1OnErrWhen(
+		!exist(sToUpper(dbType), "BADGER"),
+		"%v: [%s]", n3err.PARAM_NOT_SUPPORTED, dbType,
+	)
+	db := db.NewDBByBadger().(DB)
+	db.SetEncPwd(dbType)
+	db.SetTracer(n3tracing.InitTracer(dbType))
+	return db
 }

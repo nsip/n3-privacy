@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/cdutwhu/n3-util/n3tracing"
 	badger "github.com/dgraph-io/badger"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/opentracing/opentracing-go"
@@ -28,7 +29,7 @@ type badgerDB struct {
 func NewDBByBadger() interface{} {
 	db := &badgerDB{
 		MW: map[string]map[string][]interface{}{
-			"UseTracing": {
+			"DoTracing": {
 				"PolicyCount":    {"PolicyCount", "badgerDB", "PolicyCount", "$@"},
 				"PolicyID":       {"PolicyID", "badgerDB", "PolicyID", "$@"},
 				"PolicyIDs":      {"PolicyIDs", "badgerDB", "PolicyIDs", "$@"},
@@ -346,4 +347,26 @@ func (db *badgerDB) MapUC2lsObject(user, n3ctx string) map[string][]string {
 		key = n3ctx
 	}
 	return map[string][]string{key: db.listObject(user, n3ctx)}
+}
+
+// --------------------------------------------------------------- //
+
+func (db *badgerDB) SetTracer(tracer opentracing.Tracer) {
+	db.tracer = tracer
+}
+
+func (db *badgerDB) Tracer() opentracing.Tracer {
+	return db.tracer
+}
+
+func (db *badgerDB) SetContext(ctx context.Context) {
+	db.context = ctx
+}
+
+func (db *badgerDB) Context() context.Context {
+	return db.context
+}
+
+func (db *badgerDB) DoTracing(operName, spanValue, tagKey, tagValue string) {
+	n3tracing.DoTracing(db, operName, spanValue, tagKey, tagValue, "badgerEvent")
 }

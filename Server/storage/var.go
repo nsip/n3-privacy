@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/judge"
 )
 
 var (
@@ -26,6 +27,8 @@ var (
 	sToLower    = strings.ToLower
 	sToUpper    = strings.ToUpper
 
-	failOnErr     = fn.FailOnErr
-	failOnErrWhen = fn.FailOnErrWhen
+	failOnErr       = fn.FailOnErr
+	failOnErrWhen   = fn.FailOnErrWhen
+	failP1OnErrWhen = fn.FailP1OnErrWhen
+	exist           = judge.Exist
 )

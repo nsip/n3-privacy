@@ -11,13 +11,13 @@ const Config = "../config/config.toml"
 
 func TestAdapter(t *testing.T) {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
-	db := NewDB("badger", true)
+	db := NewDB("badger")
 	fPln(db)
 }
 
 func TestUpdatePolicy(t *testing.T) {
 	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
-	db := NewDB("badger", true).(DB)
+	db := NewDB("badger").(DB)
 	fPln(db)
 
 	// user := "qmiao"

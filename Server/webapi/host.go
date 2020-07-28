@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
@@ -16,6 +14,7 @@ import (
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/nsip/n3-privacy/Server/storage"
+	"github.com/sirupsen/logrus"
 )
 
 func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
@@ -64,20 +63,17 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		route    = Cfg.Route
 		file     = Cfg.File
 		database = Cfg.Storage.DB
-		tracing  = Cfg.Storage.Tracing
 		mMtx     = initMutex(&route)
-		db       = storage.NewDB(database, tracing).(storage.DBTr) // DBTr covers DB
+		db       = storage.NewDB(database)
 	)
 
 	// Tracing: Middleware for DB-tracing
-	if tracing {
-		e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				db.SetContext(c.Request().Context())
-				return next(c)
-			}
-		})
-	}
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			db.SetContext(c.Request().Context())
+			return next(c)
+		}
+	})
 
 	defer e.Start(fSf(":%d", port))
 
