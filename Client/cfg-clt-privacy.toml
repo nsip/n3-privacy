@@ -1,0 +1,24 @@
+Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/goclient/config.toml"
+Service = "n3-privacy"
+
+[Route]
+  LsUser = "/n3-privacy/v0.2.4/list/user"
+  Enforce = "/n3-privacy/v0.2.4/enforce"
+  GetHash = "/n3-privacy/v0.2.4/hash"
+  LsContext = "/n3-privacy/v0.2.4/list/context"
+  LsObject = "/n3-privacy/v0.2.4/list/object"
+  GetID = "/n3-privacy/v0.2.4/id"
+  Delete = "/n3-privacy/v0.2.4/delete"
+  Get = "/n3-privacy/v0.2.4/policy"
+  HELP = "/"
+  LsID = "/n3-privacy/v0.2.4/list/policyid"
+  Update = "/n3-privacy/v0.2.4/update"
+
+[Server]
+  Port = 1323
+  Protocol = "http"
+  IP = "192.168.31.168"
+
+[Access]
+  Timeout = 3
+

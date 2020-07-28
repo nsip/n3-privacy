@@ -1,0 +1,18 @@
+{
+    "glossary": {   
+        "title": "~~~~~~",     
+        "GlossDiv": {            
+            "GlossList": {
+                "GlossEntry": {
+                    "ID": "-----",
+                    "SortAs": "-----",
+                    "Acronym": "-----",
+                    "GlossDef": {
+                        "para": "-----"                        
+                    },
+                    "GlossSee": "*****"
+                }
+            }
+        }
+    }
+} 
