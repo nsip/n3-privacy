@@ -13,7 +13,6 @@ import (
 	enf "github.com/nsip/n3-privacy/Enforcer/process"
 	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/nsip/n3-privacy/Server/storage"
-	"github.com/sirupsen/logrus"
 )
 
 func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
@@ -27,11 +26,7 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 
 // HostHTTPAsync : Host a HTTP Server for providing policy json
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
-	defer func() {
-		msg := "HostHTTPAsync Exit"
-		logger(msg)
-		lrOut(logrus.Infof, msg) // --> LOGGLY
-	}()
+	defer func() { logBind(logger, loggly("info")).Do("HostHTTPAsync Exit") }()
 
 	e := echo.New()
 	defer e.Close()
@@ -74,6 +69,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	})
 
 	defer e.Start(fSf(":%d", port))
+	logBind(logger, loggly("info")).Do("Echo Service is Starting")
 
 	// *************************************** List all API, FILE *************************************** //
 

@@ -39,7 +39,8 @@ var (
 	mustInvokeWithMW = rflx.MustInvokeWithMW
 	toGeneralSlc     = rflx.ToGeneralSlc
 	prepare          = ext.Prepare
-	lrOut            = n3log.LrOut
+	loggly           = n3log.Loggly
+	logBind          = n3log.Bind
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {

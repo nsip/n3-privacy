@@ -1,7 +1,7 @@
 Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config/config.toml"
 Service = "n3-privacy"
-Version = "v0.2.7"
+Version = "v0.2.8"
 
 [Storage]
   DB = "badger"
@@ -14,22 +14,22 @@ Version = "v0.2.7"
   Port = 1323
 
 [Route]
-  Delete = "/[s]/[v]/delete"
+  LsUser = "/[s]/[v]/list/user"
+  LsID = "/[s]/[v]/list/policyid"
+  Update = "/[s]/[v]/update"
+  LsObject = "/[s]/[v]/list/object"
+  Get = "/[s]/[v]/policy"
   GetID = "/[s]/[v]/id"
   GetHash = "/[s]/[v]/hash"
-  HELP = "/"
-  LsObject = "/[s]/[v]/list/object"
-  Update = "/[s]/[v]/update"
-  LsID = "/[s]/[v]/list/policyid"
-  Enforce = "/[s]/[v]/enforce"
-  Get = "/[s]/[v]/policy"
   LsContext = "/[s]/[v]/list/context"
-  LsUser = "/[s]/[v]/list/user"
+  Enforce = "/[s]/[v]/enforce"
+  HELP = "/"
+  Delete = "/[s]/[v]/delete"
 
 [Server]
-  Port = "[port]"
   Protocol = "http"
   IP = "[IP]"
+  Port = "[port]"
 
 [Access]
   Timeout = 3
