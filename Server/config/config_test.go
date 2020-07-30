@@ -27,7 +27,6 @@ func TestGenCltCfg(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
-	n3cfg.RmFileAttrL1(temp, "../goclient/config.toml", flag.Args()...)
+	n3cfg.SelFileAttrL1(temp, "../goclient/config.toml", flag.Args()...)
 	os.Remove(temp)
-	fPln(flag.Args(), "were removed")
 }

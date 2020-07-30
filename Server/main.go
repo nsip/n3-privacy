@@ -16,9 +16,7 @@ func main() {
 	ws, service := Cfg.WebService, Cfg.Service
 
 	// --- LOGGLY --- //
-	enableLoggly(true)
-	setLogglyToken(Cfg.Loggly.Token)
-	lrInit()
+	setLoggly(true, Cfg.Loggly.Token, service)
 
 	enableLog2F(true, Cfg.Log)
 	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version)

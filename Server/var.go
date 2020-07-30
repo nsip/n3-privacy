@@ -14,16 +14,14 @@ var (
 	fPln = fmt.Println
 	fSf  = fmt.Sprintf
 
-	failOnErr      = fn.FailOnErr
-	failOnErrWhen  = fn.FailOnErrWhen
-	localIP        = net.LocalIP
-	enableLog2F    = fn.EnableLog2F
-	logWhen        = fn.LoggerWhen
-	logger         = fn.Logger
-	env2Struct     = rflx.Env2Struct
-	lrInit         = n3log.LrInit
-	loggly         = n3log.Loggly
-	logBind        = n3log.Bind
-	enableLoggly   = n3log.EnableLoggly
-	setLogglyToken = n3log.SetLogglyToken
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
+	localIP       = net.LocalIP
+	enableLog2F   = fn.EnableLog2F
+	logWhen       = fn.LoggerWhen
+	logger        = fn.Logger
+	env2Struct    = rflx.Env2Struct
+	loggly        = n3log.Loggly
+	logBind       = n3log.Bind
+	setLoggly     = n3log.SetLoggly
 )

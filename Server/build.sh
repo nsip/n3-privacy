@@ -12,7 +12,7 @@ rm -rf ./build/
 
 PROJECTPATH="github.com/nsip/n3-privacy/Server"
 go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenSvrCfgStruct
-go test -v -timeout 2s $PROJECTPATH/config -run TestGenCltCfg -args "Version" "Log" "WebService" "Storage" "File" "Loggly"
+go test -v -timeout 2s $PROJECTPATH/config -run TestGenCltCfg -args "Path" "Service" "Route" "Server" "Access"
 go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenCltCfgStruct
 
 go get
