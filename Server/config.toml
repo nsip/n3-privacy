@@ -1,0 +1,40 @@
+Log = "~/.[PRJ]/log/[DATE].log"
+Path = "[PATH]"
+Service = "[PRJ]"
+Version = "[VER]"
+
+[Storage]
+DB = "badger"
+DBPath = "~/.[PRJ]/db/[db]/"
+
+[Loggly]
+Token = "54290728-93e0-425a-a49c-c9e834288026"
+
+[WebService]
+Port = 1323
+
+[Route]
+Delete = "/[PRJ]/[VER]/delete"
+Enforce = "/[PRJ]/[VER]/enforce"
+Get = "/[PRJ]/[VER]/policy"
+GetHash = "/[PRJ]/[VER]/hash"
+GetID = "/[PRJ]/[VER]/id"
+HELP = "/"
+LsContext = "/[PRJ]/[VER]/list/context"
+LsID = "/[PRJ]/[VER]/list/policyid"
+LsObject = "/[PRJ]/[VER]/list/object"
+LsUser = "/[PRJ]/[VER]/list/user"
+Update = "/[PRJ]/[VER]/update"
+
+[File]
+EnforcerLinux64 = "./Enforcer/build/linux64/enforcer"
+EnforcerMac = "./Enforcer/build/mac/enforcer"
+EnforcerWin64 = "./Enforcer/build/win64/enforcer.exe"
+
+[Server]
+IP = "[IP]"
+Port = "[port]"
+Protocol = "http"
+
+[Access]
+Timeout = 3

@@ -7,31 +7,21 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
-	"github.com/uber/jaeger-client-go/config"
 )
 
 // DOwithTrace :
-func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
-	Cfg := env2Struct(envVarName, &Config{}).(*Config)
-	service := Cfg.Service
+func DOwithTrace(ctx context.Context, config, fn string, args *Args) (string, error) {
 
+	Cfg := n3cfg.ToEnvN3privacyGoclient(nil, envKey, config)
+	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
+
+	service := Cfg.Service
 	if ctx != nil {
 		if span := opentracing.SpanFromContext(ctx); span != nil {
-			initTracer := func(service string) opentracing.Tracer {
-				cfg, err := config.FromEnv()
-				failOnErr("%v: ", err)
-				cfg.ServiceName = service
-				cfg.Sampler.Type = "const"
-				cfg.Sampler.Param = 1
-				tracer, _, err := cfg.NewTracer()
-				failOnErr("%v: ", err)
-				return tracer
-			}
-
 			tracer := initTracer(service)
 			span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
 			defer span.Finish()
@@ -45,13 +35,14 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 			ctx = opentracing.ContextWithSpan(ctx, span)
 		}
 	}
-	return DO(configfile, fn, args)
+	return DO(config, fn, args)
 }
 
 // DO : fn ["HELP", ...]
-func DO(configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
-	Cfg := env2Struct(envVarName, &Config{}).(*Config)
+func DO(config, fn string, args *Args) (string, error) {
+
+	Cfg := n3cfg.ToEnvN3privacyGoclient(nil, envKey, config)
+	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
 
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
@@ -109,7 +100,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "GetID":
 		if user == "" || ctx == "" || object == "" || rw == "" {
-			Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] all are required", n3err.PARAM_INVALID)
+			Err = warnOnErr("%v: [User] [Ctx] [Object] [RW] are all required", n3err.PARAM_INVALID)
 			goto ERR_RET
 		}
 		url += fSf("?user=%s&ctx=%s&object=%s&rw=%s", user, ctx, object, rw)

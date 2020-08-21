@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3tracing"
 	badger "github.com/dgraph-io/badger"
-	cfg "github.com/nsip/n3-privacy/Server/config"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -74,7 +74,8 @@ func (db *badgerDB) loadIDList() int {
 
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	Cfg := n3cfg.FromEnvN3privacyServer(envKey)
+
 	path := Cfg.Storage.DBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {
 		os.MkdirAll(path, os.ModePerm)
@@ -124,7 +125,6 @@ func (db *badgerDB) UpdatePolicy(policy, name, user, n3ctx, rw string) (id, obj 
 			listID = append(listID, id)
 		}
 	}
-	// logMeta(policy, n3ctx, rw)
 	return id, obj, err
 }
 

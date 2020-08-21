@@ -14,24 +14,23 @@ import (
 )
 
 var (
-	fP          = fmt.Print
-	fPf         = fmt.Printf
-	fPln        = fmt.Println
-	fSf         = fmt.Sprintf
-	sSpl        = strings.Split
-	sJoin       = strings.Join
-	sCount      = strings.Count
-	sReplace    = strings.Replace
-	sReplaceAll = strings.ReplaceAll
-	sIndex      = strings.Index
-	sLastIndex  = strings.LastIndex
-	sTrim       = strings.Trim
-	sTrimLeft   = strings.TrimLeft
-	sHasPrefix  = strings.HasPrefix
-	sHasSuffix  = strings.HasSuffix
-	sToLower    = strings.ToLower
-	sToUpper    = strings.ToUpper
-
+	fP               = fmt.Print
+	fPf              = fmt.Printf
+	fPln             = fmt.Println
+	fSf              = fmt.Sprintf
+	sSpl             = strings.Split
+	sJoin            = strings.Join
+	sCount           = strings.Count
+	sReplace         = strings.Replace
+	sReplaceAll      = strings.ReplaceAll
+	sIndex           = strings.Index
+	sLastIndex       = strings.LastIndex
+	sTrim            = strings.Trim
+	sTrimLeft        = strings.TrimLeft
+	sHasPrefix       = strings.HasPrefix
+	sHasSuffix       = strings.HasSuffix
+	sToLower         = strings.ToLower
+	sToUpper         = strings.ToUpper
 	isJSON           = judge.IsJSON
 	exist            = judge.Exist
 	indent           = str.IndentTxt
@@ -49,14 +48,12 @@ var (
 	gslc             = rflx.ToGeneralSlc
 	toSet            = rflx.ToSet
 	env2Struct       = rflx.Env2Struct
-
-	fmtJSON      = n3json.Fmt
-	fmtJSONFile  = n3json.FmtFile
-	maybeJSONArr = n3json.MaybeArr
-	splitJSONArr = n3json.SplitArr
-	makeJSONArr  = n3json.MakeArr
-
-	newJKV = jkv.NewJKV
+	fmtJSON          = n3json.Fmt
+	fmtJSONFile      = n3json.FmtFile
+	maybeJSONArr     = n3json.MaybeArr
+	splitJSONArr     = n3json.SplitArr
+	makeJSONArr      = n3json.MakeArr
+	newJKV           = jkv.NewJKV
 )
 
 var (
@@ -72,6 +69,7 @@ var (
 )
 
 const (
+	envKey = "PRISvr"
 	linker = "#"
 )
 

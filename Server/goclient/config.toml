@@ -1,0 +1,23 @@
+Path = "/home/qmiao/Desktop/n3/n3-privacy/Server/config.toml"
+Service = "n3-privacy"
+
+[Route]
+  Enforce = "/n3-privacy/v0.2.9/enforce"
+  GetID = "/n3-privacy/v0.2.9/id"
+  HELP = "/"
+  LsObject = "/n3-privacy/v0.2.9/list/object"
+  LsUser = "/n3-privacy/v0.2.9/list/user"
+  Update = "/n3-privacy/v0.2.9/update"
+  Delete = "/n3-privacy/v0.2.9/delete"
+  Get = "/n3-privacy/v0.2.9/policy"
+  GetHash = "/n3-privacy/v0.2.9/hash"
+  LsContext = "/n3-privacy/v0.2.9/list/context"
+  LsID = "/n3-privacy/v0.2.9/list/policyid"
+
+[Server]
+  Protocol = "http"
+  IP = "192.168.31.168"
+  Port = 1323
+
+[Access]
+  Timeout = 3

@@ -7,14 +7,28 @@ import (
 
 func TestDO(t *testing.T) {
 
-	// str, err := DOwithTrace(
-	// 	nil,
-	// 	"./config.toml",
-	// 	"HELP",
-	// 	nil,
-	// )
-	// fPln(str)
-	// fPln(err)
+	str, err := DOwithTrace(
+		nil,
+		"./config.toml",
+		"HELP",
+		nil,
+	)
+	fPln(str)
+	fPln(err)
+
+	str, err = DOwithTrace(
+		nil,
+		"./config.toml",
+		"GetID", // HELP GetID GetHash Get Update Delete Enforce LsID LsContext LsUser LsObject
+		&Args{
+			User:   "user",
+			Ctx:    "ctx",
+			RW:     "r",
+			Object: "object",
+		},
+	)
+	fPln(str)
+	fPln(err)
 
 	policy, err := ioutil.ReadFile("./data/policy.json")
 	failOnErr("%v", err)
@@ -22,7 +36,7 @@ func TestDO(t *testing.T) {
 	data, err := ioutil.ReadFile("./data/file.json")
 	failOnErr("%v", err)
 
-	str, err := DOwithTrace(
+	str, err = DOwithTrace(
 		nil,
 		"./config.toml",
 		"Update", // HELP GetID GetHash Get Update Delete Enforce LsID LsContext LsUser LsObject

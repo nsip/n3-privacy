@@ -1,7 +1,7 @@
 FROM alpine
-RUN mkdir n3-privacy
-COPY ./n3-privacy /n3-privacy
-WORKDIR /n3-privacy/Server/build/linux64
+RUN mkdir /n3-privacy
+COPY . / /n3-privacy/
+WORKDIR /n3-privacy/
 CMD ["./server"]
 
 # FROM scratch
@@ -11,8 +11,9 @@ CMD ["./server"]
 
 ### docker build --tag=n3-privacy .
 
-### docker tag IMAGE_ID cdutwhu/n3-privacy:latest
-### docker login
-### docker push cdutwhu/n3-privacy
+### ! run this docker image
+### docker run --name privacy --net host n3-privacy:latest
 
-### find ./ -type d -not -path "*/\.*"
+### docker tag IMAGE_ID dockerhub-user/n3-privacy:latest
+### docker login
+### docker push dockerhub-user/n3-privacy

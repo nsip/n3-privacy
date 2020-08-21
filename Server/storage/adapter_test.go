@@ -3,48 +3,24 @@ package storage
 import (
 	"testing"
 
-	"github.com/cdutwhu/n3-util/n3err"
-	cfg "github.com/nsip/n3-privacy/Server/config"
+	"github.com/cdutwhu/n3-util/n3cfg"
 )
 
-const Config = "../config/config.toml"
+const Config = "../config.toml"
 
 func TestAdapter(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
+	n3cfg.ToEnvN3privacyServer(nil, envKey, Config)
 	db := NewDB("badger")
 	fPln(db)
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg", Config), "%v: Config Init Error", n3err.CFG_INIT_ERR)
+	n3cfg.ToEnvN3privacyServer(nil, envKey, Config)
 	db := NewDB("badger").(DB)
 	fPln(db)
 
-	// user := "qmiao"
-	// ctx := "ctx123"
-	// policy := `{
-	// 	"Test": {
-	// 		"F1": "-----",
-	// 		"F2": "*****",
-	// 		"F3": "~~~~~",
-	// 		"F4": "     "
-	// 	}
-	// }`
-	// policy = pp.FmtJSONStr(policy)
-	// db.UpdatePolicy(policy, user, ctx, "r")
-	// fPln(db.PolicyCount())
-
-	fPln(db.MapRW2lsPID("user", "n3ctx"))
-	fPln(db.MapCtx2lsUser("n3ctx", "def"))
-	fPln(db.MapUser2lsCtx())
-	fPln(db.MapUC2lsObject("user", "n3ctx"))
-
-	// if id := db.PolicyID(user, ctx, "w", "Test"); len(id) > 0 {
-	// 	fPln(id)
-	// }
-	// for _, id := range db.PolicyIDs(user, ctx, "w", "Test") {
-	// 	fPln(id)
-	// 	policy, _ := db.Policy(id)
-	// 	fPln(policy)
-	// }
+	fPln(db.MapRW2lsPID("foo", "bar"))
+	fPln(db.MapCtx2lsUser("bar"))
+	fPln(db.MapUser2lsCtx("foo"))
+	fPln(db.MapUC2lsObject("foo", "bar"))
 }

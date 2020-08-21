@@ -2,10 +2,17 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	p "github.com/nsip/n3-privacy/Enforcer/process"
+)
+
+var (
+	fPf        = fmt.Printf
+	sHasSuffix = strings.HasSuffix
 )
 
 func main() {
