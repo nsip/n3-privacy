@@ -1,4 +1,4 @@
-# Web-Service & CLI & JSON enforcement tool
+# Web-Service & JSON Enforcement tool
 
 ## Policy File Restriction
 
@@ -6,40 +6,46 @@
 
 2. BlockList Rule.
 
-3. DO NOT use "[]", "(B)", "(N)" as mask symbol for policy file attribute value.
+3. DO NOT use "[]", "(B)", "(N)" as mask symbol for policy attribute value.
 
 ## Getting Started
 
-0. If no go.mod, Run `go mod init github.com/nsip/n3-privacy`
+0. Make sure golang dev package is available in your machine.
 
-1. If no go.sum, Run `go get -u ./...`
+1. Run `go get -u ./...` to update this project's dependencies.
 
-2. One-Step. Run `build.sh`, automatically generate all executables.
+   Ignore any `undefined: n3cfg.***` errors.
 
-   [enforcer] in ./Enforcer/build/your-os/
-  
-   [server] in ./Server/build/your-os/
-  
-   [client] in ./Client/build/your-os/
+2. Build.
 
-   IMPORTANT: If manually build each sub-project, building Server must be prior to building Client.
+   In 'build.sh', change 'password' in line "sudopwd='password'" to your real sudo/admin password & save.
 
-## How To Use
+   Run `build.sh`.
 
-1. Browse "http(s)://ServerIP:Port/" to get info when Server is running.
+3. Release.
 
-2. Enforcer & Client executable should be fetched by `wget`.
-  
-   e.g. `wget IP:Port/enforcer-linux64` to get Enforcer executable on Linux64.
+   Run `release.sh 'dest-platform' 'dest-path'`.
 
-   `wget -O config.toml IP:Port/enforcer-config` to get its configure.
+   e.g. run `./release.sh [linux64|win64|mac] ~/Desktop/privacy/linux64/`
 
-   e.g. `wget IP:Port/client-linux64` to get Client executable on Linux64.
+4. Docker Deploy (local, only for linux64 platform server).
 
-   `wget -O config.toml IP:Port/client-config` to get its configure.
+   Make sure `Docker` installed.
 
-3. For `/clean.sh`, if `rmdb` provided as first argument, policy-database would be removed !!
+   Jump into your release dest-path in above step.
 
-## Docker Test
+   e.g. jump into `~/Desktop/privacy/linux64/`
 
-1. docker run --net="host" --name=privacy n3-privacy:latest
+   Run `docker build --tag n3-privacy .` to make docker image.
+
+   Run `docker run --name privacy --net host n3-privacy:latest` to run docker image.
+
+5. Test.
+
+   Make sure `curl` installed.
+
+   Simple curl test scripts in test.sh.
+
+   Before running `./test.sh`, modify some params like URL (IP, PORT ...) if needed.
+
+   OR write your own curl test like 'test.sh'.

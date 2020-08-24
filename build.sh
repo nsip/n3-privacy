@@ -14,7 +14,7 @@ ORIGINALPATH=`pwd`
 WORKPATH="./Preprocess"
 
 # sudo password
-sudopwd="cppcli"
+sudopwd="password"
 
 # generate config.go for [Server]
 echo $sudopwd | sudo -S env "PATH=$PATH" go test -v -timeout 1s -count=1 $WORKPATH/CfgReg -run TestRegCfg -args `whoami` "server"

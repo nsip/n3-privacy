@@ -10,7 +10,7 @@ W=`tput sgr0`
 printf "\n"
 
 ip="192.168.31.168:1323/"
-base=$ip"n3-privacy/v0.2.9/"
+base=$ip"n3-privacy/v0.3.0/"
 
 title="PRIVACY all API Paths"
 url=$ip

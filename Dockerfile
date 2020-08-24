@@ -1,13 +1,13 @@
+# FROM scratch
+# ADD ./Server/build/linux64/server /
+# ADD ./Server/build/linux64/config.toml /
+# CMD ["./server"]
+
 FROM alpine
 RUN mkdir /n3-privacy
 COPY . / /n3-privacy/
 WORKDIR /n3-privacy/
 CMD ["./server"]
-
-# FROM scratch
-# ADD ./Server/build/linux64/server /
-# ADD ./Server/build/linux64/config.toml /
-# CMD ["./server"]
 
 ### docker build --tag=n3-privacy .
 
