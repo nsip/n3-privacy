@@ -10,13 +10,14 @@ W=`tput sgr0`
 printf "\n"
 
 ip="192.168.31.168:1323/"
-base=$ip"n3-privacy/v0.3.0/"
+base=$ip"n3-privacy/v0.3.1/"
 
 title="PRIVACY all API Paths"
 url=$ip
 scode=`curl --write-out "%{http_code}" --silent --output /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -25,12 +26,39 @@ printf "\n"
 
 #######################################################################
 
+title="Fetch Enforcer (Linux64)"
+url=$base"enforcer/linux64"
+echo "${G}${title}${W}"
+out=enforcer-linux64
+wget $url -O $out
+chmod 777 $out
+printf "\n"
+
+title="Fetch Enforcer (Mac)"
+url=$base"enforcer/mac"
+echo "${G}${title}${W}"
+out=enforcer-mac
+wget $url -O $out
+chmod 777 $out
+printf "\n"
+
+title="Fetch Enforcer (Win64)"
+url=$base"enforcer/win64"
+echo "${G}${title}${W}"
+out=enforcer-win64.exe
+wget $url -O $out
+chmod 777 $out
+printf "\n"
+
+#######################################################################
+
 title="Update Policy"
 url=$base"update?user=foo&ctx=bar&rw=rw"
-file="@./Server/goclient/data/policy.json"
+file="@./Server/client/data/policy.json"
 scode=`curl -X POST $url -d $file -w "%{http_code}" -s -o /dev/null`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -39,10 +67,11 @@ printf "\n"
 
 title="Update Policy"
 url=$base"update?user=foo1&ctx=bar1&rw=rw"
-file="@./Server/goclient/data/policy.json"
+file="@./Server/client/data/policy.json"
 scode=`curl -X POST $url -d $file -w "%{http_code}" -s -o /dev/null`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -56,6 +85,7 @@ url=$base"id?user=foo&ctx=bar&object=object&rw=r"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -69,6 +99,7 @@ url=$base"hash?id=1615307cc4bf38ffcad90beec7b5ea62cdb7020fr"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -82,6 +113,7 @@ url=$base"policy?id=1615307cc4bf38ffcad90beec7b5ea62cdb7020fr"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -95,6 +127,7 @@ url=$base"list/policyid" # url=$base"list/policyid?user=foo&ctx=bar"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -108,6 +141,7 @@ url=$base"list/user" # url=$base"list/user?ctx=ctx"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -121,6 +155,7 @@ url=$base"list/context" # url=$base"list/context?user=foo"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -134,6 +169,7 @@ url=$base"list/object" # url=$base"list/object?user=foo&ctx=bar"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -144,10 +180,11 @@ printf "\n"
 
 title="Enforce"
 url=$base"enforce?user=foo&ctx=bar&rw=r"
-file="@./Server/goclient/data/file.json"
+file="@./Server/client/data/file.json"
 scode=`curl -X POST $url -d $file -w "%{http_code}" -s -o /dev/null`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -161,6 +198,7 @@ url=$base"delete?id=1615307cc4bf38ffcad90beec7b5ea62cdb7020fr"
 scode=`curl -X DELETE -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
@@ -174,8 +212,11 @@ url=$base"list/policyid" # url=$base"list/policyid?user=foo&ctx=bar"
 scode=`curl -w "%{http_code}" -s -o /dev/null $url`
 if [ $scode -ne 200 ]; then
     echo "${Y}${title}${W}"
+    exit -1
 else
     echo "${G}${title}${W}"
 fi
 curl $url
 printf "\n"
+
+echo "${G}All Done${W}"

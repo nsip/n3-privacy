@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
@@ -15,9 +14,9 @@ import (
 
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, config, fn string, args *Args) (string, error) {
-
-	Cfg := n3cfg.ToEnvN3privacyGoclient(nil, envKey, config)
-	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
+	pCfg := NewCfg("Config", nil)
+	failOnErrWhen(pCfg == nil, "%v", n3err.CFG_INIT_ERR)
+	Cfg := pCfg.(*Config)
 
 	service := Cfg.Service
 	if ctx != nil {
@@ -38,11 +37,11 @@ func DOwithTrace(ctx context.Context, config, fn string, args *Args) (string, er
 	return DO(config, fn, args)
 }
 
-// DO : fn ["HELP", ...]
+// DO : fn ["Help", ...]
 func DO(config, fn string, args *Args) (string, error) {
-
-	Cfg := n3cfg.ToEnvN3privacyGoclient(nil, envKey, config)
-	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
+	pCfg := NewCfg("Config", nil)
+	failOnErrWhen(pCfg == nil, "%v", n3err.CFG_INIT_ERR)
+	Cfg := pCfg.(*Config)
 
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
@@ -93,7 +92,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 	}
 
 	switch fn {
-	case "HELP":
+	case "Help":
 		if Resp, Err = http.Get(url); Err != nil {
 			goto ERR_RET
 		}

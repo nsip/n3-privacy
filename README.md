@@ -10,11 +10,7 @@
 
 ## Getting Started
 
-0. Make sure golang dev package is available in your machine.
-
-1. Run `go get -u ./...` to update this project's dependencies.
-
-   Ignore any `undefined: n3cfg.***` errors.
+1. Make sure golang dev package is available in your machine.
 
 2. Build.
 

@@ -1,0 +1,25 @@
+Service = "n3-privacy"
+
+[Route]
+  FetchEnfWin = "/n3-privacy/v0.3.1/enforcer/win64"
+  Delete = "/n3-privacy/v0.3.1/delete"
+  Enforce = "/n3-privacy/v0.3.1/enforce"
+  LsContext = "/n3-privacy/v0.3.1/list/context"
+  LsObject = "/n3-privacy/v0.3.1/list/object"
+  Get = "/n3-privacy/v0.3.1/policy"
+  GetHash = "/n3-privacy/v0.3.1/hash"
+  LsID = "/n3-privacy/v0.3.1/list/policyid"
+  LsUser = "/n3-privacy/v0.3.1/list/user"
+  GetID = "/n3-privacy/v0.3.1/id"
+  Update = "/n3-privacy/v0.3.1/update"
+  FetchEnfMac = "/n3-privacy/v0.3.1/enforcer/mac"
+  Help = "/"
+  FetchEnfLinux = "/n3-privacy/v0.3.1/enforcer/linux64"
+
+[Server]
+  IP = "192.168.31.168"
+  Port = 1323
+  Protocol = "http"
+
+[Access]
+  Timeout = 3

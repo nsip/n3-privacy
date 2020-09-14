@@ -31,7 +31,3 @@ var (
 	failP1OnErrWhen = fn.FailP1OnErrWhen
 	exist           = judge.Exist
 )
-
-const (
-	envKey = "PRISvr"
-)

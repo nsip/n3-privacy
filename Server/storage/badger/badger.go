@@ -4,9 +4,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/cdutwhu/n3-util/n3cfg"
+	"github.com/cdutwhu/gotil/rflx"
 	"github.com/cdutwhu/n3-util/n3tracing"
 	badger "github.com/dgraph-io/badger"
+	"github.com/nsip/n3-privacy/Config/cfg"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -74,7 +75,7 @@ func (db *badgerDB) loadIDList() int {
 
 // init : already invoked by New...(), DO NOT call it manually
 func (db *badgerDB) init() *badgerDB {
-	Cfg := n3cfg.FromEnvN3privacyServer(envKey)
+	Cfg := rflx.Env2Struct("Config", &cfg.Config{}).(*cfg.Config)
 
 	path := Cfg.Storage.DBPath
 	if _, db.err = os.Stat(path); os.IsNotExist(db.err) {

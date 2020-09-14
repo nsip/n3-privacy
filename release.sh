@@ -1,7 +1,6 @@
 #!/bin/bash
-
 set -e
-
+ 
 R=`tput setaf 1`
 G=`tput setaf 2`
 Y=`tput setaf 3`
@@ -26,7 +25,7 @@ fi
 mkdir -p $dir
 mkdir -p $dir"Enforcer"
 
-cp ./Server/build/$os/* ./Dockerfile $dir 
+cp ./Server/build/$os/* $dir 
 cp -r ./Enforcer/build/ $dir"Enforcer"
 
 echo "Server Package $os Version is Dumped into $dir"

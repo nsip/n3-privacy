@@ -1,5 +1,4 @@
 Log = "~/.[PRJ]/log/[DATE].log"
-Path = "[PATH]"
 Service = "[PRJ]"
 Version = "[VER]"
 
@@ -19,13 +18,16 @@ Enforce = "/[PRJ]/[VER]/enforce"
 Get = "/[PRJ]/[VER]/policy"
 GetHash = "/[PRJ]/[VER]/hash"
 GetID = "/[PRJ]/[VER]/id"
-HELP = "/"
+Help = "/"
 LsContext = "/[PRJ]/[VER]/list/context"
 LsID = "/[PRJ]/[VER]/list/policyid"
 LsObject = "/[PRJ]/[VER]/list/object"
 LsUser = "/[PRJ]/[VER]/list/user"
 Update = "/[PRJ]/[VER]/update"
-
+FetchEnfLinux = "/[PRJ]/[VER]/enforcer/linux64"
+FetchEnfMac = "/[PRJ]/[VER]/enforcer/mac"
+FetchEnfWin = "/[PRJ]/[VER]/enforcer/win64"
+ 
 [File]
 EnforcerLinux64 = "./Enforcer/build/linux64/enforcer"
 EnforcerMac = "./Enforcer/build/mac/enforcer"

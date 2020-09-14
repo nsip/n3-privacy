@@ -46,10 +46,6 @@ var (
 	jsonRoot         = n3json.JSONRoot
 )
 
-const (
-	envKey = "PRISvr"
-)
-
 var (
 	logGrp  = logBind(logger) // logBind(logger, loggly("info"))
 	warnGrp = logBind(warner) // logBind(warner, loggly("warn"))

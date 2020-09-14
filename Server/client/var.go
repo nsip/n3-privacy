@@ -34,10 +34,6 @@ var (
 	env2Struct    = rflx.Env2Struct
 )
 
-const (
-	envKey = "PRIGoClt"
-)
-
 // Args is arguments for "Route"
 type Args struct {
 	ID     string

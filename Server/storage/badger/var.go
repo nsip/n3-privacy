@@ -69,7 +69,6 @@ var (
 )
 
 const (
-	envKey = "PRISvr"
 	linker = "#"
 )
 

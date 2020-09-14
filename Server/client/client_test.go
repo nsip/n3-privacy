@@ -6,7 +6,6 @@ import (
 )
 
 func TestDO(t *testing.T) {
-
 	str, err := DOwithTrace(
 		nil,
 		"./config.toml",
