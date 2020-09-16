@@ -1,4 +1,4 @@
-package goclient
+package client
 
 import "github.com/cdutwhu/n3-util/n3cfg"
 
@@ -6,20 +6,20 @@ import "github.com/cdutwhu/n3-util/n3cfg"
 type Config struct {
 	Service string
 	Route struct {
-		FetchEnfMac string
 		LsContext string
-		GetID string
-		Help string
-		Delete string
 		Get string
-		LsID string
+		Update string
+		FetchEnfWin string
+		Enforce string
 		FetchEnfLinux string
 		LsObject string
 		LsUser string
-		FetchEnfWin string
-		Update string
-		Enforce string
+		Delete string
+		GetID string
 		GetHash string
+		Help string
+		FetchEnfMac string
+		LsID string
 	}
 	Server struct {
 		IP string

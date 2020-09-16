@@ -29,12 +29,13 @@ func mkCfg4Clt(cfg interface{}) {
 	os.Remove(outoml)
 	os.Remove(outsrc)
 	attrim.SelCfgAttrL1(forel, outoml, "Service", "Route", "Server", "Access")
-	strugen.GenStruct(outoml, "Config", "goclient", outsrc)
+	strugen.GenStruct(outoml, "Config", "client", outsrc)
 	strugen.GenNewCfg(outsrc)
 }
 
 func main() {
 	// Load global config.toml file from Config/
+	n3cfg.SetDftCfgVal("n3-privacy", "0.0.0")
 	pCfg := cfg.NewCfg(
 		"Config",
 		map[string]string{
