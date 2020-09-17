@@ -18,25 +18,25 @@ type Config struct {
 		Port int
 	}
 	Route struct {
-		LsID string
 		LsObject string
-		Update string
-		FetchEnfWin string
-		Enforce string
-		GetHash string
 		Help string
 		LsContext string
-		LsUser string
-		FetchEnfLinux string
-		FetchEnfMac string
+		Update string
 		Delete string
-		Get string
+		GetHash string
 		GetID string
+		LsUser string
+		FetchEnfMac string
+		Enforce string
+		Get string
+		LsID string
+		FetchEnfLinux string
+		FetchEnfWin string
 	}
 	File struct {
+		EnforcerLinux64 string
 		EnforcerMac string
 		EnforcerWin64 string
-		EnforcerLinux64 string
 	}
 	Server struct {
 		IP interface{}

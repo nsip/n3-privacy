@@ -56,7 +56,9 @@ func main() {
 		return
 	}
 
-	ws, logfile, service := Cfg.WebService, Cfg.Log, Cfg.Service.(string)
+	ws, logfile := Cfg.WebService, Cfg.Log
+	var IService interface{} = Cfg.Service // Cfg.Service can be "string", can be "interface{}"
+	service := IService.(string)
 
 	// Set Jaeger Env for tracing
 	os.Setenv("JAEGER_SERVICE_NAME", service)

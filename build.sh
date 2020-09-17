@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -f ./go.sum
 go get -u ./...
 
 R=`tput setaf 1`

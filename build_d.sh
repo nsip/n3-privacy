@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -f ./go.sum
 go get -u ./...
 
 oripath=`pwd`

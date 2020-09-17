@@ -6,20 +6,20 @@ import "github.com/cdutwhu/n3-util/n3cfg"
 type Config struct {
 	Service string
 	Route struct {
-		LsContext string
-		Get string
-		Update string
-		FetchEnfWin string
-		Enforce string
-		FetchEnfLinux string
-		LsObject string
-		LsUser string
-		Delete string
-		GetID string
 		GetHash string
-		Help string
+		LsContext string
+		LsUser string
 		FetchEnfMac string
+		Get string
 		LsID string
+		FetchEnfLinux string
+		Delete string
+		Help string
+		GetID string
+		LsObject string
+		Enforce string
+		FetchEnfWin string
+		Update string
 	}
 	Server struct {
 		IP string
